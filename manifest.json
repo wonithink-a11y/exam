@@ -1,0 +1,26 @@
+{
+  "name": "중1 2학기 문제은행",
+  "short_name": "문제은행",
+  "description": "중1 2학기 수학·영어·과학·사회 연습·모의고사·오답노트",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#18202e",
+  "theme_color": "#18202e",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
