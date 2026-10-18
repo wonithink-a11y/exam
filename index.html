@@ -96,7 +96,9 @@ math{font-size:1.08em}
 .scope summary small{color:var(--muted);font-weight:400}
 .units{display:grid;gap:10px;margin-top:12px}
 .unit{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start}
-.uh{border:0;background:none;padding:4px 0;font-weight:600;font-size:14px;display:flex;gap:6px;align-items:baseline;text-align:left;width:11em}
+.uh{border:0;background:none;padding:4px 0;font-weight:600;font-size:14px;display:flex;gap:6px;align-items:center;text-align:left;width:12em;cursor:pointer;color:var(--ink)}
+.uh .ck{flex:none;width:18px;height:18px;border:1.6px solid var(--ac);border-radius:5px;display:inline-grid;place-items:center;font-size:12px;line-height:1;color:var(--on)}
+.uh[data-st="all"] .ck{background:var(--ac)}.uh[data-st="part"] .ck{background:var(--ac-s);color:var(--ac)}.uh:hover .ck{box-shadow:0 0 0 3px var(--ac-s)}
 .rn{font:600 12px var(--f-num);color:var(--ac);flex:none}
 .subs{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
 .chip{border:1px solid var(--rule);background:var(--chip);border-radius:999px;padding:4px 12px;font-size:13px}
@@ -366,7 +368,7 @@ function figCone(rl,side,isSlant){return svg(300,190,`<path class="ln" d="M150 2
 function figSph(rl){return svg(300,190,`<circle class="ln" cx="150" cy="95" r="75"/><path class="ln" d="M75 95A75 18 0 0 0 225 95M150 95H225"/><path class="ln dash" d="M75 95A75 18 0 0 1 225 95"/><circle class="dot" cx="150" cy="95" r="2.4"/>${txt(rl,188,88,'middle')}`)}
 
 /* ===== 과목 데이터 ===== */
-const SUBJ={};const SEMS={'1-2':SUBJ,'2-1':{}};const SEMNAME={'1-2':['중1','2학기','2026학년도 2학기 · 기말고사 대비'],'2-1':['중2','1학기','2027학년도 1학기 · 중간·기말고사 대비']};let _T=[];const add=o=>_T.push(o);
+const SUBJ={};const SEMS={'1-2':SUBJ,'2-1':{},'2-2':{}};const SEMNAME={'1-2':['중1','2학기','2026학년도 2학기 · 기말고사 대비'],'2-1':['중2','1학기','2027학년도 1학기 · 중간·기말고사 대비'],'2-2':['중2','2학기','2027학년도 2학기 · 중간·기말고사 대비']};let _T=[];const add=o=>_T.push(o);
 /* ===== 수학 (동아 수학 1 · 2학기) ===== */
 _T=[];
 /* Ⅰ-1 점·선·면·각 */
@@ -2120,6 +2122,753 @@ SEMS['2-1'].sci={name:'과학',book:'미래엔 과학 2 · 1학기 (2022 개정)
   {id:'Q4',tag:'Ⅳ',name:'물질의 구성',subs:[['P4','원소·원자·분자·이온']]}],
  presets:[['1학기 전체',null],['중간 (Ⅰ~Ⅱ)',['P1','P2']],['기말 (Ⅲ~Ⅳ)',['P3','P4']]]};
 
+/* ===== 중2-2 수학 (동아 수학 2 · 2022 개정, 자체 제작 문항, 그림형 중심) ===== */
+_T=[];
+const N_MS=v=>String(v).replace(/^-/,'−');
+const N_g=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+function N_fr(n,d){const g=N_g(n,d)||1;n/=g;d/=g;if(d<0){n=-n;d=-d}return d===1?N_MS(n):fr(n,d)}   // 기약분수 HTML
+const N_deg=v=>v+'°',N_cm=v=>v+' cm',N_cm2=v=>v+' cm²',N_cnt=v=>v+'가지';
+const N_J=s=>{const c=String(s).replace(/<[^>]+>/g,'').trim().slice(-1);if(/\d/.test(c))return [0,1,3,6,7,8].includes(+c)?'이':'가';const k=c.charCodeAt(0)-44032;return k>=0&&k<11172&&k%28?'이':'가'};
+/* --- 그림 도구 --- */
+const N_ln=(pts,close,cls)=>`<path class="${cls||'ln'}" d="M${pts.map(p=>f1(p[0])+' '+f1(p[1])).join('L')}${close?'Z':''}"/>`;
+const N_sh=pts=>`<path class="sh" d="M${pts.map(p=>f1(p[0])+' '+f1(p[1])).join('L')}Z"/>`;
+function N_v(name,P,C,d){d=d||14;const dx=P[0]-C[0],dy=P[1]-C[1],L=Math.hypot(dx,dy)||1;return txt(name,f1(P[0]+dx/L*d),f1(P[1]+dy/L*d+5),'middle','v')}
+function N_ang(P,Q1,Q2,lab,r){r=r||18;let a1=angOf(P,Q1),a2=angOf(P,Q2);let d=(a2-a1+360)%360;if(d>180){[a1,a2]=[a2,a1];d=360-d}const t=x=>x*Math.PI/180;
+ const s=[P[0]+r*Math.cos(t(a1)),P[1]-r*Math.sin(t(a1))],e=[P[0]+r*Math.cos(t(a1+d)),P[1]-r*Math.sin(t(a1+d))],m=a1+d/2,lr=r+(d<35?18:12);
+ return `<path class="arc" d="M${f1(s[0])} ${f1(s[1])}A${r} ${r} 0 0 0 ${f1(e[0])} ${f1(e[1])}"/>`+(lab?txt(lab,f1(P[0]+lr*Math.cos(t(m))),f1(P[1]-lr*Math.sin(t(m))+5),'middle'):'')}
+function N_rt(P,Q1,Q2,s){s=s||9;const u=(Q)=>{const dx=Q[0]-P[0],dy=Q[1]-P[1],L=Math.hypot(dx,dy);return[dx/L*s,dy/L*s]};const a=u(Q1),b=u(Q2);
+ return `<path class="ln" style="stroke-width:1.1" d="M${f1(P[0]+a[0])} ${f1(P[1]+a[1])}L${f1(P[0]+a[0]+b[0])} ${f1(P[1]+a[1]+b[1])}L${f1(P[0]+b[0])} ${f1(P[1]+b[1])}"/>`}
+function N_tk(A,B,n){n=n||1;const mx=(A[0]+B[0])/2,my=(A[1]+B[1])/2,dx=B[0]-A[0],dy=B[1]-A[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,px=-uy*5,py=ux*5;let s='';
+ for(let i=0;i<n;i++){const o=(i-(n-1)/2)*4;s+=`M${f1(mx+ux*o-px)} ${f1(my+uy*o-py)}L${f1(mx+ux*o+px)} ${f1(my+uy*o+py)}`}return `<path class="arc" d="${s}"/>`}
+function N_lab(A,B,lab,C,d){d=d||13;const mx=(A[0]+B[0])/2,my=(A[1]+B[1])/2;let nx=-(B[1]-A[1]),ny=B[0]-A[0];const L=Math.hypot(nx,ny);nx/=L;ny/=L;
+ if(C&&((mx-C[0])*nx+(my-C[1])*ny)<0){nx=-nx;ny=-ny}return txt(lab,f1(mx+nx*d),f1(my+ny*d+5),'middle')}
+const N_pt=P=>`<circle class="dot" cx="${f1(P[0])}" cy="${f1(P[1])}" r="2.6"/>`;
+const N_mid=(A,B)=>[(A[0]+B[0])/2,(A[1]+B[1])/2],N_at=(A,B,t)=>[A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t],N_cen=(...P)=>[P.reduce((a,p)=>a+p[0],0)/P.length,P.reduce((a,p)=>a+p[1],0)/P.length];
+function N_foot(P,A,B){const dx=B[0]-A[0],dy=B[1]-A[1],t=((P[0]-A[0])*dx+(P[1]-A[1])*dy)/(dx*dx+dy*dy);return[A[0]+dx*t,A[1]+dy*t]}
+function N_inter(A,B,C,D){const a1=B[1]-A[1],b1=A[0]-B[0],c1=a1*A[0]+b1*A[1],a2=D[1]-C[1],b2=C[0]-D[0],c2=a2*C[0]+b2*C[1],det=a1*b2-a2*b1;return[(b2*c1-b1*c2)/det,(a1*c2-a2*c1)/det]}
+/* 각도로 삼각형 좌표 만들기: 밑변 B(왼쪽)–C(오른쪽), ∠B=b, ∠C=c */
+function N_tri(b,c,W,x0,y0){W=W||220;x0=x0||40;y0=y0||175;const t=x=>x*Math.PI/180,B=[x0,y0],C=[x0+W,y0];const tb=Math.tan(t(b)),tc=Math.tan(t(c));const x=W*tc/(tb+tc);let A=[x0+x,y0-x*tb];
+ if(A[1]<18){const k=(y0-18)/(y0-A[1]);return N_tri(b,c,W*k,x0+(W-W*k)/2,y0)}return{A,B,C}}
+
+/* ===== Ⅰ-1 이등변삼각형과 직각삼각형의 합동 ===== */
+add({id:'n22-iso1',u:'N1',name:'이등변삼각형의 밑각',lv:1,g:R=>{const top=R.pick([30,36,40,44,50,52,56,60,64,70,76,80,88,96,100,104,110,120]),bse=(180-top)/2;const k=R.pick(['base','top']);
+ const {A,B,C}=N_tri(bse,bse),G=N_cen(A,B,C);const ask=k==='base'?bse:top;
+ const fig=svg(300,195,N_ln([A,B,C],true)+N_tk(A,B)+N_tk(A,C)+(k==='base'?N_ang(A,B,C,top+'°',20)+N_ang(B,C,A,'x',22):N_ang(C,A,B,bse+'°',22)+N_ang(A,B,C,'x',20))+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G));
+ return{q:`그림과 같이 <span class="sg">AB</span> = <span class="sg">AC</span>인 이등변삼각형 ABC에서 ∠x의 크기는?`,fig,alt:k==='base'?`꼭지각 ${top}°`:`밑각 ${bse}°`,
+ ...mc(R,ask,[180-top,top/2,90-top/2+10,ask+10,ask-10,bse*2,180-2*bse+5].filter(v=>v!==ask),N_deg),
+ exp:k==='base'?`이등변삼각형의 두 밑각의 크기는 같으므로 ∠B = ∠C = (180° − ${top}°) ÷ 2 = <b>${bse}°</b>`:`∠B = ∠C = ${bse}°이므로 ∠A = 180° − 2 × ${bse}° = <b>${top}°</b>`}}});
+add({id:'n22-iso2',u:'N1',name:'이등변삼각형이 이어진 그림의 각',lv:2,g:R=>{const x=R.pick([30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78]);const ans=x/2;
+ if(!Number.isInteger(ans))return null;const {A,B,C}=N_tri(x,x,150,30,170);const AC=Math.hypot(A[0]-C[0],A[1]-C[1]),D=[C[0]+AC,C[1]],G=N_cen(A,B,D);
+ const fig=svg(330,195,N_ln([B,D])+N_ln([B,A,C])+N_ln([A,D])+N_tk(A,B)+N_tk(A,C)+N_tk(C,D)+N_ang(B,D,A,x+'°',24)+N_ang(D,A,B,'x',28)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,[C[0],C[1]-30])+N_v('D',D,G));
+ return{q:`그림에서 <span class="sg">AB</span> = <span class="sg">AC</span> = <span class="sg">CD</span>이고 ∠B = ${x}°일 때, ∠x(∠ADC)의 크기는?`,fig,alt:`AB=AC=CD, ∠B=${x}°`,
+ ...mc(R,ans,[x,180-2*x,(180-x)/2,x*2,ans+5,ans+10].filter(v=>v!==ans&&Number.isInteger(v)),N_deg),
+ exp:`△ABC에서 ∠ACB = ∠B = ${x}°이므로 ∠ACD = 180° − ${x}° = ${180-x}°<br>△ACD는 <span class="sg">CA</span> = <span class="sg">CD</span>인 이등변삼각형이므로 ∠x = (180° − ${180-x}°) ÷ 2 = <b>${ans}°</b>`}}});
+add({id:'n22-iso3',u:'N1',name:'꼭지각의 이등분선',lv:1,g:R=>{const k=R.pick(['len','ang']);const top=R.pick([40,50,60,70,80,100]);const {A,B,C}=N_tri((180-top)/2,(180-top)/2),D=N_mid(B,C),G=N_cen(A,B,C);
+ const base=R.pick([8,10,12,14,16,18,20]);
+ const fig=svg(300,195,N_ln([A,B,C],true)+N_ln([A,D])+N_tk(A,B)+N_tk(A,C)+N_ang(A,B,D,'',24)+N_ang(A,D,C,'',30)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+txt('D',D[0],D[1]+18,'middle','v')+(k==='len'?N_lab(B,C,base+' cm',A,26):''));
+ if(k==='len')return{q:`그림과 같이 <span class="sg">AB</span> = <span class="sg">AC</span>인 이등변삼각형 ABC에서 ∠A의 이등분선이 <span class="sg">BC</span>와 만나는 점을 D라 하자. <span class="sg">BC</span> = ${base} cm일 때, <span class="sg">BD</span>의 길이는?`,fig,alt:`밑변 ${base} cm`,
+  ...mc(R,base/2,[base,base/3,base/2+1,base/2-1,base/4].filter(v=>Number.isInteger(v)),N_cm),exp:`이등변삼각형의 꼭지각의 이등분선은 밑변을 수직이등분한다.<br><span class="sg">BD</span> = ${base} ÷ 2 = <b>${base/2} cm</b>`};
+ return{q:`그림과 같이 <span class="sg">AB</span> = <span class="sg">AC</span>인 이등변삼각형 ABC에서 ∠A의 이등분선이 <span class="sg">BC</span>와 만나는 점을 D라 하자. ∠BAC = ${top}°일 때, ∠ADB + ∠DAC의 크기는?`,fig,alt:`꼭지각 ${top}°`,
+ ...mc(R,90+top/2,[90,top,90+top,180-top/2,top/2+45].filter(v=>v!==90+top/2),N_deg),exp:`꼭지각의 이등분선은 밑변을 수직이등분하므로 ∠ADB = 90°, ∠DAC = ${top}° ÷ 2 = ${top/2}°<br>∴ 90° + ${top/2}° = <b>${90+top/2}°</b>`}}});
+add({id:'n22-tape',u:'N1',name:'종이 테이프 접기',lv:2,g:R=>{const a=R.pick([50,52,54,55,56,58,60,62,64,65,66,68,70,72,74,75]);const ans=180-2*a;
+ const y1=70,y2=150,t=a*Math.PI/180,P=[90,y2],Q=[P[0]+(y2-y1)/Math.tan(t),y1],dir=[Math.cos(2*t),-Math.sin(2*t)],F1=[Q[0]+dir[0]*70,Q[1]+dir[1]*70],F2=[P[0]+dir[0]*70,P[1]+dir[1]*70];
+ const fig=svg(320,190,`<path class="ln" d="M20 ${y1}H${f1(Q[0])}M20 ${y2}H300"/>`+N_ln([P,Q],false,'ln dash')+N_ln([Q,F1])+N_ln([P,F2])+N_ln([F1,F2],false,'ln dash')+N_ang(P,[300,y2],Q,a+'°',24)+N_ang(Q,[20,y1],F1,'x',22)+txt('P',P[0]-4,P[1]+16,'middle','v')+txt('Q',Q[0]+8,Q[1]+14,'','v'));
+ return{q:`폭이 일정한 종이 테이프를 선분 PQ를 접는 선으로 하여 그림과 같이 접었다. ∠QPC… 즉 접는 선과 아랫변이 이루는 각이 ${a}°일 때, ∠x의 크기는?`.replace('∠QPC… 즉 ',''),fig,alt:`접는 선과 아랫변의 각 ${a}°`,
+ ...mc(R,ans,[a,180-a,90-a/2,2*a-90,ans+10].filter(v=>v>0&&v!==ans),N_deg),
+ exp:`윗변과 접는 선이 이루는 각은 엇각으로 ${a}°이고, 접힌 부분도 접는 선과 ${a}°를 이룬다.<br>∠x = 180° − ${a}° − ${a}° = <b>${ans}°</b>`}}});
+add({id:'n22-zig',u:'N1',name:'[심화] 같은 길이로 이어진 선분과 각',lv:3,g:R=>{const n=R.pick([3,4]),x=R.pick(n===3?[15,18,20,22,24,25,26,28]:[12,14,15,16,18,20,22]);const ans=n*x;
+ const t=x*Math.PI/180,u=[Math.cos(t),Math.sin(t)];const A=u.slice(),b=2*Math.cos(t),B=[b,0];const c=b*Math.cos(t)+Math.sqrt(Math.max(0,1-b*b*Math.sin(t)**2)),C=[c*u[0],c*u[1]];const d=c*Math.cos(t)+Math.sqrt(Math.max(0,1-c*c*Math.sin(t)**2)),D=[d,0];
+ const far=n===4?d:Math.max(b,c*u[0]),sc=230/(far*1.15),P=q=>[30+q[0]*sc,170-q[1]*sc];const O=P([0,0]),X=P([far*1.15,0]),Y=P([far*1.15*u[0],far*1.15*u[1]]);
+ const pa=P(A),pb=P(B),pc=P(C),pd=P(D);if(Y[1]<12)return null;
+ let s=N_ln([O,X])+N_ln([O,Y])+N_ln(n===4?[pa,pb,pc,pd]:[pa,pb,pc])+N_ang(O,X,Y,'x',26)+N_tk(O,pa)+N_tk(pa,pb)+N_tk(pb,pc)+(n===4?N_tk(pc,pd):'')+txt('O',O[0]-6,O[1]+14,'end','v')+txt('X',X[0],X[1]+16,'middle','v')+txt('Y',Y[0]+6,Y[1],'','v')+
+  txt('A',pa[0]-6,pa[1]-6,'end','v')+txt('B',pb[0],pb[1]+16,'middle','v')+txt('C',pc[0]-6,pc[1]-6,'end','v')+(n===4?txt('D',pd[0],pd[1]+16,'middle','v')+N_ang(pc,pd,Y,'',16):N_ang(pb,X,pc,'',16));
+ const ask=n===3?'∠CBX':'∠DCY';
+ return{q:`그림과 같이 ∠XOY의 두 변 위에 <span class="sg">OA</span> = <span class="sg">AB</span> = <span class="sg">BC</span>${n===4?' = <span class="sg">CD</span>':''}가 되도록 점 A, B, C${n===4?', D':''}를 잡았다. ∠XOY = ${x}°일 때, ${ask}의 크기는?`,fig:svg(330,190,s),alt:`∠XOY = ${x}°, 같은 길이 선분 ${n}개`,
+ ...mc(R,ans,[(n+1)*x,(n-1)*x,2*x,180-ans,ans+5].filter(v=>v!==ans),N_deg),
+ exp:`이등변삼각형의 밑각과 외각의 성질을 차례로 이용한다.<br>△OAB: ∠ABO = ${x}° → ∠BAY = ${2*x}°<br>△ABC: ∠BCA = ${2*x}° → ∠CBX = ${x}° + ${2*x}° = ${3*x}°${n===4?`<br>△BCD: ∠CDB = ${3*x}° → ∠DCY = ${x}° + ${3*x}° = ${4*x}°`:''}<br>∴ ${ask} = <b>${ans}°</b>`}}});
+add(bank('n22-rhc','N1','직각삼각형의 합동 조건',1,[
+ ['두 직각삼각형에서 빗변의 길이와 한 예각의 크기가 각각 같을 때의 합동 조건은?','RHA 합동',['RHS 합동','SAS 합동','SSS 합동','ASA 합동'],'R(직각), H(빗변), A(한 예각) → RHA 합동'],
+ ['두 직각삼각형에서 빗변의 길이와 다른 한 변의 길이가 각각 같을 때의 합동 조건은?','RHS 합동',['RHA 합동','SAS 합동','ASA 합동','AAA 합동'],'R(직각), H(빗변), S(다른 한 변) → RHS 합동'],
+ ['다음 중 두 직각삼각형이 서로 합동이라고 할 수 <u>없는</u> 것은?','세 내각의 크기가 각각 같다.',['빗변의 길이와 한 예각의 크기가 각각 같다.','빗변의 길이와 다른 한 변의 길이가 각각 같다.','직각을 낀 두 변의 길이가 각각 같다.','한 변의 길이와 그 양 끝 각의 크기가 각각 같다.'],'세 각이 같아도 크기가 다를 수 있다(닮음일 뿐 합동은 아님).'],
+ ['∠XOY의 이등분선 위의 한 점 P에서 두 변에 내린 수선의 발을 A, B라 할 때, △POA ≡ △POB가 되는 합동 조건은?','RHA 합동',['RHS 합동','SSS 합동','SAS 합동','AA 닮음'],'∠PAO = ∠PBO = 90°, OP는 공통인 빗변, ∠POA = ∠POB → RHA 합동'],
+ ['∠XOY의 내부의 한 점 P에서 두 변까지의 거리가 같을 때, OP가 ∠XOY의 이등분선임을 보이는 데 쓰이는 합동 조건은?','RHS 합동',['RHA 합동','SAS 합동','ASA 합동','SSS 합동'],'∠PAO = ∠PBO = 90°, OP 공통, PA = PB → RHS 합동']]));
+add({id:'n22-bisd',u:'N1',name:'각의 이등분선 위의 점과 거리',lv:2,g:R=>{const d=R.pick([3,4,5,6,7,8]),k=R.pick(['dist','area']),ob=R.pick([8,10,12,14]);
+ const O=[30,170],X=[310,170],t=40*Math.PI/180,Y=[O[0]+280*Math.cos(t),O[1]-280*Math.sin(t)],b=20*Math.PI/180,P=[O[0]+190*Math.cos(b),O[1]-190*Math.sin(b)],A=N_foot(P,O,Y),B=N_foot(P,O,X);
+ const fig=svg(330,190,N_ln([O,X])+N_ln([O,Y])+N_ln([O,P],false,'ln dash')+N_ln([P,A])+N_ln([P,B])+N_rt(A,O,P)+N_rt(B,P,O)+N_ang(O,X,P,'',34)+N_ang(O,P,Y,'',40)+N_pt(P)+txt('P',P[0]+8,P[1]+4,'','v')+txt('A',A[0]-4,A[1]-8,'end','v')+txt('B',B[0],B[1]+16,'middle','v')+txt('O',O[0]-6,O[1]+14,'end','v')+N_lab(P,B,d+' cm',O,-14)+(k==='area'?N_lab(O,B,ob+' cm',P,-14):''));
+ if(k==='dist')return{q:`그림에서 점 P는 ∠XOY의 이등분선 위의 점이고, 점 P에서 두 변 OY, OX에 내린 수선의 발이 각각 A, B이다. <span class="sg">PB</span> = ${d} cm일 때, <span class="sg">PA</span>의 길이는?`,fig,alt:`PB = ${d} cm`,
+  ...mc(R,d,[d*2,d+1,d-1,d+2,d/2],N_cm),exp:`△AOP ≡ △BOP (RHA 합동)이므로 <span class="sg">PA</span> = <span class="sg">PB</span> = <b>${d} cm</b>`};
+ const S=ob*d;return{q:`그림에서 점 P는 ∠XOY의 이등분선 위의 점이고, 점 P에서 두 변에 내린 수선의 발이 A, B이다. <span class="sg">PB</span> = ${d} cm, <span class="sg">OB</span> = ${ob} cm일 때, 사각형 AOBP의 넓이는?`,fig,alt:`PB = ${d}, OB = ${ob}`,
+ ...mc(R,S,[S/2,S*2,ob+d,S+d,2*(ob+d)].filter(v=>v!==S),N_cm2),exp:`△AOP ≡ △BOP (RHA 합동)이므로 넓이가 같다.<br>△BOP = ${fr(1,2)} × ${ob} × ${d} = ${S/2}<br>□AOBP = 2 × ${S/2} = <b>${S} cm²</b>`}}});
+add({id:'n22-rhs3',u:'N1',name:'[심화] 직각이등변삼각형과 두 수선',lv:3,g:R=>{const a=R.pick([3,4,5,6,7,8]),b=R.pick([4,5,6,7,8,9,10]);if(a===b)return null;const k=R.pick(['len','area']);
+ const sc=150/(a+b),D=[40,170],E=[40+(a+b)*sc,170],A=[40+a*sc,170],B=[D[0],170-b*sc],C=[E[0],170-a*sc];
+ const fig=svg(260,190,N_ln([D,E])+N_ln([B,A,C])+N_ln([B,C],false,'ln dash')+N_ln([D,B])+N_ln([E,C])+N_rt(D,E,B)+N_rt(E,C,D)+N_rt(A,B,C,8)+N_tk(A,B)+N_tk(A,C)+
+  txt('D',D[0],D[1]+16,'middle','v')+txt('E',E[0],E[1]+16,'middle','v')+txt('A',A[0],A[1]+16,'middle','v')+txt('B',B[0]-6,B[1],'end','v')+txt('C',C[0]+6,C[1],'start','v')+N_lab(D,B,b+' cm',E,14)+N_lab(E,C,a+' cm',D,14));
+ const ans=k==='len'?a+b:(a+b)*(a+b)/2;if(!Number.isInteger(ans))return null;
+ return{q:`그림과 같이 ∠BAC = 90°, <span class="sg">AB</span> = <span class="sg">AC</span>인 직각이등변삼각형 ABC의 꼭짓점 A를 지나는 직선 위에 두 점 B, C에서 내린 수선의 발을 각각 D, E라 하자. <span class="sg">BD</span> = ${b} cm, <span class="sg">CE</span> = ${a} cm일 때, ${k==='len'?'<span class="sg">DE</span>의 길이':'사각형 DBCE의 넓이'}는?`,fig,alt:`BD = ${b}, CE = ${a}`,
+ ...mc(R,ans,k==='len'?[Math.abs(a-b),a*b,2*(a+b),a+b+1,a+b-1]:[a*b,(a*a+b*b)/2,(a+b)*(a+b),a*b+(a+b),ans+a].filter(v=>Number.isInteger(v)),k==='len'?N_cm:N_cm2),
+ exp:`△ABD와 △CAE에서 <span class="sg">AB</span> = <span class="sg">CA</span>, ∠ADB = ∠CEA = 90°, ∠BAD = ∠ACE이므로 △ABD ≡ △CAE (RHA 합동)<br>→ <span class="sg">AD</span> = <span class="sg">CE</span> = ${a}, <span class="sg">AE</span> = <span class="sg">BD</span> = ${b}<br>${k==='len'?`<span class="sg">DE</span> = ${a} + ${b} = <b>${ans} cm</b>`:`<span class="sg">DE</span> = ${a+b}이므로 사다리꼴 DBCE = ${fr(1,2)} × (${b} + ${a}) × ${a+b} = <b>${ans} cm²</b>`}`}}});
+
+/* ===== Ⅰ-2 삼각형의 외심과 내심 ===== */
+add(bank('n22-cprop','N2','외심과 내심의 성질',1,[
+ ['삼각형의 외심에 대한 설명으로 옳은 것은?','외심에서 세 꼭짓점에 이르는 거리는 같다.',['외심에서 세 변에 이르는 거리는 같다.','외심은 세 내각의 이등분선의 교점이다.','외심은 항상 삼각형의 내부에 있다.','둔각삼각형의 외심은 한 변 위에 있다.'],'외심은 세 변의 수직이등분선의 교점이고, 세 꼭짓점까지 거리가 같다(외접원의 중심).'],
+ ['삼각형의 내심에 대한 설명으로 옳은 것은?','내심에서 세 변에 이르는 거리는 같다.',['내심에서 세 꼭짓점에 이르는 거리는 같다.','내심은 세 변의 수직이등분선의 교점이다.','직각삼각형의 내심은 빗변의 중점이다.','내심은 둔각삼각형의 외부에 있다.'],'내심은 세 내각의 이등분선의 교점이고, 세 변까지 거리가 같다(내접원의 중심).'],
+ ['직각삼각형의 외심의 위치는?','빗변의 중점',['직각인 꼭짓점','삼각형의 내부','삼각형의 외부','빗변이 아닌 변의 중점'],'직각삼각형의 외심은 빗변의 중점이다.'],
+ ['둔각삼각형의 외심의 위치는?','삼각형의 외부',['삼각형의 내부','가장 긴 변의 중점','둔각인 꼭짓점','가장 짧은 변 위'],'예각삼각형: 내부, 직각삼각형: 빗변의 중점, 둔각삼각형: 외부'],
+ ['외심과 내심이 일치하는 삼각형은?','정삼각형',['직각삼각형','둔각삼각형','모든 이등변삼각형','직각이등변삼각형'],'정삼각형은 수직이등분선과 각의 이등분선이 일치하므로 외심과 내심이 같다.']]));
+add({id:'n22-cang',u:'N2',name:'외심과 각의 크기',lv:2,g:R=>{const x=R.pick([18,20,22,24,25,26,28,30,32,34,35]),y=R.pick([20,22,24,25,28,30,32,34,36,38,40]);const z=90-x-y;if(z<12)return null;
+ const C2=2*z,A2=2*x,B2=2*y;// ∠C=x+z? 각 꼭짓점 각: A=x+z, B=x+y, C=y+z
+ const {A,B,C}=N_tri(x+y,y+z,220,40,175),O=N_inter(N_mid(A,B),[N_mid(A,B)[0]+(A[1]-B[1]),N_mid(A,B)[1]-(A[0]-B[0])],N_mid(B,C),[N_mid(B,C)[0],0]),G=N_cen(A,B,C);
+ const fig=svg(300,195,N_ln([A,B,C],true)+N_ln([O,A],false,'ln dash')+N_ln([O,B],false,'ln dash')+N_ln([O,C],false,'ln dash')+N_pt(O)+txt('O',O[0]+8,O[1]+12,'','v')+
+  N_ang(A,B,O,x+'°',26)+N_ang(B,O,C,y+'°',28)+N_ang(C,A,O,'x',26)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G));
+ return{q:`그림에서 점 O는 △ABC의 외심이다. ∠OAB = ${x}°, ∠OBC = ${y}°일 때, ∠x(∠OCA)의 크기는?`,fig,alt:`∠OAB = ${x}°, ∠OBC = ${y}°`,
+ ...mc(R,z,[180-x-y,x+y,90-x,90-y,z+10,Math.abs(x-y)].filter(v=>v>0&&v!==z),N_deg),exp:`외심에서 세 꼭짓점까지 거리가 같으므로 △OAB, △OBC, △OCA는 이등변삼각형이다.<br>2(∠OAB + ∠OBC + ∠OCA) = 180° → ${x}° + ${y}° + ∠x = 90°<br>∴ ∠x = <b>${z}°</b>`}}});
+add({id:'n22-cboc',u:'N2',name:'외심과 중심각 ∠BOC',lv:2,g:R=>{const a=R.pick([35,40,42,45,48,50,52,55,56,58,60,62,64,65,66,68,70,72,75]);const k=R.pick(['boc','obc']);const ans=k==='boc'?2*a:90-a;
+ const b=R.pick([55,60,65,70]),c=180-a-b;if(c<35||c>85)return null;const {A,B,C}=N_tri(b,c),O=N_inter(N_mid(A,B),[N_mid(A,B)[0]+(A[1]-B[1]),N_mid(A,B)[1]-(A[0]-B[0])],N_mid(B,C),[N_mid(B,C)[0],0]),G=N_cen(A,B,C);
+ const fig=svg(300,195,N_ln([A,B,C],true)+N_ln([B,O,C],false,'ln dash')+N_pt(O)+txt('O',O[0],O[1]-10,'middle','v')+N_ang(A,B,C,a+'°',22)+N_ang(O,B,C,k==='boc'?'x':'',16)+(k==='obc'?N_ang(B,C,O,'x',30):'')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G));
+ return{q:`그림에서 점 O는 △ABC의 외심이다. ∠A = ${a}°일 때, ${k==='boc'?'∠BOC':'∠OBC'}의 크기는?`,fig,alt:`∠A = ${a}°`,
+ ...mc(R,ans,k==='boc'?[a,180-a,90+a/2,2*a+10,180-2*a]:[a,90-a/2,180-2*a,a/2,ans+10],N_deg),
+ exp:k==='boc'?`외심 O에 대하여 ∠BOC = 2∠A = 2 × ${a}° = <b>${ans}°</b>`:`∠BOC = 2∠A = ${2*a}°, △OBC는 <span class="sg">OB</span> = <span class="sg">OC</span>인 이등변삼각형<br>∠OBC = (180° − ${2*a}°) ÷ 2 = <b>${ans}°</b>`}}});
+add({id:'n22-crt',u:'N2',name:'직각삼각형의 외심',lv:1,g:R=>{const t=R.pick([[6,8,10],[5,12,13],[8,15,17],[9,12,15],[12,16,20],[10,24,26]]);const k=R.pick(['r','area','len']);
+ const sc=150/Math.max(t[0],t[1]),C=[50,170],B=[50+t[1]*sc>280?280:50+t[1]*sc,170],A=[50,170-t[0]*sc];const M=N_mid(A,B),G=N_cen(A,B,C);
+ const fig=svg(310,190,N_ln([A,B,C],true)+N_rt(C,A,B)+N_ln([C,M],false,'ln dash')+N_pt(M)+txt('O',M[0]+8,M[1]-6,'','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_lab(A,C,t[0]+' cm',B,14)+N_lab(C,B,t[1]+' cm',A,14)+(k!=='len'?'':N_lab(A,B,t[2]+' cm',C,14)));
+ if(k==='r'){const r=t[2]/2;return{q:`∠C = 90°인 직각삼각형 ABC에서 <span class="sg">AC</span> = ${t[0]} cm, <span class="sg">BC</span> = ${t[1]} cm, <span class="sg">AB</span> = ${t[2]} cm이다. 점 O가 △ABC의 외심일 때, 외접원의 반지름의 길이는?`,fig,alt:`세 변 ${t.join(', ')}`,...mc(R,r,[t[2],t[0]/2,t[1]/2,r+1,r-1].filter(v=>v!==r),N_cm),exp:`직각삼각형의 외심은 빗변의 중점이므로 반지름 = ${t[2]} ÷ 2 = <b>${r} cm</b>`}}
+ if(k==='len'){const r=t[2]/2;return{q:`그림에서 점 O는 ∠C = 90°인 직각삼각형 ABC의 외심이다. <span class="sg">OC</span>의 길이는?`,fig,alt:`빗변 ${t[2]} cm`,...mc(R,r,[t[0],t[1]/2,t[2],r+1,t[0]/2],N_cm),exp:`외심 O는 빗변의 중점이므로 <span class="sg">OA</span> = <span class="sg">OB</span> = <span class="sg">OC</span> = ${t[2]} ÷ 2 = <b>${r} cm</b>`}}
+ const S=t[0]*t[1]/4;return{q:`그림에서 점 O는 ∠C = 90°인 직각삼각형 ABC의 외심이다. △OBC의 넓이는?`,fig,alt:`직각을 낀 두 변 ${t[0]}, ${t[1]}`,...mc(R,S,[S*2,S*4,t[0]*t[1]/3,S+t[0],S/2].filter(v=>Number.isInteger(v)||v===S),N_cm2),
+ exp:`O는 빗변 AB의 중점이므로 △OBC = ${fr(1,2)} △ABC<br>= ${fr(1,2)} × ${fr(1,2)} × ${t[0]} × ${t[1]} = <b>${S} cm²</b>`}}});
+add({id:'n22-ibic',u:'N2',name:'내심과 ∠BIC',lv:2,g:R=>{const a=R.pick([30,36,40,44,48,50,52,56,60,64,68,70,72,76,80,84,88]);const k=R.pick(['bic','a','sum']);
+ const b=R.pick([50,56,60,64,70]),c=180-a-b;if(c<30)return null;const {A,B,C}=N_tri(b,c),la=Math.hypot(B[0]-C[0],B[1]-C[1]),lb=Math.hypot(A[0]-C[0],A[1]-C[1]),lc=Math.hypot(A[0]-B[0],A[1]-B[1]),s=la+lb+lc;
+ const I=[(la*A[0]+lb*B[0]+lc*C[0])/s,(la*A[1]+lb*B[1]+lc*C[1])/s],G=N_cen(A,B,C);
+ const fig=svg(300,195,N_ln([A,B,C],true)+N_ln([B,I,C],false,'ln dash')+N_ln([A,I],false,'ln dash')+N_pt(I)+txt('I',I[0]+8,I[1]-4,'','v')+N_ang(A,B,C,k==='a'?'x':a+'°',22)+N_ang(I,B,C,k==='a'?(90+a/2)+'°':'x',14)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G));
+ if(k==='a'){const v=90+a/2;if(!Number.isInteger(v))return null;return{q:`그림에서 점 I는 △ABC의 내심이다. ∠BIC = ${v}°일 때, ∠x(∠A)의 크기는?`,fig,alt:`∠BIC = ${v}°`,...mc(R,a,[v-90,180-v,2*(v-90)+10,a/2,a+10],N_deg),exp:`∠BIC = 90° + ${fr(1,2)}∠A → ${v}° = 90° + ${fr(1,2)}∠A<br>∴ ∠A = <b>${a}°</b>`}}
+ const v=90+a/2;if(!Number.isInteger(v))return null;if(k==='sum'){const w=(b+c)/2;return{q:`그림에서 점 I는 △ABC의 내심이다. ∠A = ${a}°일 때, ∠IBC + ∠ICB의 크기는?`,fig,alt:`∠A = ${a}°`,...mc(R,w,[180-a,a,90-a/2+10,v,w+10].filter(x=>x!==w),N_deg),exp:`∠IBC + ∠ICB = ${fr(1,2)}(∠B + ∠C) = ${fr(1,2)}(180° − ${a}°) = <b>${w}°</b>`}}
+ return{q:`그림에서 점 I는 △ABC의 내심이다. ∠A = ${a}°일 때, ∠x(∠BIC)의 크기는?`,fig,alt:`∠A = ${a}°`,...mc(R,v,[2*a,180-a,90+a,180-a/2,90-a/2].filter(x=>x!==v),N_deg),exp:`내심 I에 대하여 ∠BIC = 90° + ${fr(1,2)}∠A = 90° + ${a/2}° = <b>${v}°</b>`}}});
+add({id:'n22-ir',u:'N2',name:'내접원의 반지름과 넓이',lv:2,g:R=>{const t=R.pick([[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15],[12,16,20]]);const k=R.pick(['r','S']);const r=(t[0]+t[1]-t[2])/2,S=t[0]*t[1]/2;
+ const sc=140/Math.max(t[0],t[1]),C=[60,175],B=[60+t[1]*sc,175],A=[60,175-t[0]*sc],I=[60+r*sc,175-r*sc],G=N_cen(A,B,C);
+ const fig=svg(300,195,N_ln([A,B,C],true)+N_rt(C,A,B)+`<circle class="ln" cx="${f1(I[0])}" cy="${f1(I[1])}" r="${f1(r*sc)}"/>`+N_pt(I)+txt('I',I[0]+6,I[1]-4,'','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_lab(A,C,t[0]+' cm',B,16)+N_lab(C,B,t[1]+' cm',A,16)+N_lab(A,B,t[2]+' cm',C,14));
+ if(k==='r')return{q:`그림에서 원 I는 ∠C = 90°인 직각삼각형 ABC의 내접원이다. 내접원의 반지름의 길이는?`,fig,alt:`세 변 ${t.join(', ')}`,...mc(R,r,[t[2]/2,r+1,r*2,S/(t[0]+t[1]+t[2]),t[0]/2].filter(v=>v!==r),N_cm),
+  exp:`△ABC = ${fr(1,2)} × r × (세 변의 길이의 합)<br>${S} = ${fr(1,2)} × r × ${t[0]+t[1]+t[2]} → r = <b>${r} cm</b>`};
+ const In=Math.PI*r*r;return{q:`그림에서 원 I는 ∠C = 90°인 직각삼각형 ABC의 내접원이다. 색칠하지 않은 부분, 즉 △ABC에서 내접원을 뺀 부분의 넓이는?`,fig,alt:`세 변 ${t.join(', ')}`,
+ ...mc(R,`(${S} − ${r*r}π) cm²`,[`(${S} − ${2*r}π) cm²`,`(${S*2} − ${r*r}π) cm²`,`(${S} − ${(r+1)*(r+1)}π) cm²`,`(${S} + ${r*r}π) cm²`,`${S-r*r} cm²`]),
+ exp:`${S} = ${fr(1,2)} × r × ${t[0]+t[1]+t[2]} → r = ${r}<br>△ABC − 원 = ${S} − π × ${r}² = <b>(${S} − ${r*r}π) cm²</b>`}}});
+add({id:'n22-itan',u:'N2',name:'[심화] 내접원과 접선의 길이',lv:3,g:R=>{let a,b,c;do{a=R.i(7,15);b=R.i(6,14);c=R.i(5,13)}while(a>=b+c||b>=a+c||c>=a+b||(a+c-b)%2);const x=(a+c-b)/2;
+ const cosB=(a*a+c*c-b*b)/(2*a*c),Bang=Math.acos(cosB)*180/Math.PI,cosC=(a*a+b*b-c*c)/(2*a*b),Cang=Math.acos(cosC)*180/Math.PI;const {A,B,C}=N_tri(Bang,Cang),G=N_cen(A,B,C);
+ const la=Math.hypot(B[0]-C[0],B[1]-C[1]),lb=Math.hypot(A[0]-C[0],A[1]-C[1]),lc=Math.hypot(A[0]-B[0],A[1]-B[1]),s=la+lb+lc,I=[(la*A[0]+lb*B[0]+lc*C[0])/s,(la*A[1]+lb*B[1]+lc*C[1])/s];
+ const D=N_foot(I,B,C),E=N_foot(I,C,A),F=N_foot(I,A,B),rr=Math.hypot(I[0]-D[0],I[1]-D[1]);
+ const fig=svg(300,200,N_ln([A,B,C],true)+`<circle class="ln" cx="${f1(I[0])}" cy="${f1(I[1])}" r="${f1(rr)}"/>`+[D,E,F].map(N_pt).join('')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+txt('D',D[0],D[1]+16,'middle','v')+N_v('E',E,I,12)+N_v('F',F,I,12)+N_lab(A,B,c,G,16)+N_lab(A,C,b,G,16)+txt(a,(B[0]+C[0])/2-30,B[1]+16,'middle'));
+ return{q:`그림에서 원은 △ABC의 내접원이고 점 D, E, F는 접점이다. <span class="sg">AB</span> = ${c}, <span class="sg">BC</span> = ${a}, <span class="sg">CA</span> = ${b}일 때, <span class="sg">BD</span>의 길이는?`,fig,alt:`AB=${c}, BC=${a}, CA=${b}`,
+ ...mc(R,x,[a-x,(a+b-c)/2,(b+c-a)/2,a/2,x+1].filter(v=>v!==x&&Number.isInteger(v)),String),
+ exp:`원 밖의 한 점에서 그은 두 접선의 길이는 같다. <span class="sg">BD</span> = <span class="sg">BF</span> = x라 하면<br><span class="sg">AF</span> = <span class="sg">AE</span> = ${c} − x, <span class="sg">CD</span> = <span class="sg">CE</span> = ${a} − x<br>(${c} − x) + (${a} − x) = ${b} → x = <b>${x}</b>`}}});
+add({id:'n22-ipar',u:'N2',name:'[심화] 내심을 지나는 평행선',lv:3,g:R=>{const c=R.pick([8,9,10,11,12,13,14]),b=R.pick([9,10,11,12,13,14,15]),a=R.pick([10,12,14,16]);if(a>=b+c||b>=a+c||c>=a+b)return null;
+ const cosB=(a*a+c*c-b*b)/(2*a*c),cosC=(a*a+b*b-c*c)/(2*a*b);const {A,B,C}=N_tri(Math.acos(cosB)*180/Math.PI,Math.acos(cosC)*180/Math.PI),G=N_cen(A,B,C);
+ const la=Math.hypot(B[0]-C[0],B[1]-C[1]),lb=Math.hypot(A[0]-C[0],A[1]-C[1]),lc=Math.hypot(A[0]-B[0],A[1]-B[1]),s=la+lb+lc,I=[(la*A[0]+lb*B[0]+lc*C[0])/s,(la*A[1]+lb*B[1]+lc*C[1])/s];
+ const t=(I[1]-A[1])/(B[1]-A[1]),D=N_at(A,B,t),E=N_at(A,C,t);const ans=b+c;
+ const fig=svg(300,195,N_ln([A,B,C],true)+N_ln([D,E])+N_ln([B,I,C],false,'ln dash')+N_pt(I)+txt('I',I[0],I[1]+16,'middle','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,[D[0]+30,D[1]])+N_v('E',E,[E[0]-30,E[1]]));
+ return{q:`그림에서 점 I는 △ABC의 내심이고, 점 I를 지나고 <span class="sg">BC</span>에 평행한 직선이 <span class="sg">AB</span>, <span class="sg">AC</span>와 만나는 점을 각각 D, E라 하자. <span class="sg">AB</span> = ${c} cm, <span class="sg">BC</span> = ${a} cm, <span class="sg">CA</span> = ${b} cm일 때, △ADE의 둘레의 길이는?`,fig,alt:`AB=${c}, BC=${a}, CA=${b}`,
+ ...mc(R,ans,[a+b+c,a+b,a+c,ans-a/2,2*a],N_cm),exp:`∠DBI = ∠IBC (내심) = ∠DIB (엇각)이므로 △DBI는 이등변삼각형 → <span class="sg">DI</span> = <span class="sg">DB</span><br>같은 방법으로 <span class="sg">EI</span> = <span class="sg">EC</span><br>△ADE의 둘레 = <span class="sg">AB</span> + <span class="sg">AC</span> = ${c} + ${b} = <b>${ans} cm</b>`}}});
+add({id:'n22-oi',u:'N2',name:'[심화] 외심과 내심이 함께 있을 때의 각',lv:3,g:R=>{const a=R.pick([40,44,48,50,52,56,60,64,68,70,72,76]);const boc=2*a,bic=90+a/2,ans=bic-boc;if(ans===0)return null;
+ return{q:`△ABC에서 ∠A = ${a}°이다. 점 O, I가 각각 △ABC의 외심, 내심일 때, ∠BIC − ∠BOC의 크기는?`,...mc(R,ans,[boc-bic,bic+boc-180,90-a/2,a/2,ans+10,ans-10].filter(v=>v!==ans),v=>(v<0?'−':'')+Math.abs(v)+'°'),
+ exp:`외심: ∠BOC = 2∠A = ${boc}°<br>내심: ∠BIC = 90° + ${fr(1,2)}∠A = ${bic}°<br>∴ ${bic}° − ${boc}° = <b>${ans<0?'−':''}${Math.abs(ans)}°</b>`}}});
+
+/* ===== Ⅱ-1 평행사변형 ===== */
+function N_pgram(sh,w,h){sh=sh??60;w=w||200;h=h||110;const A=[50+sh,40],B=[50,40+h],C=[50+w,40+h],D=[50+w+sh,40];return{A,B,C,D}}
+add({id:'n22-pg1',u:'N3',name:'평행사변형의 성질',lv:1,g:R=>{const ang=R.pick([55,60,62,64,65,68,70,72,75,110,115,118,120,125]),ab=R.pick([5,6,7,8,9]),ad=R.pick([9,10,11,12,13,14]);const k=R.pick(['ang','side']);
+ const {A,B,C,D}=N_pgram(ang<90?60:-50,200,110);const G=N_cen(A,B,C,D);const fig=svg(330,190,N_ln([A,B,C,D],true)+N_ang(B,C,A,ang+'°',22)+(k==='ang'?N_ang(C,D,B,'x',22)+N_ang(D,A,C,'y',22)+N_ang(A,B,D,'',16):N_lab(A,B,ab+' cm',G,16)+N_lab(B,C,'x cm',G,16)+N_lab(C,D,'y cm',G,16)+N_lab(A,D,ad+' cm',G,16))+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G));
+ if(k==='ang'){const x=180-ang,y=ang,w=R.pick(['x','y']);const v=w==='x'?x:y;return{q:`그림의 평행사변형 ABCD에서 ∠B = ${ang}°일 때, ∠${w}의 크기는?`,fig,alt:`∠B = ${ang}°`,...mc(R,v,[w==='x'?y:x,90,ang/2,360-2*ang,v+10].filter(t=>t>0&&t!==v),N_deg),exp:`이웃하는 두 내각의 합은 180°이므로 ∠x = ∠C = 180° − ${ang}° = ${x}°<br>대각의 크기는 같으므로 ∠y = ∠D = ∠B = ${y}°<br>∴ ∠${w} = <b>${v}°</b>`}}
+ return{q:`그림의 평행사변형 ABCD에서 x + y의 값은?`,fig,alt:`AB = ${ab}, AD = ${ad}`,...mc(R,ab+ad,[2*ab,2*ad,ab*2+ad*2,ad-ab,ab+ad+1],String),exp:`평행사변형의 두 쌍의 대변의 길이는 각각 같다. x = ${ad}, y = ${ab}<br>∴ x + y = <b>${ab+ad}</b>`}}});
+add({id:'n22-pg2',u:'N3',name:'평행사변형의 대각선',lv:1,g:R=>{const a=R.pick([2,3,4,5]),b=R.pick([1,2,3,4,5,6]),c=R.pick([2,3,4]),dd=R.pick([1,2,3,4,5,7]);// AO=a x + b, CO = 3x - c ...
+ const x=R.i(2,6),p=a,q=b+R.i(1,3),r=a+1,s=r*x-(p*x+q);if(s<=0)return null;// p x + q = r x - s
+ const {A,B,C,D}=N_pgram(60,200,110),O=N_mid(A,C),G=O;const fig=svg(330,190,N_ln([A,B,C,D],true)+N_ln([A,C])+N_ln([B,D])+N_pt(O)+txt('O',O[0],O[1]+18,'middle','v')+N_lab(A,O,`${p}x + ${q}`,D,14)+N_lab(O,C,`${r}x − ${s}`,B,14)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G));
+ const L=2*(p*x+q);return{q:`그림의 평행사변형 ABCD에서 두 대각선의 교점을 O라 하자. <span class="sg">AO</span> = ${p}x + ${q}, <span class="sg">CO</span> = ${r}x − ${s}일 때, <span class="sg">AC</span>의 길이는?`,fig,alt:`AO = ${p}x+${q}, CO = ${r}x−${s}`,
+ ...mc(R,L,[p*x+q,x,L+2,L-2,2*x],String),exp:`평행사변형의 두 대각선은 서로를 이등분하므로 ${p}x + ${q} = ${r}x − ${s} → x = ${x}<br><span class="sg">AO</span> = ${p*x+q}이므로 <span class="sg">AC</span> = 2 × ${p*x+q} = <b>${L}</b>`}}});
+add(bank('n22-pgc','N3','평행사변형이 되는 조건',2,[
+ ['다음 중 사각형 ABCD가 평행사변형이 되는 조건이 <u>아닌</u> 것은?','<span class="sg">AB</span> ∥ <span class="sg">DC</span>, <span class="sg">AD</span> = <span class="sg">BC</span>',['<span class="sg">AB</span> ∥ <span class="sg">DC</span>, <span class="sg">AD</span> ∥ <span class="sg">BC</span>','<span class="sg">AB</span> = <span class="sg">DC</span>, <span class="sg">AD</span> = <span class="sg">BC</span>','∠A = ∠C, ∠B = ∠D','<span class="sg">AB</span> ∥ <span class="sg">DC</span>, <span class="sg">AB</span> = <span class="sg">DC</span>'],'한 쌍의 대변이 평행하고 "다른" 한 쌍의 대변의 길이가 같으면 등변사다리꼴일 수도 있다.'],
+ ['사각형 ABCD에서 두 대각선의 교점을 O라 할 때, 평행사변형이 되는 조건은?','<span class="sg">OA</span> = <span class="sg">OC</span>, <span class="sg">OB</span> = <span class="sg">OD</span>',['<span class="sg">OA</span> = <span class="sg">OB</span>, <span class="sg">OC</span> = <span class="sg">OD</span>','<span class="sg">AC</span> = <span class="sg">BD</span>','<span class="sg">AC</span> ⊥ <span class="sg">BD</span>','<span class="sg">OA</span> = <span class="sg">OD</span>'],'두 대각선이 서로를 이등분하면 평행사변형이다.'],
+ ['다음 중 평행사변형이 <u>아닌</u> 것은?','∠A = 100°, ∠B = 80°, ∠C = 80°',['∠A = ∠C = 110°, ∠B = ∠D = 70°','<span class="sg">AB</span> = <span class="sg">CD</span> = 5, <span class="sg">AD</span> = <span class="sg">BC</span> = 8','<span class="sg">AD</span> ∥ <span class="sg">BC</span>, <span class="sg">AD</span> = <span class="sg">BC</span> = 7','두 대각선이 서로를 이등분한다.'],'∠A = 100°, ∠B = 80°, ∠C = 80°이면 ∠D = 100°로 두 쌍의 대각이 각각 같지 않다(∠A ≠ ∠C).'],
+ ['평행사변형 ABCD의 두 대각선의 교점을 O라 하고, <span class="sg">OA</span>, <span class="sg">OC</span>의 중점을 각각 E, F라 할 때, 사각형 EBFD는 어떤 사각형인가?','평행사변형',['사다리꼴','직사각형','마름모','정사각형'],'<span class="sg">OE</span> = <span class="sg">OF</span>, <span class="sg">OB</span> = <span class="sg">OD</span>로 두 대각선이 서로를 이등분하므로 평행사변형이다.']]));
+add({id:'n22-pgbis',u:'N3',name:'평행사변형과 각의 이등분선',lv:2,g:R=>{const ab=R.pick([5,6,7,8,9]),ad=ab+R.pick([2,3,4,5]);const {A,B,C,D}=N_pgram(70,ad*200/14,110);
+ const E=N_at(B,C,ab/ad),G=N_cen(A,B,C,D);const fig=svg(330,190,N_ln([A,B,C,D],true)+N_ln([A,E])+N_ang(A,B,E,'',18)+N_ang(A,E,D,'',22)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G)+txt('E',E[0],E[1]+16,'middle','v')+N_lab(A,B,ab+' cm',G,16)+N_lab(A,D,ad+' cm',G,16));
+ const ans=ad-ab;return{q:`그림의 평행사변형 ABCD에서 ∠A의 이등분선이 <span class="sg">BC</span>와 만나는 점을 E라 하자. <span class="sg">AB</span> = ${ab} cm, <span class="sg">AD</span> = ${ad} cm일 때, <span class="sg">EC</span>의 길이는?`,fig,alt:`AB = ${ab}, AD = ${ad}`,
+ ...mc(R,ans,[ab,ad,ad+ab,ans+1,ans*2].filter(v=>v!==ans),N_cm),exp:`∠BAE = ∠EAD = ∠AEB (엇각)이므로 △ABE는 이등변삼각형 → <span class="sg">BE</span> = <span class="sg">AB</span> = ${ab}<br><span class="sg">EC</span> = <span class="sg">BC</span> − <span class="sg">BE</span> = ${ad} − ${ab} = <b>${ans} cm</b>`}}});
+add({id:'n22-pgarea',u:'N3',name:'평행사변형의 넓이와 내부의 점',lv:2,g:R=>{const S=R.pick([40,48,56,60,64,72,80,96,100,120]),k=R.pick(['pt','diag']);const {A,B,C,D}=N_pgram(55,200,110),G=N_cen(A,B,C,D);
+ if(k==='pt'){const P=[G[0]+R.i(-30,30),G[1]+R.i(-20,10)],a=R.pick([6,8,9,10,12]);const ans=S/2-a;if(ans<=0)return null;
+  const fig=svg(330,190,N_ln([A,B,C,D],true)+N_ln([A,P,B])+N_ln([C,P,D])+N_pt(P)+txt('P',P[0]+8,P[1]+4,'','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G));
+  return{q:`넓이가 ${S} cm²인 평행사변형 ABCD의 내부에 한 점 P가 있다. △PAB의 넓이가 ${a} cm²일 때, △PCD의 넓이는?`,fig,alt:`넓이 ${S}, △PAB = ${a}`,...mc(R,ans,[S-a,S/4,a,S/2,ans+a].filter(v=>v!==ans),N_cm2),exp:`평행사변형 내부의 한 점 P에 대하여 △PAB + △PCD = ${fr(1,2)}□ABCD = ${S/2}<br>∴ △PCD = ${S/2} − ${a} = <b>${ans} cm²</b>`}}
+ const O=N_mid(A,C);const fig=svg(330,190,N_sh([O,B,C])+N_ln([A,B,C,D],true)+N_ln([A,C])+N_ln([B,D])+N_pt(O)+txt('O',O[0],O[1]-10,'middle','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G));
+ return{q:`넓이가 ${S} cm²인 평행사변형 ABCD에서 두 대각선의 교점을 O라 할 때, 색칠한 △OBC의 넓이는?`,fig,alt:`넓이 ${S}`,...mc(R,S/4,[S/2,S/3,S/8,S/6,S].filter(v=>Number.isInteger(v)||v===S/4),N_cm2),exp:`두 대각선은 평행사변형의 넓이를 4등분한다.<br>△OBC = ${S} ÷ 4 = <b>${S/4} cm²</b>`}}});
+add({id:'n22-pgratio',u:'N3',name:'이웃한 두 각의 크기의 비',lv:1,g:R=>{const [m,n]=R.pick([[1,2],[2,3],[3,2],[1,3],[2,1],[4,5],[5,4],[3,1],[1,4],[3,7],[7,3]]);const A=180*m/(m+n);if(!Number.isInteger(A))return null;const C=A;
+ return{q:`평행사변형 ABCD에서 ∠A : ∠B = ${m} : ${n}일 때, ∠C의 크기는?`,...mc(R,C,[180-C,180*n/(m+n),C/2,90,C+10].filter(v=>v!==C&&Number.isInteger(v)),N_deg),exp:`∠A + ∠B = 180°이므로 ∠A = 180° × ${fr(m,m+n)} = ${A}°<br>대각의 크기는 같으므로 ∠C = ∠A = <b>${C}°</b>`}}});
+
+/* ===== Ⅱ-2 여러 가지 사각형 ===== */
+add({id:'n22-rect',u:'N4',name:'직사각형의 대각선',lv:1,g:R=>{const k=R.pick(['ang','len']);const A=[60,40],B=[60,160],C=[280,160],D=[280,40],O=N_mid(A,C),G=O;
+ if(k==='ang'){const a=R.pick([25,28,30,32,34,35,36,38,40,42,44,48,50,52,55,56,58,60,62,64]);const ans=180-2*a;
+  const fig=svg(330,190,N_ln([A,B,C,D],true)+N_ln([A,C])+N_ln([B,D])+N_rt(B,A,C)+N_ang(A,C,D,a+'°',30)+N_ang(O,A,B,'x',16)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G)+txt('O',O[0],O[1]-12,'middle','v'));
+  return{q:`그림의 직사각형 ABCD에서 두 대각선의 교점을 O라 하자. ∠CAD = ${a}°일 때, ∠x(∠AOB)의 크기는?`,fig,alt:`∠CAD = ${a}°`,
+  ...mc(R,2*a,[a,90-a,180-2*a,90+a,2*a+10].filter(v=>v!==2*a),N_deg),exp:`직사각형의 두 대각선은 길이가 같고 서로를 이등분하므로 <span class="sg">OA</span> = <span class="sg">OD</span><br>∠ODA = ∠OAD = ${a}° → ∠AOB는 △AOD의 외각 = ${a}° + ${a}° = <b>${2*a}°</b>`}}
+ const x=R.i(2,7),p=R.pick([2,3]),q=R.i(1,6),s=(p+1)*x-p*x;// OA = p x + q, BD = ...
+ const OA=p*x+q,BD=2*OA,r=R.pick([3,4,5]),t=r*x-BD;if(t===0)return null;
+ const fig=svg(330,190,N_ln([A,B,C,D],true)+N_ln([A,C])+N_ln([B,D])+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G)+txt('O',O[0],O[1]-12,'middle','v'));
+ return{q:`직사각형 ABCD의 두 대각선의 교점을 O라 하자. <span class="sg">OA</span> = ${p}x + ${q}, <span class="sg">BD</span> = ${r}x ${t<0?'+ '+(-t):'− '+t}일 때, x의 값은?`,fig,alt:`OA = ${p}x+${q}, BD = ${r}x${t<0?'+'+(-t):'−'+t}`,
+ ...mc(R,x,[x+1,x-1,OA,x*2,q],String),exp:`직사각형의 두 대각선은 길이가 같고 서로를 이등분 → <span class="sg">BD</span> = <span class="sg">AC</span> = 2<span class="sg">OA</span><br>${r}x ${t<0?'+ '+(-t):'− '+t} = 2(${p}x + ${q}) → x = <b>${x}</b>`}}});
+add({id:'n22-rhomb',u:'N4',name:'마름모의 성질',lv:2,g:R=>{const a=R.pick([20,24,25,28,30,32,34,35,36,38,40,42,44,46,48,50,52,55,56,58,60,62,64,65]);const k=R.pick(['ang','area']);
+ const A=[170,25],B=[60,100],C=[170,175],D=[280,100],O=[170,100],G=O;
+ if(k==='ang'){const ans=90-a;const fig=svg(330,195,N_ln([A,B,C,D],true)+N_ln([A,C])+N_ln([B,D])+N_rt(O,D,A)+N_ang(B,D,A,a+'°',26)+N_ang(A,B,C,'x',18)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G)+txt('O',O[0]+8,O[1]+16,'','v'));
+  return{q:`그림의 마름모 ABCD에서 두 대각선의 교점을 O라 하자. ∠ABD = ${a}°일 때, ∠x(∠BAC)의 크기는?`,fig,alt:`∠ABD = ${a}°`,...mc(R,ans,[a,180-2*a,2*a,90+a,ans+10].filter(v=>v>0&&v!==ans),N_deg),exp:`마름모의 두 대각선은 서로를 수직이등분하므로 ∠AOB = 90°<br>∠x = 180° − 90° − ${a}° = <b>${ans}°</b>`}}
+ const d1=R.pick([6,8,10,12,14,16]),d2=R.pick([8,10,12,16,18,20]);const S=d1*d2/2;const fig=svg(330,195,N_ln([A,B,C,D],true)+N_ln([A,C])+N_ln([B,D])+N_rt(O,D,A)+txt(`AC = ${d1} cm`,180,60,'start')+txt(`BD = ${d2} cm`,215,118,'start')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G));
+ return{q:`두 대각선의 길이가 각각 ${d1} cm, ${d2} cm인 마름모 ABCD의 넓이는?`,fig,alt:`대각선 ${d1}, ${d2}`,...mc(R,S,[S*2,d1+d2,S/2,2*(d1+d2),S+d1],N_cm2),exp:`마름모의 넓이 = ${fr(1,2)} × (두 대각선의 곱) = ${fr(1,2)} × ${d1} × ${d2} = <b>${S} cm²</b>`}}});
+add({id:'n22-sqtri',u:'N4',name:'[심화] 정사각형과 정삼각형',lv:3,g:R=>{const k=R.pick(['in','out']);const A=[80,30],B=[80,170],C=[220,170],D=[220,30];
+ if(k==='in'){const E=[150,170-140*Math.sqrt(3)/2],G=[150,100];const ask=R.pick(['AED','DAE','BEA']);const ans={AED:150,DAE:15,BEA:75}[ask];
+  const fig=svg(300,195,N_ln([A,B,C,D],true)+N_ln([B,E,C])+N_ln([A,E,D])+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G)+txt('E',E[0],E[1]+20,'middle','v')+N_tk(B,E)+N_tk(E,C)+N_tk(B,C));
+  return{q:`그림과 같이 정사각형 ABCD의 내부에 <span class="sg">BC</span>를 한 변으로 하는 정삼각형 EBC를 그렸다. ∠${ask}의 크기는?`,fig,alt:'정사각형 안의 정삼각형',...fixed(R.shuffle(['15°','30°','45°','60°','75°','150°'].filter(x=>x!==ans+'°').slice(0,4).concat(ans+'°')),ans+'°'),
+  exp:`<span class="sg">BA</span> = <span class="sg">BC</span> = <span class="sg">BE</span>이고 ∠ABE = 90° − 60° = 30°<br>△ABE는 이등변삼각형 → ∠BAE = ∠BEA = (180° − 30°) ÷ 2 = 75°<br>∠DAE = 90° − 75° = 15°, 같은 방법으로 ∠ADE = 15° → ∠AED = 180° − 30° = 150°<br>∴ ∠${ask} = <b>${ans}°</b>`}}
+ const E=[220+140*Math.sqrt(3)/2,100],G=[150,100];const ans=R.pick(['AEB','EAD']);const v={AEB:15,EAD:15}[ans];
+ const fig=svg(360,195,N_ln([A,B,C,D],true)+N_ln([D,E,C])+N_ln([A,E],false,'ln dash')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,[150,170])+txt('E',E[0]+8,E[1]+4,'','v'));
+ return{q:`그림과 같이 정사각형 ABCD의 바깥쪽에 <span class="sg">CD</span>를 한 변으로 하는 정삼각형 ECD를 그렸다. ∠DAE의 크기는?`,fig,alt:'정사각형 밖의 정삼각형',...fixed(R.shuffle(['10°','15°','20°','30°','45°']),'15°'),
+ exp:`<span class="sg">DA</span> = <span class="sg">DC</span> = <span class="sg">DE</span>, ∠ADE = 90° + 60° = 150°<br>△DAE는 이등변삼각형 → ∠DAE = (180° − 150°) ÷ 2 = <b>15°</b>`}}});
+add({id:'n22-trap',u:'N4',name:'등변사다리꼴',lv:1,g:R=>{const k=R.pick(['ang','len']);const A=[110,40],D=[230,40],B=[50,160],C=[290,160],G=[170,100];
+ if(k==='ang'){const b=R.pick([50,55,58,60,62,64,65,66,68,70,72,75]);const fig=svg(340,190,N_ln([A,B,C,D],true)+N_tk(A,B)+N_tk(D,C)+N_ang(B,C,A,b+'°',22)+N_ang(D,A,C,'x',20)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G));
+  return{q:`그림과 같이 <span class="sg">AD</span> ∥ <span class="sg">BC</span>인 등변사다리꼴 ABCD에서 ∠B = ${b}°일 때, ∠x(∠D)의 크기는?`,fig,alt:`∠B = ${b}°`,...mc(R,180-b,[b,90+b/2,180-2*b,360-2*b,90],N_deg),exp:`등변사다리꼴은 밑각의 크기가 같으므로 ∠C = ${b}°, <span class="sg">AD</span> ∥ <span class="sg">BC</span>이므로 ∠D = 180° − ∠C = <b>${180-b}°</b>`}}
+ const ad=R.pick([4,5,6,7,8]),bc=ad+R.pick([4,6,8]),h=R.pick([3,4,5,6]);const ans=(bc-ad)/2;
+ const fig=svg(340,190,N_ln([A,B,C,D],true)+N_ln([A,[A[0],160]],false,'ln dash')+N_ln([D,[D[0],160]],false,'ln dash')+N_tk(A,B)+N_tk(D,C)+N_lab(A,D,ad+' cm',G,14)+N_lab(B,C,bc+' cm',G,14)+txt('H',A[0],176,'middle','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G));
+ return{q:`그림과 같이 <span class="sg">AD</span> ∥ <span class="sg">BC</span>인 등변사다리꼴 ABCD의 꼭짓점 A에서 <span class="sg">BC</span>에 내린 수선의 발을 H라 하자. <span class="sg">AD</span> = ${ad} cm, <span class="sg">BC</span> = ${bc} cm일 때, <span class="sg">BH</span>의 길이는?`,fig,alt:`AD = ${ad}, BC = ${bc}`,
+ ...mc(R,ans,[bc-ad,ad/2,bc/2,ans+1,ad],N_cm),exp:`등변사다리꼴은 좌우가 대칭이므로 <span class="sg">BH</span> = (${bc} − ${ad}) ÷ 2 = <b>${ans} cm</b>`}}});
+add(bank('n22-qrel','N4','여러 가지 사각형 사이의 관계',2,[
+ ['평행사변형이 직사각형이 되는 조건은?','한 내각이 직각이다.',['이웃하는 두 변의 길이가 같다.','두 대각선이 서로 수직이다.','두 대각선이 서로를 이등분한다.','한 쌍의 대변이 평행하다.'],'평행사변형 + (한 내각 = 90° 또는 두 대각선의 길이가 같다) → 직사각형'],
+ ['평행사변형이 마름모가 되는 조건은?','두 대각선이 서로 수직이다.',['한 내각이 직각이다.','두 대각선의 길이가 같다.','두 쌍의 대각의 크기가 각각 같다.','대각선이 서로를 이등분한다.'],'평행사변형 + (이웃하는 두 변의 길이가 같다 또는 두 대각선이 수직) → 마름모'],
+ ['직사각형이 정사각형이 되는 조건은?','두 대각선이 서로 수직이다.',['두 대각선의 길이가 같다.','한 내각이 직각이다.','두 쌍의 대변이 평행하다.','대각선이 서로를 이등분한다.'],'직사각형 + (이웃하는 두 변의 길이가 같다 또는 두 대각선이 수직) → 정사각형'],
+ ['다음 중 두 대각선의 길이가 항상 같은 사각형으로만 짝지은 것은?','직사각형, 정사각형, 등변사다리꼴',['마름모, 정사각형','평행사변형, 직사각형','마름모, 등변사다리꼴','평행사변형, 마름모, 정사각형'],'두 대각선의 길이가 같은 사각형: 직사각형, 정사각형, 등변사다리꼴'],
+ ['다음 중 두 대각선이 서로를 수직이등분하는 사각형으로만 짝지은 것은?','마름모, 정사각형',['직사각형, 정사각형','평행사변형, 마름모','등변사다리꼴, 마름모','직사각형, 마름모'],'두 대각선이 서로를 수직이등분하는 사각형: 마름모, 정사각형'],
+ ['직사각형의 각 변의 중점을 차례로 연결하여 만든 사각형은?','마름모',['직사각형','정사각형','평행사변형이 아닌 사다리꼴','등변사다리꼴'],'직사각형의 대각선은 길이가 같으므로 중점을 이은 사각형의 네 변의 길이가 모두 같다 → 마름모'],
+ ['마름모의 각 변의 중점을 차례로 연결하여 만든 사각형은?','직사각형',['마름모','정사각형','등변사다리꼴','사다리꼴'],'마름모의 대각선은 수직이므로 중점을 이은 사각형은 네 각이 직각 → 직사각형']]));
+add({id:'n22-parea',u:'N4',name:'평행선과 삼각형의 넓이',lv:2,g:R=>{const S1=R.pick([12,15,18,20,24,30]),S2=R.pick([6,8,9,10,12]);if(S2>=S1)return null;const A=[110,40],D=[240,40],B=[50,165],C=[290,165],O=N_inter(A,C,B,D),G=[170,100];
+ const fig=svg(340,190,N_sh([A,O,B])+N_ln([A,B,C,D],true)+N_ln([A,C])+N_ln([B,D])+N_pt(O)+txt('O',O[0],O[1]-10,'middle','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G));
+ const ans=S1-S2;return{q:`그림과 같이 <span class="sg">AD</span> ∥ <span class="sg">BC</span>인 사다리꼴 ABCD에서 두 대각선의 교점을 O라 하자. △ABC의 넓이가 ${S1} cm², △OBC의 넓이가 ${S2} cm²일 때, 색칠한 △ABO의 넓이는?`,fig,alt:`△ABC = ${S1}, △OBC = ${S2}`,
+ ...mc(R,ans,[S2,S1,S1+S2,ans*2,S1/2].filter(v=>v!==ans),N_cm2),exp:`△ABO = △ABC − △OBC = ${S1} − ${S2} = <b>${ans} cm²</b><br>(참고: <span class="sg">AD</span> ∥ <span class="sg">BC</span>이므로 △ABC = △DBC, 따라서 △ABO = △DOC)`}}});
+add({id:'n22-qarea3',u:'N4',name:'[심화] 평행사변형에서 넓이의 비',lv:3,g:R=>{const [m,n]=R.pick([[1,2],[2,1],[1,3],[3,1],[2,3],[3,2]]),S=R.pick([60,72,90,120]);const ans=S/2*m/(m+n);if(!Number.isInteger(ans))return null;
+ const {A,B,C,D}=N_pgram(55,200,110),E=N_at(B,C,m/(m+n)),G=N_cen(A,B,C,D);
+ const fig=svg(330,190,N_sh([A,B,E])+N_ln([A,B,C,D],true)+N_ln([A,E])+N_ln([E,D],false,'ln dash')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G)+txt('E',E[0],E[1]+16,'middle','v'));
+ return{q:`넓이가 ${S} cm²인 평행사변형 ABCD에서 점 E는 <span class="sg">BC</span> 위의 점이고 <span class="sg">BE</span> : <span class="sg">EC</span> = ${m} : ${n}이다. 색칠한 △ABE의 넓이는?`,fig,alt:`BE:EC = ${m}:${n}`,
+ ...mc(R,ans,[S*m/(m+n),S/2*n/(m+n),S/2,ans+5,S/(m+n)].filter(v=>Number.isInteger(v)),N_cm2),exp:`△ABC = ${fr(1,2)} × ${S} = ${S/2}<br>△ABE : △AEC = <span class="sg">BE</span> : <span class="sg">EC</span> = ${m} : ${n}(높이가 같다)<br>△ABE = ${S/2} × ${fr(m,m+n)} = <b>${ans} cm²</b>`}}});
+
+/* ===== Ⅲ-1 도형의 닮음 ===== */
+add({id:'n22-sim1',u:'N5',name:'닮음비와 변의 길이',lv:1,g:R=>{const k=R.pick([2,3,[3,2],[5,2],[4,3],[5,3]]);const [p,q]=Array.isArray(k)?k:[k,1];const s=R.pick([2,3,4,6]),a=s*q,b=R.pick([3,4,5])*q,c=a*p/q,d=b*p/q;
+ const T1=[[40,150],[110,150],[60,90]],sc=p/q*0.9,T2=[[160,175],[160+70*sc,175],[160+20*sc,175-60*sc]];
+ const fig=svg(330,190,N_ln(T1,true)+N_ln(T2,true)+txt('A',T1[2][0],T1[2][1]-8,'middle','v')+txt('B',T1[0][0]-6,T1[0][1]+14,'end','v')+txt('C',T1[1][0]+6,T1[1][1]+14,'','v')+
+  txt('D',T2[2][0],T2[2][1]-8,'middle','v')+txt('E',T2[0][0]-6,T2[0][1]+14,'end','v')+txt('F',T2[1][0]+6,T2[1][1]+14,'','v')+N_lab(T1[0],T1[1],a,T1[2],14)+N_lab(T1[0],T1[2],b,T1[1],14)+N_lab(T2[0],T2[1],c,T2[2],14)+N_lab(T2[0],T2[2],'x',T2[1],14));
+ if(!Number.isInteger(d))return null;
+ return{q:`그림에서 △ABC ∽ △DEF일 때, x의 값은?`,fig,alt:`BC = ${a}, AB = ${b}, EF = ${c}`,...mc(R,d,[b*q/p,b+c-a,d+1,d-1,c].filter(v=>v!==d),String),exp:`닮음비 = <span class="sg">BC</span> : <span class="sg">EF</span> = ${a} : ${c} = ${q} : ${p}<br>${b} : x = ${q} : ${p} → x = <b>${d}</b>`}}});
+add(bank('n22-simc','N5','삼각형의 닮음 조건',1,[
+ ['두 삼각형에서 두 쌍의 대응각의 크기가 각각 같을 때의 닮음 조건은?','AA 닮음',['SAS 닮음','SSS 닮음','RHA 닮음','ASA 닮음'],'두 쌍의 대응각의 크기가 각각 같으면 AA 닮음'],
+ ['세 쌍의 대응변의 길이의 비가 같은 두 삼각형의 닮음 조건은?','SSS 닮음',['SAS 닮음','AA 닮음','RHS 닮음','ASA 닮음'],'세 쌍의 대응변의 길이의 비가 같으면 SSS 닮음'],
+ ['두 쌍의 대응변의 길이의 비가 같고 그 끼인각의 크기가 같은 두 삼각형의 닮음 조건은?','SAS 닮음',['SSS 닮음','AA 닮음','RHA 닮음','SSA 닮음'],'두 쌍의 대응변의 길이의 비가 같고 끼인각이 같으면 SAS 닮음'],
+ ['다음 중 항상 닮음인 도형이 <u>아닌</u> 것은?','두 직사각형',['두 원','두 정삼각형','두 정사각형','두 구'],'직사각형은 가로와 세로의 비가 다를 수 있으므로 항상 닮음은 아니다.'],
+ ['다음 중 항상 닮음인 도형은?','두 직각이등변삼각형',['두 이등변삼각형','두 마름모','두 직각삼각형','두 원기둥'],'직각이등변삼각형은 세 각이 90°, 45°, 45°로 항상 같으므로 AA 닮음']]));
+add({id:'n22-simf',u:'N5',name:'공통인 각을 가진 닮은 삼각형',lv:2,g:R=>{const k=R.pick(['sas','aa']);
+ if(k==='sas'){const kk=R.pick([2,3]),a=R.i(2,6),e=R.i(2,6);if(a===e||kk*e<=a||kk*a<=e)return null;const AB=kk*e,AC=kk*a,BC=kk*R.i(3,6),DE=BC/kk;
+  const A=[150,25],B=[40,175],C=[290,175],G=N_cen(A,B,C),D=N_at(A,B,a/AB),E=N_at(A,C,e/AC);
+  const fig=svg(330,195,N_ln([A,B,C],true)+N_ln([D,E])+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,[D[0]+30,D[1]])+N_v('E',E,[E[0]-30,E[1]])+N_lab(A,D,a,G,-12)+N_lab(D,B,AB-a,G,-12)+N_lab(A,E,e,G,-12)+N_lab(E,C,AC-e,G,-12)+N_lab(B,C,BC,A,14));
+  return{q:`그림의 △ABC에서 <span class="sg">AD</span> = ${a}, <span class="sg">DB</span> = ${AB-a}, <span class="sg">AE</span> = ${e}, <span class="sg">EC</span> = ${AC-e}, <span class="sg">BC</span> = ${BC}일 때, <span class="sg">DE</span>의 길이는?`,fig,alt:`AD=${a}, DB=${AB-a}, AE=${e}, EC=${AC-e}, BC=${BC}`,
+  ...mc(R,DE,[BC*a/AC,BC*e/AC,BC/2,DE+1,DE*2,BC-DE].filter(v=>v!==DE),v=>String(Math.round(v*100)/100)),exp:`<span class="sg">AD</span> : <span class="sg">AC</span> = ${a} : ${AC} = 1 : ${kk}, <span class="sg">AE</span> : <span class="sg">AB</span> = ${e} : ${AB} = 1 : ${kk}, ∠A는 공통<br>→ △ADE ∽ △ACB (SAS 닮음), 닮음비 1 : ${kk}<br><span class="sg">DE</span> = ${BC} ÷ ${kk} = <b>${DE}</b>`}}
+ const ad=R.pick([4,5,6,8]),ac=R.pick([9,10,12]),ab=R.pick([12,15,16,18]);const ae=ad*ac/ab;if(!Number.isInteger(ae)||ae>=ab)return null;// ∠AED=∠ACB 이면 △AED∽△ACB: AE/AC = AD/AB?
+ const AE=ac*ad/ab;// △ADE ∽ △ACB (AA): AD/AC = AE/AB → AE = AB*AD/AC
+ const x=ab*ad/ac;if(!Number.isInteger(x)||x>=ac)return null;
+ const A=[150,25],B=[40,175],C=[290,175],G=N_cen(A,B,C),D=N_at(A,B,ad/ab),E=N_at(A,C,x/ac);
+ const fig=svg(330,195,N_ln([A,B,C],true)+N_ln([D,E])+N_ang(D,A,E,'',14)+N_ang(C,B,A,'',16)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,[D[0]+30,D[1]])+N_v('E',E,[E[0]-30,E[1]])+N_lab(A,D,ad,G,-12)+N_lab(A,B,ab,G,16)+N_lab(A,C,ac,G,16)+N_lab(A,E,'x',G,-12));
+ return{q:`그림의 △ABC에서 ∠ADE = ∠ACB이다. <span class="sg">AD</span> = ${ad}, <span class="sg">AB</span> = ${ab}, <span class="sg">AC</span> = ${ac}일 때, x(<span class="sg">AE</span>)의 값은?`,fig,alt:`AD=${ad}, AB=${ab}, AC=${ac}`,
+ ...mc(R,x,[ad*ac/ab,ab-ad,ac-ad,x+1,x+2].filter(v=>v!==x&&Number.isInteger(v)),String),exp:`∠A 공통, ∠ADE = ∠ACB → △ADE ∽ △ACB (AA 닮음)<br><span class="sg">AD</span> : <span class="sg">AC</span> = <span class="sg">AE</span> : <span class="sg">AB</span> → ${ad} : ${ac} = x : ${ab}<br>x = <b>${x}</b>`}}});
+add({id:'n22-simrt',u:'N5',name:'직각삼각형의 닮음 (높이)',lv:2,g:R=>{const k=R.pick(['h','ab']);const [p,q]=R.pick([[4,9],[1,4],[2,8],[3,12],[4,16],[9,16],[1,9],[2,18],[3,27]]);const h=Math.sqrt(p*q);if(!Number.isInteger(h))return null;
+ const W=230,sc=W/(p+q),B=[40,170],C=[40+W,170],H=[40+p*sc,170],A=[H[0],170-h*sc>20?170-h*sc:20],G=N_cen(A,B,C);
+ const fig=svg(320,190,N_ln([A,B,C],true)+N_ln([A,H])+N_rt(H,C,A)+N_rt(A,B,C,8)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+txt('H',H[0],H[1]+16,'middle','v')+N_lab(B,H,p,A,14)+N_lab(H,C,q,A,14)+N_lab(A,H,k==='h'?'x':h,B,-10));
+ if(k==='h')return{q:`그림과 같이 ∠A = 90°인 직각삼각형 ABC의 꼭짓점 A에서 <span class="sg">BC</span>에 내린 수선의 발을 H라 하자. <span class="sg">BH</span> = ${p}, <span class="sg">CH</span> = ${q}일 때, x(<span class="sg">AH</span>)의 값은?`,fig,alt:`BH=${p}, CH=${q}`,...mc(R,h,[(p+q)/2,p*q,q-p,h+1,h*2].filter(v=>v!==h&&Number.isInteger(v)),String),
+  exp:`△ABH ∽ △CAH (AA 닮음)이므로 <span class="sg">AH</span>² = <span class="sg">BH</span> × <span class="sg">CH</span> = ${p} × ${q} = ${p*q}<br>∴ x = <b>${h}</b>`};
+ const ab2=p*(p+q),ab=Math.sqrt(ab2);if(!Number.isInteger(ab))return null;
+ return{q:`∠A = 90°인 직각삼각형 ABC의 꼭짓점 A에서 <span class="sg">BC</span>에 내린 수선의 발을 H라 하자. <span class="sg">BH</span> = ${p}, <span class="sg">CH</span> = ${q}일 때, <span class="sg">AB</span>의 길이는?`,fig,alt:`BH=${p}, CH=${q}`,...mc(R,ab,[h,Math.sqrt(q*(p+q)),p+1,ab+1,ab*2].filter(v=>Number.isInteger(v)&&v!==ab),String),
+ exp:`△ABC ∽ △HBA (AA 닮음)이므로 <span class="sg">AB</span>² = <span class="sg">BH</span> × <span class="sg">BC</span> = ${p} × ${p+q} = ${ab2}<br>∴ <span class="sg">AB</span> = <b>${ab}</b>`}}});
+add({id:'n22-simarea',u:'N5',name:'닮은 도형의 넓이의 비와 부피의 비',lv:2,g:R=>{const [m,n]=R.pick([[1,2],[2,3],[3,4],[2,5],[3,5],[1,3],[4,5]]);const k=R.pick(['area','vol','cost']);
+ if(k==='area'){const S=R.pick([4,8,12,16,20,24,36])*m*m;const ans=S/(m*m)*n*n;return{q:`닮음비가 ${m} : ${n}인 두 삼각형 A, B가 있다. 삼각형 A의 넓이가 ${S} cm²일 때, 삼각형 B의 넓이는?`,...mc(R,ans,[S*n/m,S*n*n*n/(m*m*m),S+n,ans/2,ans*2].filter(v=>Number.isInteger(v)),N_cm2),exp:`넓이의 비는 닮음비의 제곱 = ${m*m} : ${n*n}<br>${S} : x = ${m*m} : ${n*n} → x = <b>${ans} cm²</b>`}}
+ if(k==='vol'){const V=R.pick([2,3,4,5])*m*m*m;const ans=V/(m*m*m)*n*n*n;return{q:`닮음비가 ${m} : ${n}인 두 원기둥이 있다. 작은 원기둥의 부피가 ${V} cm³일 때, 큰 원기둥의 부피는?`,...mc(R,ans,[V*n/m,V*n*n/(m*m),ans/2,ans+V].filter(v=>Number.isInteger(v)),v=>v+' cm³'),exp:`부피의 비는 닮음비의 세제곱 = ${m**3} : ${n**3}<br>${V} : x = ${m**3} : ${n**3} → x = <b>${ans} cm³</b>`}}
+ const c=R.pick([2,3,4,5])*1000;const ans=c*n*n*n/(m*m*m);if(!Number.isInteger(ans))return null;return{q:`지름이 ${m*6} cm인 공 모양 초콜릿의 가격이 ${c}원이다. 같은 재료로 만든 지름이 ${n*6} cm인 공 모양 초콜릿의 가격은? (가격은 부피에 정비례한다.)`,
+ ...mc(R,ans,[c*n/m,c*n*n/(m*m),ans/2,ans+c].filter(v=>Number.isInteger(v)),v=>v.toLocaleString()+'원'),exp:`닮음비 ${m} : ${n} → 부피의 비 ${m**3} : ${n**3}<br>${c} × ${fr(n**3,m**3)} = <b>${ans.toLocaleString()}원</b>`}}});
+add({id:'n22-shadow',u:'N5',name:'닮음을 이용한 높이 재기',lv:1,g:R=>{const h=R.pick([1.2,1.5,1.6,1.8,2]),s=R.pick([0.8,1,1.2,1.5,2,2.4,3]),S=R.pick([6,8,9,10,12,15,16,18,20]);const H=Math.round(h*S/s*10)/10;if(H>40||Math.round(H)!==H&&Math.round(H*2)!==H*2)return null;
+ const fig=svg(330,190,N_ln([[20,170],[310,170]])+N_ln([[40,170],[40,40]])+N_ln([[40,40],[230,170]],false,'ln dash')+N_ln([[250,170],[250,130]])+N_ln([[250,130],[300,170]],false,'ln dash')+txt('나무',46,60,'','v')+txt('막대',256,128,'','v')+txt(`그림자 ${S} m`,135,186,'middle')+txt(`${s} m`,275,186,'middle')+txt(`${h} m`,244,152,'end'));
+ return{q:`같은 시각에 길이가 ${h} m인 막대의 그림자 길이는 ${s} m이고, 나무의 그림자 길이는 ${S} m이었다. 나무의 높이는?`,fig,alt:`막대 ${h} m, 그림자 ${s} m, 나무 그림자 ${S} m`,...mc(R,H,[S*s/h,S-s+h,H+1,H*2,H/2].map(v=>Math.round(v*10)/10),v=>v+' m'),
+ exp:`같은 시각의 막대와 나무, 그림자는 닮은 직각삼각형이다.<br>${h} : ${s} = x : ${S} → x = <b>${H} m</b>`}}});
+
+/* ===== Ⅲ-2 평행선과 선분의 길이의 비 · 무게중심 ===== */
+add({id:'n22-par1',u:'N6',name:'삼각형에서 평행선과 선분의 길이의 비',lv:1,g:R=>{const a=R.pick([2,3,4,5,6]),b=R.pick([2,3,4,6]),c=R.pick([3,4,5,6,8,9]);const k=R.pick(['side','base']);
+ const A=[150,25],B=[40,175],C=[290,175],t=a/(a+b),D=N_at(A,B,t),E=N_at(A,C,t),G=N_cen(A,B,C);
+ if(k==='side'){const d=c*b/a;if(!Number.isInteger(d))return null;const fig=svg(330,195,N_ln([A,B,C],true)+N_ln([D,E])+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,[D[0]+30,D[1]])+N_v('E',E,[E[0]-30,E[1]])+N_lab(A,D,a,G,-12)+N_lab(D,B,b,G,-12)+N_lab(A,E,c,G,-12)+N_lab(E,C,'x',G,-12));
+  return{q:`그림의 △ABC에서 <span class="sg">DE</span> ∥ <span class="sg">BC</span>일 때, x의 값은?`,fig,alt:`AD=${a}, DB=${b}, AE=${c}`,...mc(R,d,[c*a/b,c+b-a,d+1,c*(a+b)/a,b].filter(v=>v!==d),String),exp:`<span class="sg">DE</span> ∥ <span class="sg">BC</span>이므로 <span class="sg">AD</span> : <span class="sg">DB</span> = <span class="sg">AE</span> : <span class="sg">EC</span><br>${a} : ${b} = ${c} : x → x = <b>${d}</b>`}}
+ const bc=R.pick([10,12,14,15,16,18,20,21,24]),de=bc*a/(a+b);if(!Number.isInteger(de))return null;
+ const fig=svg(330,195,N_ln([A,B,C],true)+N_ln([D,E])+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,[D[0]+30,D[1]])+N_v('E',E,[E[0]-30,E[1]])+N_lab(A,D,a,G,-12)+N_lab(D,B,b,G,-12)+N_lab(D,E,'x',A,12)+N_lab(B,C,bc,A,14));
+ return{q:`그림의 △ABC에서 <span class="sg">DE</span> ∥ <span class="sg">BC</span>일 때, x의 값은?`,fig,alt:`AD=${a}, DB=${b}, BC=${bc}`,...mc(R,de,[bc*a/b,bc*b/(a+b),bc/2,de+1,de-1].filter(v=>v!==de&&Number.isInteger(v)),String),exp:`<span class="sg">AD</span> : <span class="sg">AB</span> = <span class="sg">DE</span> : <span class="sg">BC</span><br>${a} : ${a+b} = x : ${bc} → x = <b>${de}</b>`}}});
+add({id:'n22-par3',u:'N6',name:'세 평행선 사이의 선분',lv:2,g:R=>{const a=R.pick([3,4,5,6,8]),b=R.pick([4,5,6,9,10,12]),c=R.pick([2,3,4,5,6]);const x=c*b/a;if(!Number.isInteger(x))return null;
+ const ys=[40,40+a*110/(a+b),150];const p=[[60,ys[0]],[60+0.35*(ys[1]-40),ys[1]],[60+0.35*110,ys[2]]],q=[[230,ys[0]],[230-0.25*(ys[1]-40),ys[1]],[230-0.25*110,ys[2]]];
+ const fig=svg(330,180,ys.map((y,i)=>`<path class="ln" d="M20 ${f1(y)}H300"/>`+txt(['l','m','n'][i],306,y+4,'','v')).join('')+N_ln([[50,20],p[0],p[2],[p[2][0]+7,170]])+N_ln([[234,20],q[0],q[2],[q[2][0]-6,170]])+N_lab(p[0],p[1],a,q[0],-14)+N_lab(p[1],p[2],b,q[0],-14)+N_lab(q[0],q[1],c,p[0],-14)+N_lab(q[1],q[2],'x',p[0],-14));
+ return{q:`그림에서 세 직선 l, m, n이 서로 평행할 때, x의 값은?`,fig,alt:`왼쪽 ${a}, ${b} / 오른쪽 ${c}, x`,...mc(R,x,[c*a/b,c+b-a,x+1,x-1,b].filter(v=>v!==x&&Number.isInteger(v)),String),exp:`평행선 사이의 선분의 길이의 비는 같다.<br>${a} : ${b} = ${c} : x → x = <b>${x}</b>`}}});
+add({id:'n22-mid',u:'N6',name:'삼각형의 두 변의 중점을 연결한 선분',lv:1,g:R=>{const k=R.pick(['len','per']);const A=[150,25],B=[40,175],C=[290,175],M=N_mid(A,B),N=N_mid(A,C),G=N_cen(A,B,C);
+ const fig=svg(330,195,N_ln([A,B,C],true)+N_ln([M,N])+N_tk(A,M)+N_tk(M,B)+N_tk(A,N,2)+N_tk(N,C,2)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('M',M,[M[0]+30,M[1]])+N_v('N',N,[N[0]-30,N[1]]));
+ if(k==='len'){const bc=R.pick([8,10,12,14,16,18,20,22,24,9,11,13]);return{q:`그림의 △ABC에서 두 점 M, N은 각각 <span class="sg">AB</span>, <span class="sg">AC</span>의 중점이다. <span class="sg">BC</span> = ${bc} cm일 때, <span class="sg">MN</span>의 길이는?`,fig,alt:`BC = ${bc}`,...mc(R,bc/2,[bc,bc/3,bc*2,bc/2+1,bc/4].filter(v=>v!==bc/2),N_cm),exp:`삼각형의 두 변의 중점을 연결한 선분은 나머지 변과 평행하고 길이는 그 절반이다.<br><span class="sg">MN</span> = ${bc} ÷ 2 = <b>${bc/2} cm</b>`}}
+ const a=R.pick([6,7,8,9,10]),b=R.pick([8,10,12,14]),c=R.pick([9,11,12,13]);if(a>=b+c||b>=a+c||c>=a+b)return null;const ans=(a+b+c)/2;
+ return{q:`세 변의 길이가 ${a} cm, ${b} cm, ${c} cm인 △ABC의 세 변의 중점을 연결하여 만든 삼각형의 둘레의 길이는?`,...mc(R,ans,[a+b+c,(a+b+c)/3,(a+b+c)/4,ans+2,ans*1.5].filter(v=>v!==ans),N_cm),exp:`중점을 연결한 선분의 길이는 각각 마주 보는 변의 절반이므로 둘레 = (${a} + ${b} + ${c}) ÷ 2 = <b>${ans} cm</b>`}}});
+add({id:'n22-trapmid',u:'N6',name:'[심화] 사다리꼴에서 중점을 연결한 선분',lv:3,g:R=>{const ad=R.pick([4,6,8,10]),bc=ad+R.pick([4,6,8,10]);const k=R.pick(['mn','pq']);const ans=k==='mn'?(ad+bc)/2:(bc-ad)/2;
+ const A=[110,40],D=[110+ad*130/bc,40],B=[50,170],C=[300,170],M=N_mid(A,B),N=N_mid(D,C),P=N_inter(M,N,B,D),Q=N_inter(M,N,A,C),G=[170,100];
+ const fig=svg(340,195,N_ln([A,B,C,D],true)+N_ln([M,N])+N_ln([A,C],false,'ln dash')+N_ln([B,D],false,'ln dash')+N_tk(A,M)+N_tk(M,B)+N_tk(D,N,2)+N_tk(N,C,2)+[P,Q].map(N_pt).join('')+txt('P',P[0],P[1]-8,'middle','v')+txt('Q',Q[0],Q[1]-8,'middle','v')+
+  N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G)+N_v('M',M,G)+N_v('N',N,G)+N_lab(A,D,ad,G,14)+N_lab(B,C,bc,G,14));
+ return{q:`그림과 같이 <span class="sg">AD</span> ∥ <span class="sg">BC</span>인 사다리꼴 ABCD에서 두 점 M, N은 각각 <span class="sg">AB</span>, <span class="sg">DC</span>의 중점이고, <span class="sg">MN</span>이 두 대각선과 만나는 점을 P, Q라 하자. <span class="sg">AD</span> = ${ad} cm, <span class="sg">BC</span> = ${bc} cm일 때, ${k==='mn'?'<span class="sg">MN</span>':'<span class="sg">PQ</span>'}의 길이는?`,fig,alt:`AD=${ad}, BC=${bc}`,
+ ...mc(R,ans,k==='mn'?[bc-ad,ad+bc,bc/2,ans+1,(bc-ad)/2]:[(ad+bc)/2,bc-ad,ad/2,bc/2,ans+1].filter(v=>v!==ans),N_cm),
+ exp:`△ABC에서 <span class="sg">MQ</span> = ${fr(1,2)}<span class="sg">BC</span> = ${bc/2}, △ABD에서 <span class="sg">MP</span> = ${fr(1,2)}<span class="sg">AD</span> = ${ad/2}<br>${k==='mn'?`<span class="sg">MN</span> = ${fr(1,2)}(<span class="sg">AD</span> + <span class="sg">BC</span>) = <b>${ans} cm</b>`:`<span class="sg">PQ</span> = <span class="sg">MQ</span> − <span class="sg">MP</span> = ${bc/2} − ${ad/2} = <b>${ans} cm</b>`}`}}});
+add({id:'n22-bisr',u:'N6',name:'삼각형의 각의 이등분선',lv:2,g:R=>{const ab=R.pick([4,5,6,8,9,10,12]),ac=R.pick([6,8,10,12,15]);if(ab===ac)return null;const bc=R.pick([5,6,7,8,9,10,12,14,15]);if(bc>=ab+ac||ab>=bc+ac||ac>=ab+bc)return null;
+ const bd=bc*ab/(ab+ac);if(!Number.isInteger(bd*2))return null;const cosB=(bc*bc+ab*ab-ac*ac)/(2*bc*ab),cosC=(bc*bc+ac*ac-ab*ab)/(2*bc*ac);const T=N_tri(Math.acos(cosB)*180/Math.PI,Math.acos(cosC)*180/Math.PI),{A,B,C}=T,D=N_at(B,C,ab/(ab+ac)),G=N_cen(A,B,C);
+ const fig=svg(300,195,N_ln([A,B,C],true)+N_ln([A,D])+N_ang(A,B,D,'',20)+N_ang(A,D,C,'',26)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+txt('D',D[0],D[1]+16,'middle','v')+N_lab(A,B,ab,G,14)+N_lab(A,C,ac,G,14)+N_lab(B,D,'x',A,24));
+ return{q:`그림의 △ABC에서 <span class="sg">AD</span>는 ∠A의 이등분선이다. <span class="sg">AB</span> = ${ab}, <span class="sg">AC</span> = ${ac}, <span class="sg">BC</span> = ${bc}일 때, x(<span class="sg">BD</span>)의 값은?`,fig,alt:`AB=${ab}, AC=${ac}, BC=${bc}`,
+ ...mc(R,bd,[bc*ac/(ab+ac),bc/2,bd+1,bc*ab/ac,ab/2].filter(v=>v!==bd&&Number.isInteger(v*2)),v=>String(v)),exp:`각의 이등분선의 성질: <span class="sg">AB</span> : <span class="sg">AC</span> = <span class="sg">BD</span> : <span class="sg">DC</span> = ${ab} : ${ac}<br>x = ${bc} × ${fr(ab,ab+ac)} = <b>${bd}</b>`}}});
+add({id:'n22-cent',u:'N6',name:'삼각형의 무게중심',lv:1,g:R=>{const k=R.pick(['ad','gd','be']);const A=[150,25],B=[40,175],C=[290,175],D=N_mid(B,C),G=N_cen(A,B,C);
+ const fig=svg(330,195,N_ln([A,B,C],true)+N_ln([A,D])+N_ln([B,N_mid(A,C)],false,'ln dash')+N_tk(B,D)+N_tk(D,C)+N_pt(G)+txt('G',G[0]+8,G[1]-4,'','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+txt('D',D[0],D[1]+16,'middle','v'));
+ const v=R.pick([6,9,12,15,18,21,24]);if(k==='ad')return{q:`그림에서 점 G는 △ABC의 무게중심이고 <span class="sg">AD</span>는 중선이다. <span class="sg">AD</span> = ${v} cm일 때, <span class="sg">AG</span>의 길이는?`,fig,alt:`AD = ${v}`,...mc(R,v*2/3,[v/3,v/2,v*3/4,v*2/3+1].filter(x=>Number.isInteger(x)),N_cm),exp:`무게중심은 중선을 꼭짓점으로부터 2 : 1로 나눈다.<br><span class="sg">AG</span> = ${v} × ${fr(2,3)} = <b>${v*2/3} cm</b>`};
+ const w=R.pick([2,3,4,5,6,7]);if(k==='gd')return{q:`그림에서 점 G는 △ABC의 무게중심이다. <span class="sg">GD</span> = ${w} cm일 때, <span class="sg">AD</span>의 길이는?`,fig,alt:`GD = ${w}`,...mc(R,3*w,[2*w,w+2,4*w,3*w+1,w*1.5].filter(x=>Number.isInteger(x)),N_cm),exp:`<span class="sg">AG</span> : <span class="sg">GD</span> = 2 : 1이므로 <span class="sg">AG</span> = ${2*w}<br><span class="sg">AD</span> = ${2*w} + ${w} = <b>${3*w} cm</b>`};
+ return{q:`△ABC의 무게중심 G에 대하여 <span class="sg">AG</span> = ${2*w} cm일 때, 중선 <span class="sg">AD</span>와 <span class="sg">GD</span>의 길이의 합은?`,fig,alt:`AG = ${2*w}`,...mc(R,4*w,[3*w,5*w,2*w,4*w+1,6*w],N_cm),exp:`<span class="sg">GD</span> = ${fr(1,2)}<span class="sg">AG</span> = ${w}, <span class="sg">AD</span> = ${3*w}<br>${3*w} + ${w} = <b>${4*w} cm</b>`}}});
+add({id:'n22-centa',u:'N6',name:'무게중심과 넓이',lv:2,g:R=>{const S=R.pick([24,30,36,42,48,54,60,72,90]);const k=R.pick(['gbd','gbc','agce']);const A=[150,25],B=[40,175],C=[290,175],D=N_mid(B,C),E=N_mid(A,C),F=N_mid(A,B),G=N_cen(A,B,C);
+ const shade={gbd:[G,B,D],gbc:[G,B,C],agce:[A,G,D,C]}[k];const val={gbd:S/6,gbc:S/3,agce:S/3}[k];const name={gbd:'△GBD',gbc:'△GBC',agce:'사각형 AGDC의 일부인 △AGC'}[k];
+ const fig=svg(330,195,N_sh(k==='agce'?[A,G,C]:shade)+N_ln([A,B,C],true)+N_ln([A,D])+N_ln([B,E])+N_ln([C,F])+N_pt(G)+txt('G',G[0]+10,G[1]+4,'','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+txt('D',D[0],D[1]+16,'middle','v')+N_v('E',E,G)+N_v('F',F,G));
+ const nm=k==='agce'?'△AGC':name;return{q:`그림에서 점 G는 넓이가 ${S} cm²인 △ABC의 무게중심이다. 색칠한 ${nm}의 넓이는?`,fig,alt:`넓이 ${S}`,...mc(R,val,[S/6,S/3,S/2,S/4,S/12].filter(v=>v!==val&&Number.isInteger(v)),N_cm2),
+ exp:`세 중선은 삼각형을 넓이가 같은 6개의 삼각형으로 나눈다(각 ${S/6}).<br>${nm}은 ${val/(S/6)}개 → <b>${val} cm²</b>`}}});
+add({id:'n22-centd',u:'N6',name:'[심화] 무게중심의 무게중심',lv:3,g:R=>{const v=R.pick([18,27,36,45,54]);const ans=v*2/9;if(!Number.isInteger(ans))return null;const A=[150,20],B=[40,180],C=[290,180],D=N_mid(B,C),G=N_cen(A,B,C),G2=N_cen(G,B,C);
+ const fig=svg(330,200,N_ln([A,B,C],true)+N_ln([A,D])+N_ln([G,B],false,'ln dash')+N_ln([G,C],false,'ln dash')+N_pt(G)+N_pt(G2)+txt('G',G[0]+8,G[1]-2,'','v')+txt("G'",G2[0]+8,G2[1]+2,'','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+txt('D',D[0],D[1]+16,'middle','v'));
+ return{q:`그림에서 점 G는 △ABC의 무게중심이고, 점 G'은 △GBC의 무게중심이다. <span class="sg">AD</span> = ${v} cm일 때, <span class="sg">GG'</span>의 길이는?`,fig,alt:`AD = ${v}`,...mc(R,ans,[v/3,v/9,v*2/3,v/6,ans+2].filter(x=>Number.isInteger(x)&&x!==ans),N_cm),
+ exp:`<span class="sg">GD</span> = ${fr(1,3)} × ${v} = ${v/3}<br>G'은 △GBC의 중선 GD를 2 : 1로 나누므로 <span class="sg">GG'</span> = ${fr(2,3)} × ${v/3} = <b>${ans} cm</b>`}}});
+add({id:'n22-cone',u:'N6',name:'[심화] 원뿔 모양 그릇의 물의 부피',lv:3,g:R=>{const [m,n]=R.pick([[1,2],[1,3],[2,3],[3,4],[2,5]]);const V=R.pick([8,16,24,27,54,64,81,125])*1;const full=V*n**3/m**3;if(!Number.isInteger(full))return null;const k=R.pick(['more','full']);
+ const tip=[150,175],L=[60,25],Rr=[240,25],t=m/n,wl=N_at(tip,L,t),wr=N_at(tip,Rr,t);
+ const fig=svg(300,195,N_sh([tip,wl,wr])+N_ln([L,tip,Rr])+`<ellipse class="ln" cx="150" cy="25" rx="90" ry="12"/>`+`<ellipse class="ln" cx="150" cy="${f1(wl[1])}" rx="${f1((wr[0]-wl[0])/2)}" ry="${f1(12*t)}"/>`+txt(`물의 높이 : 그릇의 높이 = ${m} : ${n}`,150,192,'middle'));
+ const ans=k==='full'?full:full-V;return{q:`그림과 같이 원뿔 모양의 그릇에 물을 부었더니 물의 높이가 그릇의 높이의 ${fr(m,n)}이 되었고, 물의 부피는 ${V} cm³였다. ${k==='full'?'그릇의 부피':'그릇을 가득 채우려면 더 부어야 하는 물의 양'}은?`,fig,alt:`높이 비 ${m}:${n}, 물 ${V} cm³`,
+ ...mc(R,ans,[V*n/m,V*n*n/(m*m),k==='full'?full-V:full,ans*2].filter(v=>Number.isInteger(v)),v=>v+' cm³'),exp:`물과 그릇은 닮은 원뿔, 닮음비 ${m} : ${n} → 부피의 비 ${m**3} : ${n**3}<br>그릇의 부피 = ${V} × ${fr(n**3,m**3)} = ${full}${k==='more'?`<br>더 부어야 할 양 = ${full} − ${V} = <b>${ans} cm³</b>`:` → <b>${full} cm³</b>`}`}}});
+
+/* ===== Ⅳ 피타고라스 정리 ===== */
+const N_PY=[[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15],[7,24,25],[12,16,20],[9,40,41],[15,20,25],[10,24,26],[20,21,29],[12,35,37]];
+add({id:'n22-py1',u:'N7',name:'피타고라스 정리',lv:1,g:R=>{const t=R.pick(N_PY),k=R.pick(['hyp','leg']);const sc=140/Math.max(t[0],t[1]),C=[60,170],B=[60+t[1]*sc,170],A=[60,170-t[0]*sc],G=N_cen(A,B,C);
+ const L=k==='hyp'?[t[0],t[1],'x']:[t[0],'x',t[2]];const fig=svg(300,190,N_ln([A,B,C],true)+N_rt(C,A,B)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_lab(A,C,L[0],B,14)+N_lab(C,B,L[1],A,14)+N_lab(A,B,L[2],C,14));
+ const ans=k==='hyp'?t[2]:t[1];return{q:`그림의 직각삼각형 ABC에서 x의 값은?`,fig,alt:k==='hyp'?`두 변 ${t[0]}, ${t[1]}`:`변 ${t[0]}, 빗변 ${t[2]}`,...mc(R,ans,k==='hyp'?[t[0]+t[1],t[1]+1,t[2]+1,t[2]-1]:[t[2]-t[0],t[1]+1,t[1]-1,t[0]+1],String),
+ exp:k==='hyp'?`x² = ${t[0]}² + ${t[1]}² = ${t[0]**2+t[1]**2} → x = <b>${t[2]}</b>`:`x² = ${t[2]}² − ${t[0]}² = ${t[2]**2-t[0]**2} → x = <b>${t[1]}</b>`}}});
+add({id:'n22-pysq',u:'N7',name:'세 정사각형의 넓이',lv:1,g:R=>{const a=R.pick([9,16,25,36,49,64]),b=R.pick([16,25,36,64,81,100,144]);const k=R.pick(['big','small']);
+ const C=[140,140],A=[140,90],B=[220,140];const fig=svg(320,200,N_ln([A,B,C],true)+N_rt(C,A,B)+N_ln([A,[90,90],[90,140],C])+N_ln([C,[140,195],[220,195],B])+N_ln([A,[190,40],[270,90],B])+
+  txt(k==='big'?a+' cm²':a+' cm²',115,120,'middle')+txt(k==='big'?b+' cm²':'?',180,172,'middle')+txt(k==='big'?'?':(a+b)+' cm²',205,95,'middle'));
+ const ans=k==='big'?a+b:b;return{q:`그림은 직각삼각형의 세 변을 각각 한 변으로 하는 정사각형을 그린 것이다. ? 부분 정사각형의 넓이는?`,fig,alt:k==='big'?`작은 정사각형 ${a}, ${b}`:`정사각형 ${a}, 가장 큰 정사각형 ${a+b}`,...mc(R,ans,k==='big'?[Math.abs(b-a),a*b/10,ans+10,ans-5]:[a+b+a,b-a,ans+9,a].filter(v=>v!==ans),N_cm2),
+ exp:`빗변 위의 정사각형의 넓이 = 나머지 두 정사각형의 넓이의 합<br>${k==='big'?`${a} + ${b} = <b>${ans} cm²</b>`:`${a+b} − ${a} = <b>${ans} cm²</b>`}`}}});
+add({id:'n22-pyjudge',u:'N7',name:'직각삼각형이 되는 세 변',lv:1,g:R=>{const t=R.pick(N_PY),k=R.pick([1,2]);const s=t.map(v=>v*k);const bad=[];while(bad.length<4){const a=R.i(3,15),b=R.i(a,18),c=R.i(b+1,22);if(a*a+b*b!==c*c&&!bad.some(x=>x===`${a}, ${b}, ${c}`))bad.push(`${a}, ${b}, ${c}`)}
+ const ans=`${s[0]}, ${s[1]}, ${s[2]}`;return{q:`세 변의 길이가 다음과 같은 삼각형 중 직각삼각형인 것은? (단위: cm)`,...fixed(R.shuffle([ans,...bad]),ans),exp:`가장 긴 변의 제곱이 나머지 두 변의 제곱의 합과 같으면 직각삼각형<br>${s[0]}² + ${s[1]}² = ${s[0]**2+s[1]**2} = ${s[2]}² → <b>${ans}</b>`}}});
+add({id:'n22-pyobt',u:'N7',name:'예각·직각·둔각삼각형 판별',lv:2,g:R=>{const a=R.i(4,10),b=R.i(a,12),c=R.i(b,a+b-1);const L=c*c,Rr=a*a+b*b;const ans=L<Rr?'예각삼각형':L===Rr?'직각삼각형':'둔각삼각형';
+ return{q:`세 변의 길이가 ${a} cm, ${b} cm, ${c} cm인 삼각형은 어떤 삼각형인가?`,...fixed(['예각삼각형','직각삼각형','둔각삼각형','이등변삼각형이 아닌 직각삼각형','삼각형이 될 수 없다'],ans),
+ exp:`가장 긴 변 ${c}: ${c}² = ${L}, 나머지 두 변: ${a}² + ${b}² = ${Rr}<br>${L} ${L<Rr?'<':L===Rr?'=':'>'} ${Rr} → <b>${ans}</b>`}}});
+add({id:'n22-pyrect',u:'N7',name:'직사각형의 대각선과 사다리꼴',lv:2,g:R=>{const k=R.pick(['rect','trap']);
+ if(k==='rect'){const t=R.pick(N_PY);const fig=svg(320,170,N_ln([[60,30],[60,140],[260,140],[260,30]],true)+N_ln([[60,140],[260,30]])+txt(t[0]+' cm',52,90,'end')+txt('x cm',160,158,'middle')+txt(t[2]+' cm',172,78,'middle'));
+  return{q:`그림과 같이 세로의 길이가 ${t[0]} cm이고 대각선의 길이가 ${t[2]} cm인 직사각형의 넓이는?`,fig,alt:`세로 ${t[0]}, 대각선 ${t[2]}`,...mc(R,t[0]*t[1],[t[0]*t[2],t[1]*t[2]/2,t[0]*t[1]/2,(t[0]+t[1])*2],N_cm2),exp:`가로 = √(${t[2]}² − ${t[0]}²) = ${t[1]}<br>넓이 = ${t[0]} × ${t[1]} = <b>${t[0]*t[1]} cm²</b>`}}
+ const t=R.pick([[3,4,5],[6,8,10],[5,12,13],[9,12,15],[8,6,10],[12,5,13]]),ad=R.pick([4,5,6,7,8]);const bc=ad+t[1];const A=[60,40],D=[160,40],B=[60,160],C=[280,160];
+ const fig=svg(320,190,N_ln([A,B,C,D],true)+N_rt(B,C,A)+N_rt(A,B,D)+N_ln([D,[160,160]],false,'ln dash')+N_lab(A,D,ad+' cm',[170,100],14)+N_lab(B,C,bc+' cm',[170,100],14)+N_lab(D,C,t[2]+' cm',B,14)+N_lab(A,B,'x cm',C,14)+[['A',A],['B',B],['C',C],['D',D]].map(([n,P])=>N_v(n,P,[170,100])).join(''));
+ return{q:`그림과 같이 ∠A = ∠B = 90°인 사다리꼴 ABCD에서 <span class="sg">AD</span> = ${ad} cm, <span class="sg">BC</span> = ${bc} cm, <span class="sg">CD</span> = ${t[2]} cm일 때, x(<span class="sg">AB</span>)의 값은?`,fig,alt:`AD=${ad}, BC=${bc}, CD=${t[2]}`,...mc(R,t[0],[t[1],t[2]-t[1],t[0]+1,t[0]+2,ad].filter(v=>v!==t[0]),String),
+ exp:`점 D에서 <span class="sg">BC</span>에 수선을 그으면 밑변 = ${bc} − ${ad} = ${t[1]}, 빗변 = ${t[2]}인 직각삼각형<br>x = √(${t[2]}² − ${t[1]}²) = <b>${t[0]}</b>`}}});
+add({id:'n22-pytwo',u:'N7',name:'두 직각삼각형이 붙은 그림',lv:2,g:R=>{const a=R.pick([3,5,6,8,9,12]),t=N_PY.find(x=>x[0]===a||x[1]===a);const b=t[0]===a?t[1]:t[0],c=t[2];const t2=N_PY.find(x=>x[0]===c||x[1]===c);if(!t2)return null;const d=t2[0]===c?t2[1]:t2[0],e=t2[2];
+ const sc=140/Math.max(e,30),B=[60,170],C=[60+b*sc*1.2>200?200:60+b*sc*1.2,170],A=[60,170-a*sc*1.3<30?30:170-a*sc*1.3];const v=[C[0]-A[0],C[1]-A[1]],L=Math.hypot(...v),D=[C[0]+v[1]/L*90,C[1]-v[0]/L*90];
+ const fig=svg(330,195,N_ln([A,B,C],true)+N_ln([A,D,C])+N_rt(B,A,C)+N_rt(C,A,D)+N_v('A',A,[150,140])+N_v('B',B,[150,100])+N_v('C',C,[100,100])+N_v('D',D,[150,140])+N_lab(A,B,a,C,14)+N_lab(B,C,b,A,14)+N_lab(C,D,d,A,14)+N_lab(A,D,'x',C,14));
+ return{q:`그림에서 ∠B = ∠ACD = 90°이고 <span class="sg">AB</span> = ${a}, <span class="sg">BC</span> = ${b}, <span class="sg">CD</span> = ${d}일 때, x(<span class="sg">AD</span>)의 값은?`,fig,alt:`AB=${a}, BC=${b}, CD=${d}`,...mc(R,e,[c,a+b+d,c+d,e+1,e-1].filter(v=>v!==e),String),
+ exp:`△ABC에서 <span class="sg">AC</span>² = ${a}² + ${b}² = ${c*c} → <span class="sg">AC</span> = ${c}<br>△ACD에서 x² = ${c}² + ${d}² = ${e*e} → x = <b>${e}</b>`}}});
+add({id:'n22-pyiso',u:'N7',name:'이등변삼각형의 높이와 넓이',lv:2,g:R=>{const t=R.pick([[3,4,5],[5,12,13],[6,8,10],[8,15,17],[4,3,5],[12,5,13],[8,6,10]]);const half=t[0],h=t[1],s=t[2],S=half*h;
+ const B=[50,170],C=[250,170],H=[150,170],A=[150,170-140*h/Math.max(h,half*1.3)];const G=N_cen(A,B,C);
+ const fig=svg(300,190,N_ln([A,B,C],true)+N_ln([A,H],false,'ln dash')+N_rt(H,C,A)+N_tk(A,B)+N_tk(A,C)+N_lab(A,B,s+' cm',G,14)+N_lab(B,C,2*half+' cm',A,14)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+txt('H',156,164,'start','v'));
+ return{q:`그림과 같이 <span class="sg">AB</span> = <span class="sg">AC</span> = ${s} cm, <span class="sg">BC</span> = ${2*half} cm인 이등변삼각형 ABC의 넓이는?`,fig,alt:`등변 ${s}, 밑변 ${2*half}`,...mc(R,S,[S*2,half*s,2*half*s/2,S+half,h*s].filter(v=>v!==S),N_cm2),
+ exp:`꼭짓점 A에서 밑변에 내린 수선은 밑변을 이등분 → <span class="sg">BH</span> = ${half}<br>높이 <span class="sg">AH</span> = √(${s}² − ${half}²) = ${h}<br>넓이 = ${fr(1,2)} × ${2*half} × ${h} = <b>${S} cm²</b>`}}});
+add({id:'n22-pybox',u:'N7',name:'[심화] 직육면체 겉면을 따라가는 최단 거리',lv:3,g:R=>{const opt=R.pick([[3,4,5,12,13],[2,4,6,8,10],[4,5,3,12,15],[3,5,4,16,20],[2,3,5,12,13],[4,4,7,24,25]]);// a,b,c: 가로,세로,높이 → 펼쳤을 때 (a+b) 와 c
+ const [a,b,c]=opt;const cand=[Math.hypot(a+b,c),Math.hypot(a+c,b),Math.hypot(b+c,a)];const best=Math.min(...cand);const sq=Math.round(best*best);const ans=Number.isInteger(best)?String(best):`√${sq}`;
+ const fig=svg(320,190,`<path class="ln" d="M60 70H200V170H60Z M60 70L110 35H250L200 70 M250 35V135L200 170"/><path class="ln dash" d="M110 35V135H250 M110 135L60 170"/>`+txt(a+' cm',130,184,'middle')+txt(b+' cm',235,165,'start')+txt(c+' cm',52,124,'end')+N_pt([60,170])+N_pt([250,35])+txt('A',50,180,'end','v')+txt('G',258,30,'','v'));
+ const wr=[...cand.map(v=>Math.round(v*v)).filter(v=>v!==sq).map(v=>Number.isInteger(Math.sqrt(v))?String(Math.sqrt(v)):`√${v}`),`√${a*a+b*b+c*c}`,`√${sq+4}`,String(a+b+c)];
+ return{q:`그림과 같이 가로 ${a} cm, 세로 ${b} cm, 높이 ${c} cm인 직육면체의 꼭짓점 A에서 겉면을 따라 꼭짓점 G까지 가는 최단 거리는?`,fig,alt:`${a}×${b}×${c} 직육면체`,...mc(R,ans,wr.filter(x=>x!==ans)),
+ exp:`전개도로 펼치면 최단 거리는 직각삼각형의 빗변이 된다. 펼치는 방법 세 가지:<br>√((${a}+${b})² + ${c}²) = √${Math.round(cand[0]**2)}, √((${a}+${c})² + ${b}²) = √${Math.round(cand[1]**2)}, √((${b}+${c})² + ${a}²) = √${Math.round(cand[2]**2)}<br>가장 짧은 것: <b>${ans} cm</b>`}}});
+add({id:'n22-pyfold',u:'N7',name:'[심화] 직사각형 종이 접기',lv:3,g:R=>{const opt=R.pick([[8,10],[6,10],[12,13],[16,20],[9,15],[24,25],[15,17]]);const [ab,ad]=opt;const be=Math.sqrt(ad*ad-ab*ab);if(!Number.isInteger(be))return null;const ec=ad-be;const x=(ab*ab+ec*ec)/(2*ab);// DF = x?
+ // 꼭짓점 D가 BC 위 점 E에 오도록 AF를 접는 선: AE = AD, BE = √(AD²−AB²), EC = AD − BE, FC = ? (DF = FE, FC = AB − DF) → (AB−DF)² + EC² = DF² → DF = (AB²+EC²)/(2AB)
+ const fc=ab-x;if(!Number.isInteger(fc*2))return null;
+ const A=[50,40],B=[50,160],C=[290,160],D=[290,40],k=240/ad,E=[50+be*k,160],F=[290,160-fc*120/ab];
+ const fig=svg(330,190,N_ln([A,B,C,D],true)+N_ln([A,F],false,'ln dash')+N_ln([A,E,F])+txt('A',40,34,'','v')+txt('B',40,176,'','v')+txt('C',296,176,'','v')+txt('D',296,34,'','v')+txt('E',E[0],176,'middle','v')+txt('F',F[0]+6,F[1]+4,'','v')+txt(ab+' cm',44,104,'end')+txt(ad+' cm',170,30,'middle'));
+ return{q:`그림과 같이 <span class="sg">AB</span> = ${ab} cm, <span class="sg">AD</span> = ${ad} cm인 직사각형 ABCD를 <span class="sg">AF</span>를 접는 선으로 하여 꼭짓점 D가 <span class="sg">BC</span> 위의 점 E에 오도록 접었다. <span class="sg">FC</span>의 길이는?`,fig,alt:`AB=${ab}, AD=${ad}`,
+ ...mc(R,fc,[x,ec,be,fc+1,ab/2].filter(v=>v!==fc&&Number.isInteger(v*2)),v=>v+' cm'),exp:`<span class="sg">AE</span> = <span class="sg">AD</span> = ${ad} → <span class="sg">BE</span> = √(${ad}² − ${ab}²) = ${be}, <span class="sg">EC</span> = ${ec}<br><span class="sg">FC</span> = y라 하면 <span class="sg">EF</span> = <span class="sg">DF</span> = ${ab} − y<br>△EFC에서 (${ab} − y)² = y² + ${ec}² → y = <b>${fc} cm</b>`}}});
+
+/* ===== Ⅴ-1 경우의 수 ===== */
+add({id:'n22-dice',u:'N8',name:'두 주사위의 눈',lv:1,g:R=>{const k=R.pick(['sum','diff','mul','sumor']);let cnt=0,cond='';
+ if(k==='sum'){const s=R.i(3,11);cond=`나오는 두 눈의 수의 합이 ${s}`;for(let a=1;a<=6;a++)for(let b=1;b<=6;b++)if(a+b===s)cnt++}
+ else if(k==='diff'){const d=R.i(1,4);cond=`나오는 두 눈의 수의 차가 ${d}`;for(let a=1;a<=6;a++)for(let b=1;b<=6;b++)if(Math.abs(a-b)===d)cnt++}
+ else if(k==='mul'){const m=R.pick([4,6,12]);cond=`나오는 두 눈의 수의 곱이 ${m}`;for(let a=1;a<=6;a++)for(let b=1;b<=6;b++)if(a*b===m)cnt++}
+ else{const s1=R.i(3,6),s2=R.i(8,11);cond=`나오는 두 눈의 수의 합이 ${s1} 또는 ${s2}`;for(let a=1;a<=6;a++)for(let b=1;b<=6;b++)if(a+b===s1||a+b===s2)cnt++}
+ return{q:`서로 다른 두 개의 주사위를 동시에 던질 때, ${cond}인 경우의 수는?`,...mc(R,cnt,[cnt+1,cnt-1,cnt*2,36-cnt,6],N_cnt),exp:`두 눈을 (a, b)로 나타내어 조건에 맞는 경우를 모두 세면 <b>${cnt}가지</b>`}}});
+add({id:'n22-sumprod',u:'N8',name:'합의 법칙과 곱의 법칙',lv:1,g:R=>{const k=R.pick(['or','and','road']);
+ if(k==='or'){const a=R.i(3,7),b=R.i(2,6);return{q:`서점에 소설책 ${a}종류와 만화책 ${b}종류가 있다. 이 중에서 한 권을 사는 경우의 수는?`,...mc(R,a+b,[a*b,a+b+1,a*b-1,a,a+b-1],N_cnt),exp:`소설책 또는 만화책 → 합의 법칙: ${a} + ${b} = <b>${a+b}가지</b>`}}
+ if(k==='and'){const a=R.i(3,5),b=R.i(2,4),c=R.pick([1,2]);const ans=a*b*(c===2?2:1);return{q:`티셔츠 ${a}종류, 바지 ${b}종류${c===2?', 모자 2종류':''}가 있다. ${c===2?'티셔츠, 바지, 모자를 각각 하나씩':'티셔츠와 바지를 각각 하나씩'} 골라 입는 경우의 수는?`,...mc(R,ans,[a+b+(c===2?2:0),a*b,ans+1,ans*2],N_cnt),exp:`동시에 일어나는 경우 → 곱의 법칙: ${a} × ${b}${c===2?' × 2':''} = <b>${ans}가지</b>`}}
+ const a=R.i(2,4),b=R.i(2,4),d=R.i(1,3);const ans=a*b+d;const fig=svg(320,120,`<circle class="dot" cx="40" cy="60" r="4"/><circle class="dot" cx="160" cy="60" r="4"/><circle class="dot" cx="280" cy="60" r="4"/>`+txt('A',40,48,'middle','v')+txt('B',160,48,'middle','v')+txt('C',280,48,'middle','v')+
+  Array.from({length:a},(_,i)=>`<path class="ln" d="M40 60Q100 ${60-30+i*60/(a-1||1)} 160 60"/>`).join('')+Array.from({length:b},(_,i)=>`<path class="ln" d="M160 60Q220 ${60-30+i*60/(b-1||1)} 280 60"/>`).join('')+Array.from({length:d},(_,i)=>`<path class="ln dash" d="M40 60Q160 ${100+i*8} 280 60"/>`).join(''));
+ return{q:`그림과 같이 A 마을에서 B 마을로 가는 길이 ${a}가지, B 마을에서 C 마을로 가는 길이 ${b}가지, A 마을에서 B를 거치지 않고 C 마을로 바로 가는 길이 ${d}가지 있다. A 마을에서 C 마을로 가는 경우의 수는? (같은 마을을 두 번 지나지 않는다.)`,fig,alt:`A→B ${a}, B→C ${b}, A→C ${d}`,
+ ...mc(R,ans,[a*b,a+b+d,a*b*d,ans+1,a*b+d*2],N_cnt),exp:`B를 거치는 길: ${a} × ${b} = ${a*b}, 바로 가는 길: ${d}<br>합의 법칙: ${a*b} + ${d} = <b>${ans}가지</b>`}}});
+const N_fact=n=>n<=1?1:n*N_fact(n-1);
+add({id:'n22-line',u:'N8',name:'한 줄로 세우기',lv:2,g:R=>{const n=R.i(4,6),k=R.pick(['all','fix','adj','pick']);
+ if(k==='all'){const ans=N_fact(n);return{q:`${n}명의 학생을 한 줄로 세우는 경우의 수는?`,...mc(R,ans,[n*n,N_fact(n-1),ans/2,n*(n-1),ans+n].filter(Number.isInteger),N_cnt),exp:`${Array.from({length:n},(_,i)=>n-i).join(' × ')} = <b>${ans}가지</b>`}}
+ if(k==='fix'){const ans=N_fact(n-1);return{q:`A를 포함한 ${n}명의 학생을 한 줄로 세울 때, A가 맨 앞에 서는 경우의 수는?`,...mc(R,ans,[N_fact(n),N_fact(n-2),ans*2,n-1,ans+1],N_cnt),exp:`A를 맨 앞에 고정하고 나머지 ${n-1}명을 세우면 ${n-1}! = <b>${ans}가지</b>`}}
+ if(k==='adj'){const ans=N_fact(n-1)*2;return{q:`A, B를 포함한 ${n}명의 학생을 한 줄로 세울 때, A와 B가 이웃하여 서는 경우의 수는?`,...mc(R,ans,[N_fact(n-1),N_fact(n),N_fact(n-2)*2,ans/2*3].filter(Number.isInteger),N_cnt),exp:`A, B를 한 묶음으로 보면 ${n-1}명을 세우는 경우 ${N_fact(n-1)}가지, 묶음 안에서 A, B가 자리를 바꾸는 경우 2가지<br>${N_fact(n-1)} × 2 = <b>${ans}가지</b>`}}
+ const r=R.pick([2,3]);const ans=r===2?n*(n-1):n*(n-1)*(n-2);return{q:`${n}명의 학생 중에서 ${r}명을 뽑아 한 줄로 세우는 경우의 수는?`,...mc(R,ans,[r===2?n*(n-1)/2:n*(n-1)*(n-2)/6,N_fact(n),n*r,ans+n].filter(Number.isInteger),N_cnt),exp:`${r===2?`${n} × ${n-1}`:`${n} × ${n-1} × ${n-2}`} = <b>${ans}가지</b>`}}});
+add({id:'n22-card',u:'N8',name:'카드로 자연수 만들기',lv:2,g:R=>{const n=R.pick([4,5,6]),z=R.pick([true,false]),r=R.pick([2,3]);const digits=z?Array.from({length:n},(_,i)=>i):Array.from({length:n},(_,i)=>i+1);
+ const k=R.pick(['cnt','odd']);let cnt=0;const nums=[];const rec=(cur,used)=>{if(cur.length===r){if(cur[0]===0)return;const v=+cur.join('');if(k==='cnt'||v%2===1){cnt++;nums.push(v)}return}for(const d of digits)if(!used.includes(d))rec([...cur,d],[...used,d])};rec([],[]);
+ const desc=k==='cnt'?`${r}자리 자연수`:`${r}자리 홀수`;return{q:`${digits.join(', ')}의 숫자가 각각 하나씩 적힌 ${n}장의 카드 중에서 ${r}장을 뽑아 만들 수 있는 ${desc}의 개수는?`,...mc(R,cnt,[r===2?n*(n-1):n*(n-1)*(n-2),z?(n-1)*(n-1)*(r===3?n-2:1):n*n,cnt+n,cnt*2,cnt-(n-1)].filter(v=>v>0),v=>v+'개'),
+ exp:`${z?'맨 앞자리에는 0이 올 수 없음에 주의한다.<br>':''}${k==='odd'?'일의 자리에 홀수가 오는 경우를 먼저 정하고 나머지 자리를 채운다.<br>':''}조건을 만족하는 수: <b>${cnt}개</b>`}}});
+add({id:'n22-pick',u:'N8',name:'대표 뽑기',lv:2,g:R=>{const n=R.i(4,8),k=R.pick(['diff','same','three']);
+ if(k==='diff'){const ans=n*(n-1);return{q:`${n}명의 후보 중에서 회장 1명, 부회장 1명을 뽑는 경우의 수는?`,...mc(R,ans,[ans/2,n*2,n*n,ans+n].filter(Number.isInteger),N_cnt),exp:`자격이 다른 대표: ${n} × ${n-1} = <b>${ans}가지</b>`}}
+ if(k==='same'){const ans=n*(n-1)/2;return{q:`${n}명의 후보 중에서 대표 2명을 뽑는 경우의 수는?`,...mc(R,ans,[n*(n-1),n*2,ans+1,ans-1].filter(v=>v>0),N_cnt),exp:`자격이 같은 대표: (${n} × ${n-1}) ÷ 2 = <b>${ans}가지</b>`}}
+ const ans=n*(n-1)*(n-2)/6;return{q:`${n}명의 학생 중에서 청소 당번 3명을 뽑는 경우의 수는?`,...mc(R,ans,[n*(n-1)*(n-2),n*(n-1)/2,ans*2,ans+n].filter(Number.isInteger),N_cnt),exp:`자격이 같은 3명: (${n} × ${n-1} × ${n-2}) ÷ (3 × 2 × 1) = <b>${ans}가지</b>`}}});
+add({id:'n22-coin',u:'N8',name:'동전과 주사위',lv:1,g:R=>{const c=R.i(1,3),d=R.i(0,2);if(c+d<2)return null;const ans=2**c*6**d;const what=[c?`동전 ${c}개`:'',d?`주사위 ${d}개`:''].filter(Boolean).join('와 ');
+ return{q:`${what}를 동시에 던질 때, 일어나는 모든 경우의 수는?`,...mc(R,ans,[2*c+6*d,2**c+6**d,ans/2,ans*2].filter(v=>Number.isInteger(v)&&v>0),N_cnt),exp:`동전 1개: 2가지, 주사위 1개: 6가지 → 곱의 법칙<br>${[...Array(c).fill(2),...Array(d).fill(6)].join(' × ')} = <b>${ans}가지</b>`}}});
+add({id:'n22-color',u:'N8',name:'[심화] 영역 색칠하기',lv:3,g:R=>{const n=R.pick([3,4,5]),shape=R.pick(['row','band']);let ans,fig,desc;
+ if(shape==='row'){ans=n*(n-1)**3;fig=svg(320,90,['A','B','C','D'].map((l,i)=>`<rect class="ln" x="${30+i*65}" y="20" width="65" height="50"/>`+txt(l,62+i*65,50,'middle','v')).join(''));desc='그림과 같이 한 줄로 놓인 네 영역 A, B, C, D'}
+ else{ans=n*(n-1)*(n-2)*(n-2);fig=svg(300,170,`<rect class="ln" x="30" y="20" width="240" height="55"/><rect class="ln" x="30" y="75" width="80" height="75"/><rect class="ln" x="110" y="75" width="80" height="75"/><rect class="ln" x="190" y="75" width="80" height="75"/>`+txt('C',150,53,'middle','v')+txt('A',70,118,'middle','v')+txt('B',150,118,'middle','v')+txt('D',230,118,'middle','v'));desc='그림의 네 영역 A, B, C, D'}
+ return{q:`${desc}에 ${n}가지 색을 칠하려고 한다. 같은 색을 여러 번 써도 되지만 이웃한 영역은 서로 다른 색을 칠하는 경우의 수는?`,fig,alt:desc,...mc(R,ans,[n**4,n*(n-1)*(n-2)*(n-3),N_fact(n),ans+n,n*(n-1)*(n-1)*(n-2),n*(n-1)*(n-2)*(n-1)].filter(v=>Number.isInteger(v)&&v>0&&v!==ans),N_cnt),
+ exp:shape==='row'?`A: ${n}가지, B: A와 다른 색 ${n-1}가지, C: B와 다른 색 ${n-1}가지, D: C와 다른 색 ${n-1}가지<br>${n} × ${n-1} × ${n-1} × ${n-1} = <b>${ans}가지</b>`:`가장 많은 영역과 이웃한 C부터 칠한다: C ${n}가지, B(C와 다름) ${n-1}가지, A(B·C와 다름) ${n-2}가지, D(B·C와 다름) ${n-2}가지<br>${n} × ${n-1} × ${n-2} × ${n-2} = <b>${ans}가지</b>`}}});
+add({id:'n22-path',u:'N8',name:'[심화] 최단 경로의 수',lv:3,g:R=>{const w=R.i(2,4),h=R.i(2,3);const k=R.pick(['all','via']);const C=(n,r)=>{let v=1;for(let i=0;i<r;i++)v=v*(n-i)/(i+1);return v};
+ const px=k==='via'?R.i(1,w-1):0,py=k==='via'?R.i(1,h-1):0;const ans=k==='all'?C(w+h,w):C(px+py,px)*C(w-px+h-py,w-px);const s=50,ox=40,oy=30;
+ let g='';for(let i=0;i<=w;i++)g+=`<path class="ln" d="M${ox+i*s} ${oy}V${oy+h*s}"/>`;for(let j=0;j<=h;j++)g+=`<path class="ln" d="M${ox} ${oy+j*s}H${ox+w*s}"/>`;
+ g+=N_pt([ox,oy+h*s])+N_pt([ox+w*s,oy])+txt('A',ox-8,oy+h*s+14,'end','v')+txt('B',ox+w*s+8,oy-4,'','v')+(k==='via'?N_pt([ox+px*s,oy+(h-py)*s])+txt('P',ox+px*s+6,oy+(h-py)*s-6,'','v'):'');
+ return{q:`그림과 같은 길이 있다. A 지점에서 B 지점까지 ${k==='via'?'P 지점을 거쳐 ':''}최단 거리로 가는 경우의 수는?`,fig:svg(ox*2+w*s,oy*2+h*s,g),alt:`가로 ${w}칸, 세로 ${h}칸${k==='via'?`, P(${px},${py})`:''}`,
+ ...mc(R,ans,[C(w+h,w)+1,w*h,ans*2,w+h,k==='via'?C(w+h,w):ans+2].filter(v=>v!==ans),N_cnt),exp:k==='all'?`오른쪽 ${w}번, 위쪽 ${h}번을 나열하는 경우의 수 = 각 교차점에 도달하는 경우의 수를 차례로 더해 구하면 <b>${ans}가지</b>`:`A → P: ${C(px+py,px)}가지, P → B: ${C(w-px+h-py,w-px)}가지<br>곱의 법칙: <b>${ans}가지</b>`}}});
+
+/* ===== Ⅴ-2 확률 ===== */
+add({id:'n22-p1',u:'N9',name:'확률의 뜻',lv:1,g:R=>{const k=R.pick(['bead','dice','card']);
+ if(k==='bead'){const r=R.i(2,7),b=R.i(2,7),w=R.i(1,5),t=R.pick(['빨간','파란']);const f=t==='빨간'?r:b,n=r+b+w;return{q:`주머니 속에 빨간 구슬 ${r}개, 파란 구슬 ${b}개, 흰 구슬 ${w}개가 들어 있다. 한 개를 꺼낼 때, ${t} 구슬이 나올 확률은?`,...mc(R,N_fr(f,n),[N_fr(f,n-f),N_fr(n-f,n),N_fr(1,n),N_fr(f,n+1),N_fr(1,3)].filter(x=>x!==N_fr(f,n))),exp:`전체 ${n}개 중 ${t} 구슬 ${f}개 → <b>${N_fr(f,n)}</b>`}}
+ if(k==='dice'){const c=R.pick(['소수','3의 배수','6의 약수','4 이상']);const f={'소수':3,'3의 배수':2,'6의 약수':4,'4 이상':3}[c];return{q:`한 개의 주사위를 던질 때, ${c}의 눈이 나올 확률은?`,...mc(R,N_fr(f,6),[N_fr(f+1,6),N_fr(f-1,6),N_fr(6-f+1,6),N_fr(1,6),N_fr(f,5)].filter(x=>x!==N_fr(f,6))),exp:`6가지 중 ${c}: ${f}가지 → <b>${N_fr(f,6)}</b>`}}
+ const n=R.pick([10,12,15,20,30]),m=R.pick([3,4,5]);const f=Math.floor(n/m);return{q:`1부터 ${n}까지의 자연수가 각각 하나씩 적힌 ${n}장의 카드 중에서 한 장을 뽑을 때, ${m}의 배수가 나올 확률은?`,...mc(R,N_fr(f,n),[N_fr(f+1,n),N_fr(1,m+1),N_fr(f-1,n),N_fr(n-f,n),N_fr(m,n)].filter(x=>x!==N_fr(f,n))),exp:`${m}의 배수: ${f}개 → ${fr(f,n)} = <b>${N_fr(f,n)}</b>`}}});
+add({id:'n22-pnot',u:'N9',name:'어떤 사건이 일어나지 않을 확률',lv:2,g:R=>{const k=R.pick(['coin','pass','least']);
+ if(k==='coin'){const c=R.i(2,4);const N=2**c;return{q:`동전 ${c}개를 동시에 던질 때, 적어도 한 개는 앞면이 나올 확률은?`,...mc(R,N_fr(N-1,N),[N_fr(1,N),N_fr(1,2),N_fr(c,N),N_fr(N-2,N)].filter(x=>x!==N_fr(N-1,N))),exp:`(적어도 한 개는 앞면) = 1 − (모두 뒷면) = 1 − ${fr(1,N)} = <b>${N_fr(N-1,N)}</b>`}}
+ if(k==='pass'){const p=R.pick([[2,5],[3,4],[1,3],[3,5],[5,8],[4,7]]);return{q:`어떤 시험에 합격할 확률이 ${fr(p[0],p[1])}일 때, 불합격할 확률은?`,...mc(R,N_fr(p[1]-p[0],p[1]),[N_fr(p[0],p[1]),N_fr(1,p[1]),N_fr(p[1]-p[0],p[1]+1),N_fr(p[0],p[1]-p[0])].filter(x=>x!==N_fr(p[1]-p[0],p[1]))),exp:`1 − ${fr(p[0],p[1])} = <b>${N_fr(p[1]-p[0],p[1])}</b>`}}
+ const b=R.i(2,4),g=R.i(2,4),n=b+g;const all=n*(n-1)/2,none=g*(g-1)/2;return{q:`남학생 ${b}명, 여학생 ${g}명 중에서 대표 2명을 뽑을 때, 적어도 한 명은 남학생이 뽑힐 확률은?`,...mc(R,N_fr(all-none,all),[N_fr(none,all),N_fr(b,n),N_fr(b*g,all),N_fr(all-none-1,all)].filter(x=>x!==N_fr(all-none,all))),
+ exp:`전체: ${all}가지, 2명 모두 여학생: ${none}가지<br>1 − ${fr(none,all)} = <b>${N_fr(all-none,all)}</b>`}}});
+add({id:'n22-pand',u:'N9',name:'두 사건이 동시에 일어날 확률',lv:2,g:R=>{const k=R.pick(['bags','shot','dice']);
+ if(k==='bags'){const a=R.i(2,5),b=R.i(1,4),c=R.i(2,5),d=R.i(1,4);return{q:`A 주머니에는 흰 공 ${a}개, 검은 공 ${b}개, B 주머니에는 흰 공 ${c}개, 검은 공 ${d}개가 들어 있다. 두 주머니에서 각각 한 개씩 꺼낼 때, 두 공이 모두 흰 공일 확률은?`,
+  ...mc(R,N_fr(a*c,(a+b)*(c+d)),[N_fr(a+c,a+b+c+d),N_fr(b*d,(a+b)*(c+d)),N_fr(a*c+b*d,(a+b)*(c+d)),N_fr(a,a+b)].filter(x=>x!==N_fr(a*c,(a+b)*(c+d)))),exp:`${fr(a,a+b)} × ${fr(c,c+d)} = <b>${N_fr(a*c,(a+b)*(c+d))}</b>`}}
+ if(k==='shot'){const p=R.pick([[3,5],[2,3],[4,5],[3,4]]),q=R.pick([[1,2],[2,5],[3,5],[2,3]]);const t=R.pick(['both','one']);
+  const v=t==='both'?N_fr(p[0]*q[0],p[1]*q[1]):N_fr(p[0]*(q[1]-q[0])+(p[1]-p[0])*q[0],p[1]*q[1]);return{q:`명중률이 각각 ${fr(p[0],p[1])}, ${fr(q[0],q[1])}인 두 선수가 동시에 한 발씩 쏠 때, ${t==='both'?'두 선수 모두 명중시킬':'한 선수만 명중시킬'} 확률은?`,
+  ...mc(R,v,[N_fr(p[0]*q[0],p[1]*q[1]),N_fr((p[1]-p[0])*(q[1]-q[0]),p[1]*q[1]),N_fr(p[0]*q[1]+q[0]*p[1]-p[0]*q[0],p[1]*q[1]),N_fr(p[0]+q[0],p[1]+q[1])].filter(x=>x!==v)),
+  exp:t==='both'?`${fr(p[0],p[1])} × ${fr(q[0],q[1])} = <b>${v}</b>`:`(A만) + (B만) = ${fr(p[0],p[1])} × ${fr(q[1]-q[0],q[1])} + ${fr(p[1]-p[0],p[1])} × ${fr(q[0],q[1])} = <b>${v}</b>`}}
+ return{q:`동전 한 개와 주사위 한 개를 동시에 던질 때, 동전은 앞면이 나오고 주사위는 짝수의 눈이 나올 확률은?`,...mc(R,N_fr(1,4),[N_fr(1,2),N_fr(1,6),N_fr(1,12),N_fr(1,3),N_fr(3,4)]),exp:`${fr(1,2)} × ${fr(3,6)} = <b>${fr(1,4)}</b>`}}});
+add({id:'n22-pdraw',u:'N9',name:'연속하여 꺼내기 (꺼낸 것을 넣을 때·넣지 않을 때)',lv:2,g:R=>{const a=R.i(2,5),b=R.i(2,5),n=a+b,back=R.pick([true,false]);const v=back?N_fr(a*a,n*n):N_fr(a*(a-1),n*(n-1));
+ return{q:`주머니 속에 당첨 제비 ${a}개, 꽝 제비 ${b}개가 들어 있다. 한 개를 꺼내 확인하고 ${back?'다시 넣은 후':'다시 넣지 않고'} 또 한 개를 꺼낼 때, 두 번 모두 당첨 제비가 나올 확률은?`,...mc(R,v,[N_fr(a*a,n*n),N_fr(a*(a-1),n*(n-1)),N_fr(a,n),N_fr(2*a,n*n),N_fr(a*(a-1),n*n)].filter(x=>x!==v)),
+ exp:back?`꺼낸 것을 다시 넣으므로 두 번째도 ${fr(a,n)}<br>${fr(a,n)} × ${fr(a,n)} = <b>${v}</b>`:`첫 번째: ${fr(a,n)}, 두 번째는 남은 ${n-1}개 중 당첨 ${a-1}개 → ${fr(a-1,n-1)}<br>${fr(a,n)} × ${fr(a-1,n-1)} = <b>${v}</b>`}}});
+add(bank('n22-pprop','N9','확률의 성질',1,[
+ ['다음 중 옳지 <u>않은</u> 것은?','어떤 사건이 일어날 확률 p는 0 < p < 1이다.',['반드시 일어나는 사건의 확률은 1이다.','절대로 일어나지 않는 사건의 확률은 0이다.','사건 A가 일어날 확률이 p이면 일어나지 않을 확률은 1 − p이다.','확률은 0 이상 1 이하의 값이다.'],'확률 p의 범위는 0 ≤ p ≤ 1이다.'],
+ ['한 개의 주사위를 던질 때, 확률이 1인 사건은?','6 이하의 눈이 나온다.',['7의 눈이 나온다.','짝수의 눈이 나온다.','소수의 눈이 나온다.','6의 약수의 눈이 나온다.'],'1~6의 모든 눈이 6 이하이므로 반드시 일어나는 사건 → 확률 1'],
+ ['한 개의 주사위를 던질 때, 확률이 0인 사건은?','7의 배수의 눈이 나온다.',['1의 눈이 나온다.','홀수의 눈이 나온다.','3의 배수의 눈이 나온다.','6 이하의 눈이 나온다.'],'1~6 중 7의 배수는 없으므로 확률 0'],
+ ['사건 A가 일어날 확률이 0.3일 때, 사건 A가 일어나지 않을 확률은?','0.7',['0.3','0.6','1.3','0'],'1 − 0.3 = 0.7']]));
+add({id:'n22-pdeep',u:'N9',name:'[심화] 주사위로 정하는 방정식·점의 이동',lv:3,g:R=>{const k=R.pick(['eq','move']);
+ if(k==='eq'){const c=R.pick([6,8,12]);let f=0;for(let a=1;a<=6;a++)for(let b=1;b<=6;b++)if(c%a===0&&c/a===b)f++;// ax = ? 단순: 방정식 ax = b의 해가 ...
+  let g=0;for(let a=1;a<=6;a++)for(let b=1;b<=6;b++)if(b%a===0)g++;const v=N_fr(g,36);
+  return{q:`한 개의 주사위를 두 번 던져 처음 나온 눈의 수를 a, 두 번째 나온 눈의 수를 b라 할 때, 방정식 ax = b의 해가 정수일 확률은?`,...mc(R,v,[N_fr(g-2,36),N_fr(g+2,36),N_fr(6,36),N_fr(1,2),N_fr(g,30)].filter(x=>x!==v)),exp:`해 x = ${fr('b','a')}가 정수이려면 b가 a의 배수<br>a = 1: 6가지, a = 2: 3가지, a = 3: 2가지, a = 4, 5, 6: 각 1가지 → ${g}가지<br>${fr(g,36)} = <b>${v}</b>`}}
+ const n=R.pick([2,3]);// 동전 앞면 +1, 뒷면 −1, n번 던져 위치 0? n=2: 0 으로 돌아올 확률 1/2; n=3: 위치 1일 확률 3/8
+ const v=n===2?N_fr(1,2):N_fr(3,8);return{q:`수직선 위의 원점에 있는 점 P가 동전을 던져 앞면이 나오면 오른쪽으로 1만큼, 뒷면이 나오면 왼쪽으로 1만큼 움직인다. 동전을 ${n}번 던졌을 때, 점 P가 ${n===2?'원점':'1의 위치'}에 있을 확률은?`,
+ ...mc(R,v,[N_fr(1,4),N_fr(1,8),N_fr(3,4),N_fr(5,8),N_fr(1,3)].filter(x=>x!==v)),exp:n===2?`(앞, 뒤), (뒤, 앞) 2가지 → ${fr(2,4)} = <b>${v}</b>`:`앞면 2번, 뒷면 1번: (앞앞뒤), (앞뒤앞), (뒤앞앞) 3가지 → <b>${fr(3,8)}</b>`}}});
+
+_T.forEach(t=>{if(t.bank)return;const f=t.g;t.g=R=>{for(let i=0;i<400;i++){const r=f(R);if(r&&r.opts.length===5&&new Set(r.opts).size===5&&r.opts.includes(r.ans))return r}throw new Error('gen fail '+t.id)}});
+SEMS['2-2'].math={name:'수학',book:'동아 수학 2 · 2학기 (2022 개정)',T:_T,
+ units:[{id:'I',tag:'Ⅰ',name:'삼각형의 성질',subs:[['N1','이등변삼각형·직각삼각형의 합동'],['N2','외심과 내심']]},
+  {id:'II',tag:'Ⅱ',name:'사각형의 성질',subs:[['N3','평행사변형'],['N4','여러 가지 사각형']]},
+  {id:'III',tag:'Ⅲ',name:'도형의 닮음',subs:[['N5','닮은 도형'],['N6','평행선과 선분의 길이의 비·무게중심']]},
+  {id:'IV',tag:'Ⅳ',name:'피타고라스 정리',subs:[['N7','피타고라스 정리']]},
+  {id:'V',tag:'Ⅴ',name:'확률',subs:[['N8','경우의 수'],['N9','확률']]}],
+ presets:[['2학기 전체',null],['중간 (Ⅰ~Ⅱ)',['N1','N2','N3','N4']],['중간 (Ⅰ~Ⅲ)',['N1','N2','N3','N4','N5','N6']],['기말 (Ⅲ~Ⅴ)',['N5','N6','N7','N8','N9']]]};
+
+/* ===== 중2-2 영어 (동아 윤정미 영어 2 · Lesson 5–8, 자체 제작 문항) ===== */
+_T=[];
+/* L5는 1학기 앱에 있던 유형을 그대로 가져오고(2학기 중간 범위), 대화 유형을 더한다 */
+SEMS['2-1'].eng.T.filter(t=>/^A5/.test(t.u)).forEach(t=>_T.push(Object.assign({},t,{u:'B5'+t.u.slice(2)})));
+const E22_W6=[["recommend","추천하다","Can you ___ a good book for me?"],["independence","독립","Many people fought for the ___ of Korea."],["foreigner","외국인","He was a ___ who loved Korea."],["favor","부탁, 호의","Can I ask you a ___?"],["gather","모이다","Thousands of people ___ed in the square."],["event","사건, 행사","The photos showed the important ___ to the world."],["hide","숨다, 숨기다","The children ___ behind the door."],["similar","비슷한","Your bag is ___ to mine."],["medicine","의학; 약","She went to Canada to study ___."],["believe","믿다","I ___ that everyone is equal."],["movement","운동, 움직임","He joined the peace ___."],["historic","역사적으로 중요한","This is a ___ day for our country."],["article","기사","I read an ___ about the festival."],["situation","상황","The ___ became worse."],["return","돌아오다","He ___ed to his hometown after ten years."],["invitation","초대","Thank you for your kind ___."],["government","정부","The ___ made a new law."],["bury","묻다, 매장하다","Squirrels ___ nuts in the ground."],["review","논평, 감상문","I wrote a short ___ of the movie."],["be interested in","~에 관심이 있다"],["right away","즉시","She began to learn Korean ___."],["take pictures","사진을 찍다","He went up to the roof to ___."]];
+const E22_W7=[["festival","축제","The town holds a music ___ every summer."],["prefer","더 좋아하다","Do you ___ tea or coffee?"],["celebrate","기념하다, 축하하다","We ___ New Year's Day with our family."],["traditional","전통적인","They wore ___ clothes at the festival."],["decorate","장식하다","We ___ the room with flowers."],["parade","행진, 퍼레이드","A long ___ went down the main street."],["giant","거대한","There was a ___ statue in the square."],["statue","조각상","People took pictures in front of the ___."],["burn","타다, 태우다","They ___ old wooden boxes in the fire."],["symbolize","상징하다","The white dove ___s peace."],["hardly","거의 ~않다","It ___ gets dark in summer there."],["skeleton","해골, 뼈대","Some people dress up as ___s at the festival."],["visitor","방문객","Thousands of ___s come every year."],["various","다양한","You can enjoy ___ sports in the snow."],["firework","불꽃놀이","We watched the ___s at night."],["participate","참가하다","Anyone can ___ in the race."],["take place","개최되다, 일어나다","The festival will ___ in March."],["dress up as","~처럼 차려입다","I will ___ a pirate for the party."],["such as","~와 같은","I like winter sports ___ skiing."],["be held","열리다","The event will ___ next week."]];
+const E22_W8=[["travel","여행하다","I want to ___ back to the past."],["foolish","어리석은","Don't do anything ___."],["founder","설립자","He is the ___ of the company."],["possible","가능한","Is it ___ to see a dinosaur?"],["follow","따르다","Please ___ the instructions."],["instruction","지시, 설명","Read the ___s carefully."],["accident","사고","He was hurt in a car ___."],["cause","일으키다; 원인","Small mistakes can ___ big problems."],["appear","나타나다","A huge animal ___ed in front of us."],["scared","겁먹은","The boy was too ___ to move."],["panic","당황하다","Don't ___. Stay calm."],["whisper","속삭이다","She ___ed the answer to me."],["silence","침묵","There was a long ___ in the room."],["suddenly","갑자기","___, the lights went out."],["safely","안전하게","Everyone returned ___."],["stare","응시하다","He ___d at the strange sign."],["except","~을 제외하고","Everyone came ___ Tom."],["confused","혼란스러운","I was ___ by the new rules."],["shocked","충격받은","We were ___ at the news."],["take a step","한 걸음 내딛다","Don't ___ off the path."],["get back","돌아오다","When will you ___ home?"],["by mistake","실수로","I took his umbrella ___."]];
+add(vocab('e22-6v','B6V','어휘·숙어',E22_W6));add(vocab('e22-7v','B7V','어휘·숙어',E22_W7));add(vocab('e22-8v','B8V','어휘·숙어',E22_W8));
+
+/* --- L5 대화: 교통수단·소요 시간 --- */
+add(bank('e22-5d','B5D','대화: 교통수단과 소요 시간 묻기',1,[
+ ['대화의 빈칸에 들어갈 말로 알맞은 것은?'+psg('A: ___ can I get to the museum?<br>B: You can get there by subway.'),'How',['What','Why','Where','Who'],'교통수단(방법)을 물을 때: How can I get to ~?'],
+ ['대화의 빈칸에 들어갈 말로 알맞은 것은?'+psg('A: How long will it take?<br>B: ___'),"It'll take about 20 minutes.",["It's 20 kilometers away.","I'll take the bus.","It's next to the bank.","It takes the subway."],'소요 시간을 물으면 It will take + 시간으로 답한다.'],
+ ['다음 중 짝지어진 대화가 <u>어색한</u> 것은?',"A: How long will it take?<br>B: You can get there by bus.",["A: How can I get to the park?<br>B: You can take bus number 7.","A: How long will it take to get there?<br>B: About 15 minutes.","A: How can I get to the library?<br>B: You can walk there.","A: Can I get there by subway?<br>B: Yes, take line 2."],'소요 시간을 물었는데 교통수단으로 답했으므로 어색하다.'],
+ ['대화의 내용과 일치하는 것은?'+psg("A: Excuse me. How can I get to City Hall?<br>B: Take bus number 5 and get off at the third stop.<br>A: How long will it take?<br>B: It'll take about 10 minutes."),'A는 버스를 타고 시청에 갈 수 있다.',['A는 지하철을 타야 한다.','시청까지 30분 정도 걸린다.','두 번째 정류장에서 내려야 한다.','B는 시청에 가는 길을 모른다.'],'5번 버스를 타고 세 번째 정류장에서 내리며 약 10분 걸린다.']]));
+
+/* --- L6 문법: 지각동사 + 목적어 + 현재분사(동사원형) · so ~ that --- */
+const E22_PER=[['heard','people','shout','shouting','소리치는'],['saw','a boy','dance','dancing','춤추는'],['watched','the birds','fly','flying','나는'],['felt','the ground','shake','shaking','흔들리는'],['heard','someone','call','calling','부르는'],['saw','my sister','cry','crying','우는'],['noticed','a man','run','running','달리는'],['listened to','the children','sing','singing','노래하는']];
+add({id:'e22-6g',u:'B6G',name:'지각동사 + 목적어 + 현재분사/동사원형',lv:1,g:R=>{const x=R.pick(E22_PER);const k=R.pick(['fill','wrong']);
+ if(k==='fill'){const ans=R.pick([x[3],x[2]]);return{q:`${BL}${psg(`I ${x[0]} ${x[1]} ___ in the street.`)}`,...mc(R,ans,[`to ${x[2]}`,`${x[2]}s`,`to ${x[3]}`,`be ${x[3]}`,`to be ${x[3]}`].filter(v=>v!==ans&&v!==x[2]&&v!==x[3])),
+  exp:`지각동사(see, watch, hear, feel, listen to 등) + 목적어 + 동사원형/현재분사(-ing)<br>→ ${x[1]}가 ${x[4]} 것을 ${x[0]} → <b>${ans}</b>`}}
+ const ok=`I ${x[0]} ${x[1]} ${x[3]}.`;const others=R.shuffle(E22_PER.filter(y=>y!==x)).slice(0,4).map(y=>`I ${y[0]} ${y[1]} ${R.pick(['to '+y[2],'to '+y[3]])}.`);
+ return{q:`다음 중 어법상 올바른 문장은?`,...fixed(R.shuffle([ok,...others]),ok),exp:`지각동사의 목적격 보어로는 동사원형이나 현재분사(-ing)를 쓴다. to부정사는 쓸 수 없다.<br>∴ <b>${ok}</b>`}}});
+const E22_SO=[['tired','I went to bed early','피곤해서 일찍 잤다'],['hungry','she ate two bowls of rice','배가 고파서 밥을 두 그릇 먹었다'],['hot','we jumped into the pool','더워서 수영장에 뛰어들었다'],['hard','he was able to teach in Korean','열심히 해서 한국어로 가르칠 수 있었다'],['heavy','I couldn\'t carry the box','무거워서 상자를 옮길 수 없었다'],['funny','everyone laughed','웃겨서 모두 웃었다'],['fast','nobody could catch him','빨라서 아무도 그를 잡을 수 없었다'],['loud','we couldn\'t hear each other','시끄러워서 서로의 말을 들을 수 없었다']];
+add({id:'e22-6g2',u:'B6G',name:'so ~ that 구문',lv:2,g:R=>{const x=R.pick(E22_SO);const k=R.pick(['fill','mean','tooto']);
+ const subj=x[0]==='hard'?'He studied':x[0]==='fast'?'He ran':x[0]==='loud'?'The music was':x[0]==='heavy'?'The box was':x[0]==='funny'?'The movie was':x[0]==='hot'?'It was':x[0]==='hungry'?'She was':'I was';
+ if(k==='fill')return{q:`${BL}${psg(`${subj} ___ ${x[0]} that ${x[1]}.`)}`,...mc(R,'so',['such','too','very','that']),exp:`「so + 형용사/부사 + that + 주어 + 동사」: 매우 ~해서 …하다<br>→ ${x[2]} ∴ <b>so</b>`};
+ if(k==='mean')return{q:`다음 문장의 의미로 알맞은 것은?${psg(`${subj} so ${x[0]} that ${x[1]}.`)}`,...mc(R,`매우 ${x[2]}.`,[`${x[2].replace(/서 /,'지만 ')}`.replace(/다$/,'다.'),`${x[2]}면 좋겠다.`,`${x[2]}기 위해 노력했다.`,`${x[2]}는지 궁금했다.`].map(s=>s.replace('..','.'))),exp:`so ~ that …: 매우 ~해서 …하다 → <b>매우 ${x[2]}.</b>`};
+ const T2=R.pick([["I was so tired that I couldn't do my homework.","I was ___ tired to do my homework."],["The soup was so hot that I couldn't eat it.","The soup was ___ hot to eat."],["He was so sick that he couldn't go to school.","He was ___ sick to go to school."],["The box was so heavy that I couldn't carry it.","The box was ___ heavy to carry."]]);
+ return{q:`다음 두 문장의 의미가 같도록 할 때, 빈칸에 들어갈 말로 알맞은 것은?${psg(`${T2[0]}<br>= ${T2[1]}`)}`,...mc(R,'too',['so','very','enough','such']),exp:`「so + 형용사 + that + 주어 + couldn't + 동사원형」 = 「too + 형용사 + to부정사」(너무 ~해서 …할 수 없다) → <b>too</b>`}}});
+add(bank('e22-6d','B6D','대화: 종류 묻기와 추천 요청하기',1,[
+ ['대화의 빈칸에 들어갈 말로 알맞은 것은?'+psg('A: What ___ of music do you like?<br>B: I like K-pop.'),'kinds',['kind','kinding','time','many'],'좋아하는 종류를 물을 때: What kinds of ~ do you like?'],
+ ['대화의 빈칸에 들어갈 말로 알맞은 것은?'+psg('A: ___<br>B: Sure. I recommend <i>The Little Prince</i>.'),'Can you recommend a good book for me?',['What kinds of books do you read?','Did you read the book?','Where did you buy the book?','How long is the book?'],'Sure. I recommend ~로 답했으므로 추천을 요청하는 말이 알맞다.'],
+ ['다음 중 짝지어진 대화가 <u>어색한</u> 것은?','A: Can you recommend a movie for me?<br>B: I usually watch movies on weekends.',['A: What kinds of sports do you like?<br>B: I like team sports like soccer.','A: Can you recommend a restaurant?<br>B: How about Mario\'s? Their pizza is great.','A: What kinds of books do you usually read?<br>B: I usually read mystery novels.','A: Could you recommend a song for me?<br>B: Sure. Try this one.'],'추천을 요청했는데 영화를 보는 때를 말하고 있으므로 어색하다.'],
+ ['대화의 흐름상 B가 할 말로 가장 알맞은 것은?'+psg("A: I want to read a sci-fi novel. Can you recommend one?<br>B: ___"),"How about <i>The Time Traveler</i>? I think it's the best.",["I don't like science.","I read it yesterday.","No, I can't read.","It's a kind of cookie."],'추천 요청에 How about ~? / I recommend ~로 답한다.']]));
+/* L6 독해: 한국을 사랑한 외국인 (자체 지문) */
+const E22_P6=psg("Homer Hulbert was an American teacher. He came to Korea in 1886 to teach young students. At first, he couldn't speak Korean at all, but he studied so hard that he could teach in Korean after a few years. He loved Hangeul because it was easy to learn. He even made the first Korean textbook written only in Hangeul. Later, when Korea lost its freedom, he traveled to many countries and told people about the situation in Korea. Many people heard him speaking for Korea's independence. He once said, \"I would rather be buried in Korea than in Westminster Abbey.\" Today, he rests in Seoul as he wished.");
+add(bank('e22-6r','B6R','독해: 한국을 사랑한 외국인',2,[
+ [`${RQ2}${E22_P6}Homer Hulbert에 대한 내용으로 옳지 <u>않은</u> 것은?`,'처음부터 한국어를 잘했다.',['미국인 교사였다.','1886년에 한국에 왔다.','한글로만 된 교과서를 만들었다.','서울에 묻혔다.'],'처음에는 한국어를 전혀 못했지만 열심히 공부했다(couldn\'t speak Korean at all).'],
+ [`${RQ2}${E22_P6}Why did Hulbert love Hangeul?`,'Because it was easy to learn.',['Because it was very old.','Because his students made it.','Because it looked like English.','Because the king asked him to.'],'He loved Hangeul because it was easy to learn.'],
+ [`${RQ2}${E22_P6}What did Hulbert do when Korea lost its freedom?`,'He told people in many countries about Korea.',['He went back to America and stopped working.','He opened a hospital.','He wrote a novel in English.','He became a soldier.'],'he traveled to many countries and told people about the situation in Korea.'],
+ [`${RQ2}${E22_P6}윗글의 heard him speaking과 같은 문장 구조가 쓰인 것은?`,'I saw my brother playing the piano.',['I want you to come early.','It is fun to play soccer.','They call the dog Max.','I have never seen a whale.'],'지각동사 + 목적어 + 현재분사']]));
+
+/* --- L7 문법: 가주어 it ~ to부정사 · call/make/name + 목적어 + 명사 --- */
+const E22_IT=[['important','remember dead people','죽은 사람들을 기억하는 것은 중요하다'],['fun','dance at the festival','축제에서 춤추는 것은 재미있다'],['difficult','learn a new language','새로운 언어를 배우는 것은 어렵다'],['dangerous','swim in the river','강에서 수영하는 것은 위험하다'],['exciting','watch the parade','퍼레이드를 보는 것은 신난다'],['easy','make this cake','이 케이크를 만드는 것은 쉽다'],['necessary','wear a helmet','헬멧을 쓰는 것은 필요하다'],['interesting','learn about other cultures','다른 문화에 대해 배우는 것은 흥미롭다']];
+add({id:'e22-7g',u:'B7G',name:'가주어 it과 진주어 to부정사',lv:1,g:R=>{const x=R.pick(E22_IT);const k=R.pick(['it','to','trans']);
+ if(k==='it')return{q:`${BL}${psg(`___ is ${x[0]} to ${x[1]}.`)}`,...mc(R,'It',['That','This','There','What']),exp:`진주어 to부정사(to ${x[1]})가 길어서 뒤로 보내고, 주어 자리에 가주어 <b>It</b>을 쓴다.`};
+ if(k==='to')return{q:`${BL}${psg(`It is ${x[0]} ___ ${x[1]}.`)}`,...mc(R,'to',['for','that','of','and']),exp:`It(가주어) + is + 형용사 + <b>to</b> + 동사원형(진주어)`};
+ const ok=`It is ${x[0]} to ${x[1]}.`;return{q:`다음 우리말을 영어로 바르게 옮긴 것은?<div class="cond">${x[2]}.</div>`,...mc(R,ok,[`It is ${x[0]} ${x[1]}.`,`That is ${x[0]} to ${x[1]}.`,`It is ${x[0]} ${x[1].replace(/^(\w+)/,'$1ing')}.`.replace('swiming','swimming').replace('danceing','dancing').replace('makeing','making'),`To ${x[0]} is ${x[1]}.`,`It is ${x[0]} for ${x[1]}.`]),exp:`To ${x[1]} is ${x[0]}. = <b>${ok}</b>`}}});
+const E22_CALL=[['call','the festival','Fallas','그 축제를 Fallas라고 부른다'],['name','their baby','Minho','아기의 이름을 민호라고 짓다'],['make','him','a star','그를 스타로 만들다'],['call','me','Sunny','나를 Sunny라고 부른다'],['elect','her','class president','그녀를 반장으로 뽑다'],['name','the dog','Max','그 개를 Max라고 이름 짓다']];
+add({id:'e22-7g2',u:'B7G',name:'동사 + 목적어 + 명사 (5형식)',lv:2,g:R=>{const x=R.pick(E22_CALL);const k=R.pick(['order','wrong']);
+ const subj=x[0]==='elect'?'The students':x[0]==='make'?'The song':'They';const verb=x[0]==='make'?'made':x[0]==='elect'?'elected':x[0];
+ const ok=`${subj} ${verb} ${x[1]} ${x[2]}.`;
+ if(k==='order')return{q:`다음 우리말과 같도록 할 때 바르게 옮긴 것은?<div class="cond">${x[3]}</div>`,...mc(R,ok,[`${subj} ${verb} ${x[2]} ${x[1]}.`,`${subj} ${verb} ${x[1]} to ${x[2]}.`,`${subj} ${verb} ${x[1]} as to ${x[2]}.`,`${subj} ${verb} to ${x[1]} ${x[2]}.`,`${subj} ${verb} ${x[1]} for ${x[2]}.`]),exp:`「${x[0]} + 목적어 + 명사(목적격 보어)」: 목적어를 ~라고 부르다/짓다/~로 만들다<br>∴ <b>${ok}</b>`};
+ const pool=['They call it the Midsummer festival.','We named our cat Coco.','The news made him famous.','People call him a hero.'];const bad=[`They call the Midsummer festival it.`,`We named Coco our cat to.`,`The news made famous him.`,`People call to him a hero.`];const pick=R.pick([0,1,2,3]);
+ return{q:`다음 중 어법상 <u>어색한</u> 문장은?`,...fixed(R.shuffle([bad[pick],...pool.filter((_,i)=>i!==pick),ok].slice(0,5)),bad[pick]),exp:`목적어 뒤에 바로 목적격 보어(명사)가 온다. 바르게 고치면: ${pool[pick]}`}}});
+add(bank('e22-7d','B7D','대화: 선호와 이유 묻기',1,[
+ ['대화의 빈칸에 들어갈 말로 알맞은 것은?'+psg('A: ___ do you like more, pizza or pasta?<br>B: I like pizza more.'),'Which',['What','Who','Why','How'],'둘 중 선호를 물을 때: Which do you like more, A or B?'],
+ ['대화의 빈칸에 들어갈 말로 알맞은 것은?'+psg('A: Which do you like more, summer or winter?<br>B: I like summer more.<br>A: ___<br>B: Because I love swimming in the sea.'),'Why do you like summer more?',['When does summer start?','What do you do in winter?','How was your summer?','Where do you swim?'],'Because로 이유를 답했으므로 이유를 묻는 말이 알맞다.'],
+ ['다음 중 짝지어진 대화가 <u>어색한</u> 것은?','A: Why do you like spring more?<br>B: I like spring more.',['A: Which do you like more, cats or dogs?<br>B: I like dogs more.','A: Which do you prefer, tea or juice?<br>B: I prefer juice.','A: Why do you like the festival?<br>B: Because I can see fireworks.','A: Which season do you like more?<br>B: I like fall more because of the cool weather.'],'이유를 물었는데 이유를 말하지 않았다.'],
+ ['대화의 내용과 일치하는 것은?'+psg("A: We can do face painting or play VR games. Which do you like more?<br>B: I like face painting more.<br>A: Why?<br>B: Because I want to have a butterfly on my face."),'B는 페이스 페인팅을 더 좋아한다.',['B는 VR 게임을 더 좋아한다.','A는 나비를 그리고 싶어 한다.','두 사람은 게임을 하기로 했다.','B는 그 이유를 말하지 않았다.'],'B: I like face painting more. ~ Because I want to have a butterfly on my face.']]));
+/* L7 독해: 세계의 축제 (자체 지문) */
+const E22_P7=psg("Holi is a spring festival in India. It usually takes place in March. During the festival, people throw colorful powder and water at each other. They believe it is important to say goodbye to winter and welcome spring together. People call it the Festival of Colors. On the night before Holi, people make a big fire and sing and dance around it. The next day, the streets are full of people with pink, green, and yellow faces. It doesn't matter who you are. Everyone becomes a friend during Holi.");
+add(bank('e22-7r','B7R','독해: 세계의 축제',2,[
+ [`${RQ2}${E22_P7}윗글의 내용과 일치하지 <u>않는</u> 것은?`,'Holi는 겨울을 맞이하는 축제이다.',['Holi는 인도의 봄 축제이다.','보통 3월에 열린다.','사람들은 색 가루와 물을 서로에게 던진다.','Holi 전날 밤에 큰 불을 피운다.'],'겨울에 작별하고 봄을 맞이하는 축제이다(say goodbye to winter and welcome spring).'],
+ [`${RQ2}${E22_P7}What do people call Holi?`,'The Festival of Colors',['The Festival of Fire','The Winter Festival','The Water Day','The Festival of Lights'],'People call it the Festival of Colors.'],
+ [`${RQ2}${E22_P7}윗글의 It is important to say goodbye에서 It과 쓰임이 같은 것은?`,'It is fun to watch the parade.',['It is my new bike.','It is Monday today.','It is very cold outside.','It is two kilometers to the station.'],'가주어 It (진주어: to부정사)'],
+ [`${RQ2}${E22_P7}What happens on the night before Holi?`,'People make a big fire and dance around it.',['People throw powder at each other.','People go to bed early.','People clean the streets.','People eat cold food.'],'On the night before Holi, people make a big fire and sing and dance around it.']]));
+
+/* --- L8 문법: 현재완료 · 동사 + 목적어 + to부정사(want/ask/tell/expect) --- */
+const E22_PP=[['see','seen','such a huge animal'],['eat','eaten','Indian food'],['visit','visited','Jeju Island'],['ride','ridden','a horse'],['write','written','a poem'],['meet','met','a famous singer'],['be','been','to Japan'],['read','read','this book'],['take','taken','a cooking class'],['go','gone','to the store']];
+add({id:'e22-8g',u:'B8G',name:'현재완료',lv:1,g:R=>{const x=R.pick(E22_PP.filter(y=>y[0]!=='go'));const k=R.pick(['form','neg','use']);
+ if(k==='form'){const ans=`have ${x[1]}`;return{q:`${BL}${psg(`I ___ ${x[2]} before.`)}`,...mc(R,ans,[`have ${x[0]}`,`has ${x[1]}`,`am ${x[1]}`,`had ${x[0]}ing`,`have ${x[0]}ed`.replace('beed','been')].filter(v=>v!==ans)),exp:`경험을 나타내는 현재완료: have/has + 과거분사(${x[0]}–${x[1]})<br>∴ <b>${ans}</b>`}}
+ if(k==='neg'){const ans=`I've never ${x[1]} ${x[2]}.`;return{q:`다음 우리말을 영어로 바르게 옮긴 것은?<div class="cond">나는 한 번도 ~한 적이 없다 (${x[2]})</div>`,...mc(R,ans,[`I've ${x[1]} never ${x[2]}.`,`I never have ${x[0]} ${x[2]}.`,`I'm never ${x[1]} ${x[2]}.`,`I've never ${x[0]} ${x[2]}.`,`I haven't never ${x[1]} ${x[2]}.`].filter(v=>v!==ans)),exp:`현재완료의 부정: have/has + never(not) + 과거분사<br>∴ <b>${ans}</b>`}}
+ const items=[['I have lived here since 2020.','계속'],['She has just finished her homework.','완료'],['Have you ever seen a dinosaur?','경험'],['He has lost his key.','결과'],['We have known each other for five years.','계속'],['I have been to London twice.','경험'],['The train has already left.','완료'],['She has gone to Paris.','결과']];
+ const tgt=R.pick(items);const ans=tgt[0];const others=R.shuffle(items.filter(i=>i[1]!==tgt[1])).slice(0,4).map(i=>i[0]);
+ return{q:`다음 중 현재완료의 쓰임이 '${tgt[1]}'인 문장은?`,...fixed(R.shuffle([ans,...others]),ans),exp:`경험(ever, never, before, ~ times) / 계속(for, since) / 완료(just, already, yet) / 결과(lost, gone 등 현재까지 남은 결과)<br>∴ <b>${ans}</b>`}}});
+const E22_ing=w=>/[^aeiou]e$/.test(w)?w.slice(0,-1)+'ing':/^(win|run|swim|stop|sit)$/.test(w)?w+w.slice(-1)+'ing':w+'ing';
+const E22_WT=[['want','you','do anything foolish',"I don't want"],['ask','him','close the window','I asked'],['tell','us','be quiet','The teacher told'],['expect','her','win the race','We expect'],['want','me','clean my room','My mom wants'],['advise','them','take a rest','The doctor advised'],['allow','us','use our phones','The teacher allowed']];
+add({id:'e22-8g2',u:'B8G',name:'동사 + 목적어 + to부정사',lv:2,g:R=>{const x=R.pick(E22_WT);const k=R.pick(['fill','wrong']);
+ if(k==='fill'){const w=x[2].split(' ')[0],ans=`to ${w}`;return{q:`${BL}${psg(`${x[3]} ${x[1]} ___ ${x[2].split(' ').slice(1).join(' ')}.`)}`,...mc(R,ans,[w,E22_ing(w),`for ${w}`,`that ${w}`,`to ${E22_ing(w)}`].filter(v=>v!==ans)),
+  exp:`${x[0]} + 목적어 + to부정사: (목적어)가 ~하기를 ${x[0]==='want'?'원하다':x[0]==='ask'?'요청하다':x[0]==='tell'?'말하다':x[0]==='expect'?'기대하다':x[0]==='advise'?'충고하다':'허락하다'}<br>∴ <b>${ans}</b>`}}
+ const ok=`${x[3]} ${x[1]} to ${x[2]}.`;const bads=['I want you come early.','She told me cleaning my room.','He asked me helping him.','My parents want me being a doctor.','The coach told us running fast.','I expect him wins.'];
+ return{q:`다음 중 어법상 올바른 문장은?`,...fixed(R.shuffle([ok,...R.shuffle(bads).slice(0,4)]),ok),exp:`want, ask, tell, expect, advise, allow 등은 「목적어 + to부정사」를 목적격 보어로 쓴다.<br>∴ <b>${ok}</b>`}}});
+/* L8 독해: 시간 여행 이야기 (자체 지문) */
+const E22_P8=psg("Mina stepped into the time machine. \"Remember,\" said the guide, \"I don't want you to touch anything in the past. Even a small change can change the future.\" The machine took them back to the year 1900. Mina had never seen such an old town before. She walked slowly along the path. Suddenly, she saw a beautiful flower and picked it without thinking. When they returned to the present, everything looked a little different. The school was gone, and a large park was in its place. Mina looked at the flower in her hand. \"What have I done?\" she whispered.");
+add(bank('e22-8r','B8R','독해: 시간 여행 이야기',2,[
+ [`${RQ2}${E22_P8}가이드가 Mina에게 당부한 것은?`,'과거의 어떤 것도 만지지 말 것',['꽃을 꼭 가져올 것','빨리 걸을 것','사진을 많이 찍을 것','1900년에 머무를 것'],"I don't want you to touch anything in the past."],
+ [`${RQ2}${E22_P8}현재로 돌아왔을 때 달라진 것은?`,'학교가 사라지고 공원이 있었다.',['Mina의 집이 커졌다.','가이드가 사라졌다.','타임머신이 고장 났다.','꽃이 시들어 있었다.'],'The school was gone, and a large park was in its place.'],
+ [`${RQ2}${E22_P8}윗글의 마지막 부분에서 Mina가 느꼈을 심정으로 가장 알맞은 것은?`,'worried',['proud','bored','relieved','excited'],'자신의 행동으로 미래가 바뀐 것을 깨닫고 걱정했을 것이다.'],
+ [`다음 중 현재완료가 '경험'의 의미로 쓰인 문장은?`,'I have never ridden a horse.',['I have just finished lunch.','She has lived here for ten years.','He has lost his wallet.','They have already left.'],'never + 과거분사 → 경험']]));
+
+/* --- 심화 --- */
+const E22_OK=["This is the bag that I bought yesterday.","There used to be a big tree here.","I heard someone calling my name.","He was so tired that he fell asleep.","It is important to wear a helmet.","They call the dog Max.","I have never seen a whale.","Mom wants me to clean my room.","She has lived in Busan since 2019.","I saw him play the guitar."];
+const E22_BAD=["I heard someone to call my name.","He was such tired that he fell asleep.","That is important to wear a helmet.","They call Max the dog to.","I have never see a whale.","Mom wants me clean my room.","She has lived in Busan for 2019.","I used to living in Seoul.","I have seen the movie yesterday.","This is the bag who I bought."];
+add({id:'e22-dcnt',u:'B9',name:'[심화] 어법상 올바른 문장의 개수',lv:3,g:R=>{const n=R.i(1,4),ok=R.shuffle(E22_OK).slice(0,n),bad=R.shuffle(E22_BAD).slice(0,5-n);const L=R.shuffle([...ok,...bad]);const ab='abcde';
+ return{q:`다음 중 어법상 올바른 문장의 개수는?<div class="data" style="font-family:var(--f-body)">${L.map((s,i)=>`(${ab[i]}) ${s}`).join('<br>')}</div>`,...mc(R,n,[0,1,2,3,4,5].filter(v=>v!==n),v=>v+'개'),
+ exp:`올바른 문장: ${L.map((s,i)=>ok.includes(s)?`(${ab[i]})`:'').filter(Boolean).join(', ')} → <b>${n}개</b><br>틀린 문장: ${bad.join(' / ')}<br>(현재완료는 yesterday 같은 명백한 과거 표현과 함께 쓰지 않는다. for + 기간, since + 시점)`}}});
+add(bank('e22-dord','B9','[심화] 글의 순서 배열',3,[
+ ["주어진 글 다음에 이어질 순서로 알맞은 것은?"+psg("Every winter, a snow festival is held in a small town.<br>(A) After that, they make huge snow statues together.<br>(B) First, people from all over the world come to the town.<br>(C) At night, the statues shine with colorful lights."),"(B)-(A)-(C)",["(A)-(B)-(C)","(A)-(C)-(B)","(C)-(A)-(B)","(B)-(C)-(A)"],"First(B) → After that(A) → At night(C)"],
+ ["주어진 글 다음에 이어질 순서로 알맞은 것은?"+psg("Jake got into the time machine.<br>(A) There, he saw a huge dinosaur eating leaves.<br>(B) It took him back to 65 million years ago.<br>(C) He was so scared that he ran back to the machine."),"(B)-(A)-(C)",["(A)-(B)-(C)","(A)-(C)-(B)","(C)-(B)-(A)","(B)-(C)-(A)"],"과거로 이동(B) → 공룡을 봄(A) → 겁이 나서 돌아감(C)"],
+ ["주어진 글 다음에 이어질 순서로 알맞은 것은?"+psg("A foreign doctor came to Korea in 1916.<br>(A) Thanks to his effort, he could teach in Korean soon.<br>(B) He wanted to teach students in Korean.<br>(C) So he studied Korean very hard."),"(B)-(C)-(A)",["(A)-(B)-(C)","(C)-(A)-(B)","(B)-(A)-(C)","(C)-(B)-(A)"],"원함(B) → 그래서 공부(C) → 그 결과(A)"]]));
+add(bank('e22-dwr','B9','[심화] 우리말에 맞게 배열하기',3,[
+ ["우리말과 같도록 주어진 단어를 배열할 때 4번째 오는 단어는?"+psg("나는 그가 노래하는 것을 들었다.<br>(him / I / singing / heard / a song)"),"singing",["him","heard","a song","I"],"I heard him singing a song. → I(1) heard(2) him(3) singing(4)"],
+ ["우리말과 같도록 주어진 단어를 배열할 때 3번째 오는 단어는?"+psg("외국어를 배우는 것은 재미있다.<br>(is / to / it / fun / learn / a foreign language)"),"fun",["is","to","learn","it"],"It is fun to learn a foreign language. → It(1) is(2) fun(3)"],
+ ["우리말과 같도록 주어진 단어를 배열할 때 5번째 오는 단어는?"+psg("선생님은 우리에게 일찍 오라고 말씀하셨다.<br>(told / come / the / teacher / us / to / early)"),"to",["us","come","told","early"],"The teacher told us to come early. → The(1) teacher(2) told(3) us(4) to(5)"],
+ ["우리말과 같도록 주어진 단어를 배열할 때 4번째 오는 단어는?"+psg("나는 그렇게 큰 동물을 본 적이 없다.<br>(never / I've / such / seen / a huge animal)"),"such",["seen","never","a huge animal","I've"],"I've never seen such a huge animal. → I've(1) never(2) seen(3) such(4)"]]));
+
+_T.forEach(t=>{if(t.bank||t._w22)return;const f=t.g;t._w22=1;t.g=R=>{for(let i=0;i<400;i++){const r=f(R);if(r&&r.opts.length===5&&new Set(r.opts).size===5&&r.opts.includes(r.ans))return r}throw new Error('gen fail '+t.id)}});
+SEMS['2-2'].eng={name:'영어',book:'동아 영어 2 (윤정미) · Lesson 5–8',T:_T,
+ units:[{id:'L5',tag:'L5',name:'The City as a Canvas',subs:[['B5V','어휘'],['B5D','대화'],['B5G','문법'],['B5R','독해']]},
+  {id:'L6',tag:'L6',name:'The Greatest Love for All',subs:[['B6V','어휘'],['B6D','대화'],['B6G','문법'],['B6R','독해']]},
+  {id:'L7',tag:'L7',name:"Let's Enjoy Festivals",subs:[['B7V','어휘'],['B7D','대화'],['B7G','문법'],['B7R','독해']]},
+  {id:'L8',tag:'L8',name:'Time Travel',subs:[['B8V','어휘'],['B8G','문법'],['B8R','독해']]},
+  {id:'D',tag:'심화',name:'통합 심화',subs:[['B9','어법·배열 심화']]}],
+ presets:[['2학기 전체',null],['중간 (L5~L6)',['B5V','B5D','B5G','B5R','B6V','B6D','B6G','B6R']],['기말 (L7~L8)',['B7V','B7D','B7G','B7R','B8V','B8G','B8R','B9']],['문법만',['B5G','B6G','B7G','B8G','B9']]]};
+
+/* ===== 중2-2 과학 (미래엔 과학 2 · 2022 개정, Ⅴ~Ⅷ 단원, 자체 제작 문항) ===== */
+_T=[];
+const S22_r=v=>Math.round(v*100)/100;
+
+/* ===== Ⅴ 식물과 에너지 ===== */
+add(bank('s22-ps','R5','광합성의 재료와 산물',1,[
+ ['광합성에 필요한 물질로만 짝지은 것은?','물, 이산화 탄소',['물, 산소','포도당, 산소','이산화 탄소, 산소','포도당, 물'],'광합성: 이산화 탄소 + 물 → (빛에너지, 엽록체) → 포도당 + 산소'],
+ ['광합성 결과 만들어지는 물질로만 짝지은 것은?','포도당, 산소',['물, 이산화 탄소','산소, 이산화 탄소','녹말, 이산화 탄소','물, 질소'],'광합성 산물: 포도당(→ 녹말로 저장), 산소'],
+ ['광합성이 일어나는 세포 속 장소는?','엽록체',['핵','미토콘드리아','세포막','액포'],'엽록체 속의 엽록소가 빛에너지를 흡수하여 광합성이 일어난다.'],
+ ['광합성에 필요한 이산화 탄소가 주로 잎으로 들어오는 곳은?','기공',['뿌리털','물관','체관','엽록체'],'기체(이산화 탄소, 산소, 수증기)는 잎의 기공을 통해 드나든다.'],
+ ['잎에서 광합성으로 녹말이 만들어졌는지 확인할 때 쓰는 용액과 색 변화로 옳은 것은?','아이오딘-아이오딘화 칼륨 용액, 청람색',['베네딕트 용액, 황적색','뷰렛 용액, 보라색','수단 Ⅲ 용액, 선홍색','BTB 용액, 노란색'],'녹말은 아이오딘-아이오딘화 칼륨 용액과 반응하여 청람색을 띤다.'],
+ ['광합성에서 흡수한 빛에너지는 어떤 형태의 에너지로 바뀌어 저장되는가?','포도당 속의 화학 에너지',['열에너지','전기 에너지','소리 에너지','운동 에너지'],'빛에너지 → 양분(포도당) 속의 화학 에너지']]));
+add({id:'s22-psenv',u:'R5',name:'광합성에 영향을 미치는 환경 요인',lv:2,g:R=>{const k=R.pick(['light','co2','temp']);
+ if(k==='temp'){const opt=R.pick([30,35]);const fig=chart({w:300,h:190,x0:0,x1:50,y0:0,y1:10,xt:[0,10,20,30,40,50],yt:[],xl:'온도(°C)',yl:'광합성량',series:[[[[0,0.5],[10,3],[20,6.5],[opt,9],[opt+7,5],[48,0.5]]]]});
+  return{q:'그래프는 온도에 따른 광합성량을 나타낸 것이다. 이에 대한 설명으로 옳은 것은?',fig,alt:`${opt}°C에서 최대`,...fixed(R.shuffle([`약 ${opt}°C에서 광합성량이 가장 많다.`,'온도가 높을수록 광합성량은 계속 증가한다.','온도는 광합성에 영향을 주지 않는다.','0°C에서 광합성량이 가장 많다.','50°C에서도 광합성이 활발하다.']),`약 ${opt}°C에서 광합성량이 가장 많다.`),
+  exp:`광합성량은 온도가 높아질수록 증가하다가 약 ${opt}°C에서 최대가 되고, 그보다 높아지면 급격히 줄어든다(광합성에 관여하는 효소가 제 기능을 못 함).`}}
+ const sat=R.pick([4,5,6]);const fig=chart({w:300,h:190,x0:0,x1:10,y0:0,y1:10,xt:[0,2,4,6,8,10],yt:[],xl:k==='light'?'빛의 세기':'이산화 탄소 농도',yl:'광합성량',series:[[[[0,0],[sat,8],[10,8]]]]});
+ const nm=k==='light'?'빛의 세기':'이산화 탄소 농도';const ans=`${nm}가 일정 수준 이상이 되면 광합성량이 더 이상 증가하지 않는다.`;
+ return{q:`그래프는 ${nm}에 따른 광합성량을 나타낸 것이다. 이에 대한 설명으로 옳은 것은? (단, 다른 조건은 일정하다.)`,fig,alt:`${sat} 이후 일정`,...fixed(R.shuffle([ans,`${nm}가 셀수록 광합성량은 끝없이 증가한다.`,`${nm}는 광합성량에 영향을 주지 않는다.`,`${nm}가 0일 때 광합성량이 가장 많다.`,`${nm}가 증가하면 광합성량은 감소한다.`]),ans),
+ exp:`${nm}가 증가하면 광합성량이 증가하다가, 어느 수준(그래프의 ${sat}) 이상에서는 다른 요인이 부족하여 더 이상 증가하지 않고 일정해진다.`}}});
+add(bank('s22-resp','R5','광합성과 호흡',2,[
+ ['식물의 호흡에 대한 설명으로 옳은 것은?','낮과 밤 모두 일어난다.',['빛이 있을 때만 일어난다.','산소를 내보내고 이산화 탄소를 흡수한다.','엽록체에서 일어난다.','에너지를 저장하는 과정이다.'],'호흡은 살아 있는 모든 세포에서 항상(낮, 밤) 일어나며 양분을 분해하여 에너지를 얻는다.'],
+ ['광합성과 호흡을 비교한 것으로 옳지 <u>않은</u> 것은?','광합성은 밤에만 일어난다.',['광합성은 빛이 있을 때 일어난다.','호흡은 산소를 흡수한다.','광합성은 이산화 탄소를 흡수한다.','호흡은 에너지를 방출한다.'],'광합성은 빛이 있을 때(낮)에 일어난다.'],
+ ['빛이 강한 낮에 식물의 잎에서 기체가 출입하는 모습으로 옳은 것은?','산소를 내보내고 이산화 탄소를 흡수한다.',['산소를 흡수하고 이산화 탄소를 내보낸다.','기체가 전혀 출입하지 않는다.','산소와 이산화 탄소를 모두 흡수한다.','질소만 내보낸다.'],'낮에는 광합성량이 호흡량보다 많아 이산화 탄소 흡수, 산소 방출이 나타난다.'],
+ ['밤에 식물의 잎에서 기체가 출입하는 모습으로 옳은 것은?','산소를 흡수하고 이산화 탄소를 내보낸다.',['산소를 내보내고 이산화 탄소를 흡수한다.','산소만 내보낸다.','기체가 출입하지 않는다.','수소를 흡수한다.'],'밤에는 광합성이 일어나지 않고 호흡만 일어난다.'],
+ ['호흡에 대한 식으로 옳은 것은?','포도당 + 산소 → 이산화 탄소 + 물 + 에너지',['이산화 탄소 + 물 → 포도당 + 산소','포도당 + 이산화 탄소 → 산소 + 물','산소 + 물 → 포도당 + 에너지','녹말 + 물 → 산소 + 에너지'],'호흡: 포도당을 산소로 분해하여 생명 활동에 필요한 에너지를 얻는다.']]));
+add(bank('s22-store','R5','광합성 산물의 이동과 저장',1,[
+ ['잎에서 만들어진 녹말이 다른 기관으로 이동할 때의 형태와 통로로 옳은 것은?','설탕, 체관',['녹말, 물관','포도당, 물관','설탕, 물관','단백질, 체관'],'녹말은 물에 잘 녹는 설탕으로 바뀌어 밤에 주로 체관을 통해 이동한다.'],
+ ['광합성 산물이 주로 녹말 형태로 저장되는 식물은?','감자',['포도','양파','콩','땅콩'],'감자(줄기), 고구마(뿌리) 등에는 녹말로 저장된다. 포도·양파는 포도당(당), 콩은 단백질, 땅콩은 지방'],
+ ['물관에 대한 설명으로 옳은 것은?','뿌리에서 흡수한 물과 무기 양분이 이동한다.',['잎에서 만든 양분이 이동한다.','기체가 드나드는 통로이다.','광합성이 일어나는 장소이다.','설탕이 이동하는 통로이다.'],'물관: 물과 무기 양분, 체관: 광합성 산물(설탕)'],
+ ['광합성으로 만들어진 양분의 쓰임으로 옳지 <u>않은</u> 것은?','기공을 열고 닫는 데만 쓰인다.',['호흡으로 분해되어 에너지를 얻는 데 쓰인다.','식물의 몸을 구성하는 데 쓰인다.','열매나 뿌리에 저장된다.','생장에 쓰인다.'],'양분은 에너지원, 몸의 구성 성분, 저장 양분으로 쓰인다.']]));
+add({id:'s22-btb',u:'R5',name:'BTB 용액을 이용한 광합성·호흡 실험',lv:2,g:R=>{const k=R.pick(['light','dark','foil']);const map={light:['빛을 비춘 시험관','파란색','광합성으로 이산화 탄소가 줄어 용액이 염기성 쪽으로 변한다.'],dark:['어둠 속에 둔 시험관','노란색','호흡만 일어나 이산화 탄소가 늘어 산성 쪽으로 변한다.'],foil:['알루미늄 포일로 싼 시험관','노란색','빛이 차단되어 호흡만 일어나므로 이산화 탄소가 늘어난다.']}[k];
+ const t=svg(300,150,`<rect class="ln" x="60" y="20" width="40" height="110" rx="18"/><rect class="ln" x="200" y="20" width="40" height="110" rx="18" style="fill:var(--ink);opacity:.25"/><path class="ln" d="M75 70Q80 50 72 40M85 75Q92 52 88 38M215 70Q220 50 212 40M225 75Q232 52 228 38"/>`+txt('A: 빛을 비춤',80,146,'middle')+txt('B: 빛을 가림',220,146,'middle'));
+ return{q:`숨을 불어넣어 초록색으로 맞춘 BTB 용액이 든 시험관에 검정말을 넣고, ${map[0]}을(를) 몇 시간 동안 두었다(그림의 ${k==='light'?'A':'B'}). 이 시험관의 BTB 용액 색깔과 그 까닭으로 옳은 것은?`.replace('을(를)','을'),fig:t,alt:map[0],...fixed(R.shuffle([`${map[1]} – ${map[2]}`,`${map[1]==='파란색'?'노란색':'파란색'} – ${map[2]}`,`초록색 – 아무 변화도 일어나지 않는다.`,`${map[1]} – 산소가 늘어나 산성이 된다.`,`빨간색 – 녹말이 만들어진다.`]),`${map[1]} – ${map[2]}`),
+ exp:`BTB 용액: 산성(이산화 탄소 많음) 노란색, 중성 초록색, 염기성 파란색<br>${map[0]}: <b>${map[1]}</b> – ${map[2]}`}}});
+add(bank('s22-pdeep','R5','[심화] 광합성량과 호흡량의 비교',3,[
+ ['식물에서 광합성량과 호흡량이 같아지는 빛의 세기에서 나타나는 현상으로 옳은 것은?','겉보기에 기체의 출입이 없는 것처럼 보인다.',['산소만 많이 방출된다.','이산화 탄소만 방출된다.','호흡이 멈춘다.','광합성이 멈춘다.'],'광합성으로 흡수하는 이산화 탄소와 호흡으로 내보내는 이산화 탄소의 양이 같아 겉보기 기체 출입이 없다.'],
+ ['하루 동안 식물이 생장하려면 어떤 조건이 필요한가?','하루 광합성량이 하루 호흡량보다 많아야 한다.',['하루 호흡량이 광합성량보다 많아야 한다.','광합성량과 호흡량이 같아야 한다.','밤이 낮보다 길어야 한다.','호흡이 일어나지 않아야 한다.'],'광합성으로 만든 양분이 호흡으로 쓰는 양분보다 많아야 남는 양분으로 생장한다.'],
+ ['빛의 세기가 0일 때부터 점점 강해질 때, 식물의 이산화 탄소 출입에 대한 설명으로 옳은 것은?','처음에는 이산화 탄소를 방출하다가 점점 흡수하게 된다.',['처음부터 이산화 탄소를 흡수한다.','항상 이산화 탄소를 방출한다.','빛이 셀수록 이산화 탄소를 더 많이 방출한다.','이산화 탄소의 출입은 빛과 관계없다.'],'빛이 약하면 호흡량 > 광합성량(방출), 빛이 강해지면 광합성량 > 호흡량(흡수)']]));
+
+/* ===== Ⅵ 동물과 에너지 ===== */
+const S22_NUT=[['녹말','아이오딘-아이오딘화 칼륨 용액','청람색'],['포도당(당)','베네딕트 용액(가열)','황적색'],['단백질','뷰렛 용액(5% 수산화 나트륨 + 1% 황산 구리)','보라색'],['지방','수단 Ⅲ 용액','선홍색']];
+add({id:'s22-nut',u:'R6',name:'영양소 검출 반응',lv:1,g:R=>{const x=R.pick(S22_NUT),k=R.pick(['reag','color','food']);
+ if(k==='reag')return{q:`${x[0]}을 검출할 때 사용하는 용액은?`,...fixed(R.shuffle(S22_NUT.map(n=>n[1]).concat(['BTB 용액'])),x[1]),exp:`${x[0]} → <b>${x[1]}</b> → ${x[2]}`};
+ if(k==='color')return{q:`${x[1]}을(를) 넣었을 때 ${x[2]}이 나타났다. 검출된 영양소는?`.replace('을(를)','을'),...fixed(R.shuffle(['녹말','포도당(당)','단백질','지방','바이타민']),x[0]),exp:`${x[1]} + ${x[0]} → <b>${x[2]}</b>`};
+ const foods=[['밥','녹말'],['달걀흰자','단백질'],['식용유','지방'],['꿀물','포도당(당)']];const f=foods.find(y=>y[1]===x[0]);
+ return{q:`${f[0]}에 여러 검출 용액을 넣었을 때 나타나는 반응으로 가장 알맞은 것은?`,...fixed(R.shuffle(S22_NUT.map(n=>`${n[1].split('(')[0]} – ${n[2]}`).concat(['BTB 용액 – 파란색'])),`${x[1].split('(')[0]} – ${x[2]}`),exp:`${f[0]}에는 ${x[0]}이 많다 → <b>${x[1].split('(')[0]} – ${x[2]}</b>`}}});
+add(bank('s22-dig','R6','소화 효소와 소화 과정',2,[
+ ['침 속에 들어 있는 소화 효소와 그 작용으로 옳은 것은?','아밀레이스 – 녹말을 엿당으로 분해',['펩신 – 단백질 분해','라이페이스 – 지방 분해','트립신 – 녹말 분해','아밀레이스 – 단백질 분해'],'침의 아밀레이스는 녹말을 엿당으로 분해한다.'],
+ ['위에서 분비되는 소화 효소와 분해하는 영양소는?','펩신 – 단백질',['아밀레이스 – 녹말','라이페이스 – 지방','트립신 – 단백질','쓸개즙 – 지방'],'위액의 펩신은 염산의 도움을 받아 단백질을 분해한다.'],
+ ['이자액에 들어 있는 소화 효소를 모두 고른 것은?','아밀레이스, 트립신, 라이페이스',['펩신, 아밀레이스','쓸개즙, 펩신','펩신, 트립신','아밀레이스만'],'이자액: 아밀레이스(녹말), 트립신(단백질), 라이페이스(지방)'],
+ ['쓸개즙에 대한 설명으로 옳은 것은?','소화 효소는 없지만 지방의 소화를 돕는다.',['단백질을 분해하는 효소가 있다.','위에서 만들어진다.','녹말을 포도당으로 분해한다.','이자에서 만들어진다.'],'쓸개즙은 간에서 만들어져 쓸개에 저장되며, 지방을 작은 알갱이로 만들어 소화를 돕는다(효소 없음).'],
+ ['최종 소화 산물이 바르게 짝지어진 것은?','단백질 – 아미노산',['녹말 – 엿당','지방 – 포도당','단백질 – 지방산','녹말 – 아미노산'],'녹말 → 포도당, 단백질 → 아미노산, 지방 → 지방산 + 모노글리세리드'],
+ ['소화된 영양소를 주로 흡수하는 기관은?','소장',['위','식도','대장','간'],'소장 안쪽 벽의 융털에서 영양소를 흡수한다.']]));
+add({id:'s22-saliva',u:'R6',name:'침의 소화 작용 실험',lv:2,g:R=>{const temp=R.pick([35,37,40]);const k=R.pick(['which','why']);
+ const fig=svg(320,150,['A','B'].map((l,i)=>`<rect class="ln" x="${90+i*110}" y="20" width="32" height="90" rx="14"/>`+txt(l,106+i*110,128,'middle','v')).join('')+txt(`A: 녹말 + 물   B: 녹말 + 침   (${temp}°C)`,160,146,'middle'));
+ if(k==='which')return{q:`녹말 용액이 든 시험관 A에는 물을, B에는 침 용액을 넣고 ${temp}°C의 물에 10분 동안 두었다. 이후 아이오딘-아이오딘화 칼륨 용액과 베네딕트 용액으로 반응을 확인할 때의 결과로 옳은 것은?`,fig,alt:'A 물, B 침',
+  ...fixed(R.shuffle(['A는 청람색, B는 베네딕트 반응에서 황적색이 나타난다.','A는 황적색, B는 청람색이 나타난다.','A와 B 모두 청람색이 나타난다.','A와 B 모두 아무 변화가 없다.','B에서만 보라색이 나타난다.']),'A는 청람색, B는 베네딕트 반응에서 황적색이 나타난다.'),exp:`A: 녹말이 그대로 남아 아이오딘 반응(청람색)<br>B: 침의 아밀레이스가 녹말을 엿당으로 분해 → 베네딕트 반응(황적색)`};
+ return{q:`침의 소화 작용 실험에서 시험관을 약 ${temp}°C의 물에 넣어 두는 까닭은?`,fig,alt:'실험 장치',...fixed(R.shuffle(['소화 효소가 체온과 비슷한 온도에서 잘 작용하기 때문이다.','녹말을 끓여 없애기 위해서이다.','베네딕트 반응을 막기 위해서이다.','물이 증발하지 않게 하기 위해서이다.','침을 굳히기 위해서이다.']),'소화 효소가 체온과 비슷한 온도에서 잘 작용하기 때문이다.'),
+ exp:'소화 효소는 체온(약 35~40°C)에서 가장 활발하게 작용한다.'}}});
+function S22_heart(){const s=`<path class="ln" d="M150 30C95 30 70 70 75 110C80 150 120 175 150 190C180 175 220 150 225 110C230 70 205 30 150 30Z"/><path class="ln" d="M150 40V185M80 105H220"/>`;
+ return svg(300,200,s+txt('A',115,80,'middle','v')+txt('B',185,80,'middle','v')+txt('C',115,145,'middle','v')+txt('D',185,145,'middle','v')+txt('(앞에서 본 모습: 그림의 왼쪽이 몸의 오른쪽)',150,198,'middle'))}
+add({id:'s22-heart',u:'R6',name:'심장의 구조와 혈액 순환 경로',lv:2,g:R=>{const k=R.pick(['ra','lv','path','pulm']);const fig=S22_heart();const P={A:'우심방',B:'좌심방',C:'우심실',D:'좌심실'};
+ if(k==='ra')return{q:'그림은 사람의 심장 구조를 나타낸 것이다. 온몸을 돌고 온 혈액이 대정맥을 통해 들어오는 곳은?',fig,alt:'A 우심방, B 좌심방, C 우심실, D 좌심실',...fixed(['A (우심방)','B (좌심방)','C (우심실)','D (좌심실)','대동맥'],'A (우심방)'),exp:'온몸 → 대정맥 → <b>우심방</b> → 우심실 → 폐동맥 → 폐'};
+ if(k==='lv')return{q:'그림은 사람의 심장 구조를 나타낸 것이다. 근육이 가장 두껍고, 혈액을 대동맥을 통해 온몸으로 내보내는 곳은?',fig,alt:'A~D 심장의 네 방',...fixed(['A (우심방)','B (좌심방)','C (우심실)','D (좌심실)','폐정맥'],'D (좌심실)'),exp:'<b>좌심실</b>은 온몸으로 혈액을 내보내야 하므로 근육 벽이 가장 두껍다.'};
+ if(k==='path')return{q:'온몸 순환의 경로로 옳은 것은?',...fixed(R.shuffle(['좌심실 → 대동맥 → 온몸의 모세 혈관 → 대정맥 → 우심방','우심실 → 폐동맥 → 폐 → 폐정맥 → 좌심방','좌심방 → 대동맥 → 온몸 → 대정맥 → 우심실','우심방 → 대동맥 → 온몸 → 폐정맥 → 좌심실','좌심실 → 폐동맥 → 온몸 → 대정맥 → 좌심방']),'좌심실 → 대동맥 → 온몸의 모세 혈관 → 대정맥 → 우심방'),exp:'온몸 순환: 좌심실 → 대동맥 → 온몸 → 대정맥 → 우심방<br>폐순환: 우심실 → 폐동맥 → 폐 → 폐정맥 → 좌심방'};
+ return{q:'폐순환 과정에서 일어나는 일로 옳은 것은?',...fixed(R.shuffle(['폐에서 이산화 탄소를 내보내고 산소를 받는다.','온몸의 세포에 산소를 공급한다.','소장에서 영양소를 흡수한다.','콩팥에서 노폐물을 걸러 낸다.','폐동맥에는 산소가 많은 혈액이 흐른다.']),'폐에서 이산화 탄소를 내보내고 산소를 받는다.'),exp:'폐순환: 우심실 → 폐동맥(정맥혈) → 폐(기체 교환) → 폐정맥(동맥혈) → 좌심방'}}});
+add(bank('s22-blood','R6','혈액과 혈관',1,[
+ ['혈액의 구성 성분 중 산소를 운반하는 것은?','적혈구',['백혈구','혈소판','혈장','림프'],'적혈구의 헤모글로빈이 산소를 운반한다.'],
+ ['몸에 침입한 세균을 잡아먹는 혈구는?','백혈구',['적혈구','혈소판','혈장','헤모글로빈'],'백혈구는 식균 작용을 한다.'],
+ ['상처가 났을 때 혈액을 굳게 하여 출혈을 막는 것은?','혈소판',['적혈구','백혈구','혈장','콩팥'],'혈소판은 혈액 응고 작용을 한다.'],
+ ['혈관 벽이 가장 얇고 조직 세포와 물질 교환이 일어나는 혈관은?','모세 혈관',['동맥','정맥','대동맥','폐정맥'],'모세 혈관은 한 겹의 세포로 되어 있어 물질 교환이 일어난다.'],
+ ['정맥에 대한 설명으로 옳은 것은?','판막이 있어 혈액이 거꾸로 흐르는 것을 막는다.',['혈관 벽이 가장 두껍고 탄력성이 크다.','심장에서 나가는 혈액이 흐른다.','혈압이 가장 높다.','물질 교환이 일어난다.'],'정맥은 혈압이 낮아 판막이 있다. 동맥은 혈관 벽이 두껍고 탄력성이 크다.']]));
+add(bank('s22-breath','R6','호흡 운동',2,[
+ ['숨을 들이쉴 때(들숨) 일어나는 변화로 옳은 것은?','갈비뼈가 올라가고 가로막이 내려간다.',['갈비뼈가 내려가고 가로막이 올라간다.','흉강의 부피가 작아진다.','폐 속 압력이 높아진다.','폐에서 공기가 빠져나간다.'],'들숨: 갈비뼈↑, 가로막↓ → 흉강 부피↑ → 폐 내부 압력↓ → 공기가 들어온다.'],
+ ['숨을 내쉴 때(날숨) 일어나는 변화로 옳은 것은?','흉강의 부피가 작아지고 폐 속 압력이 높아진다.',['갈비뼈가 올라간다.','가로막이 내려간다.','폐의 부피가 커진다.','외부 공기가 폐로 들어온다.'],'날숨: 갈비뼈↓, 가로막↑ → 흉강 부피↓ → 폐 내부 압력↑ → 공기가 나간다.'],
+ ['호흡 운동 모형(고무막을 붙인 병과 풍선)에서 고무막을 아래로 당길 때의 결과로 옳은 것은?','풍선이 부풀어 오른다.',['풍선이 쪼그라든다.','병 속 압력이 높아진다.','아무 변화가 없다.','날숨에 해당한다.'],'고무막(가로막)을 당기면 병 속(흉강) 부피↑, 압력↓ → 풍선(폐)이 부푼다(들숨).'],
+ ['폐에서 기체 교환이 일어나는 곳은?','폐포',['기관','기관지','후두','가로막'],'폐포는 모세 혈관으로 둘러싸여 있어 산소와 이산화 탄소를 교환한다.'],
+ ['폐가 많은 수의 폐포로 이루어져 있어서 유리한 점은?','공기와 닿는 표면적이 넓어 기체 교환이 효율적이다.',['폐가 가벼워진다.','숨을 천천히 쉴 수 있다.','근육이 필요 없다.','혈액이 흐르지 않아도 된다.'],'폐포는 표면적을 넓혀 기체 교환을 효율적으로 한다.']]));
+add(bank('s22-excr','R6','배설',2,[
+ ['콩팥에서 오줌이 만들어지는 과정을 순서대로 나열한 것은?','여과 → 재흡수 → 분비',['재흡수 → 여과 → 분비','분비 → 여과 → 재흡수','여과 → 분비 → 흡수','흡수 → 여과 → 배출'],'사구체 → 보먼주머니(여과) → 세뇨관(재흡수, 분비)'],
+ ['단백질이 분해될 때 생기는 암모니아는 어디에서 독성이 약한 요소로 바뀌는가?','간',['콩팥','방광','이자','폐'],'암모니아는 간에서 요소로 바뀐 뒤 콩팥에서 오줌으로 나간다.'],
+ ['네프론에서 여과가 일어나는 곳은?','사구체에서 보먼주머니로',['세뇨관에서 모세 혈관으로','방광에서 요도로','콩팥 깔때기에서 오줌관으로','모세 혈관에서 세뇨관으로'],'혈압 차이로 크기가 작은 물질이 사구체에서 보먼주머니로 걸러진다.'],
+ ['정상인의 경우 여과는 되지만 모두 재흡수되어 오줌에 들어 있지 않은 물질은?','포도당',['요소','물','무기염류','단백질'],'포도당과 아미노산은 여과된 후 세뇨관에서 100% 재흡수된다(단백질은 너무 커서 여과되지 않음).'],
+ ['오줌이 몸 밖으로 나가는 경로로 옳은 것은?','콩팥 → 오줌관 → 방광 → 요도',['방광 → 콩팥 → 오줌관 → 요도','콩팥 → 방광 → 오줌관 → 요도','오줌관 → 콩팥 → 방광 → 요도','요도 → 방광 → 오줌관 → 콩팥'],'콩팥에서 만들어진 오줌은 오줌관을 거쳐 방광에 모였다가 요도로 나간다.']]));
+add(bank('s22-adeep','R6','[심화] 기관계의 통합적 작용',3,[
+ ['세포 호흡에 필요한 물질이 세포까지 오는 과정에 대한 설명으로 옳은 것은?','영양소는 소화계에서, 산소는 호흡계에서 흡수되어 순환계를 통해 세포로 운반된다.',['영양소와 산소는 모두 소화계에서 흡수된다.','산소는 배설계를 통해 들어온다.','순환계는 노폐물만 운반한다.','세포 호흡은 폐에서만 일어난다.'],'소화계(영양소) + 호흡계(산소) → 순환계(운반) → 세포 호흡 → 노폐물은 호흡계(CO₂), 배설계(요소 등)로 배출'],
+ ['세포 호흡 결과 생긴 이산화 탄소가 몸 밖으로 나가는 경로로 옳은 것은?','조직 세포 → 모세 혈관 → 대정맥 → 우심방 → 우심실 → 폐동맥 → 폐',['조직 세포 → 대동맥 → 좌심실 → 폐','조직 세포 → 콩팥 → 방광','조직 세포 → 폐정맥 → 좌심방 → 폐','조직 세포 → 소장 → 대장'],'이산화 탄소는 정맥혈을 따라 심장으로 돌아와 폐동맥을 거쳐 폐에서 배출된다.'],
+ ['운동을 할 때 호흡이 빨라지고 심장 박동이 빨라지는 까닭으로 옳은 것은?','세포 호흡에 필요한 산소와 영양소를 더 빨리 공급하기 위해서이다.',['소화를 빠르게 하기 위해서이다.','오줌을 많이 만들기 위해서이다.','체온을 낮추기 위해서이다.','혈액의 양을 줄이기 위해서이다.'],'운동 시 에너지가 많이 필요하므로 산소와 영양소 공급, 이산화 탄소 제거가 빨라져야 한다.']]));
+
+/* ===== Ⅶ 전기와 자기 ===== */
+const S22_SER=['털가죽','유리','명주','나무','고무','플라스틱'];
+add({id:'s22-fric',u:'R7',name:'마찰 전기와 대전',lv:1,g:R=>{let i,j;do{i=R.i(0,5);j=R.i(0,5)}while(i===j);const a=S22_SER[i],b=S22_SER[j];const pos=i<j?a:b,neg=i<j?b:a;const ask=R.pick(['+','-']);
+ const ans=ask==='+'?pos:neg;const jb=w=>(w.charCodeAt(w.length-1)-44032)%28?1:0;return{q:`대전열이 다음과 같을 때, ${a}${jb(a)?'과':'와'} ${b}${jb(b)?'을':'를'} 서로 마찰하면 ${ask==='+'?'(+)':'(−)'}전하로 대전되는 물체는?<div class="data">(+) ${S22_SER.join(' – ')} (−)</div>`,
+ ...fixed(R.shuffle([a,b,'둘 다 (+)전하','둘 다 (−)전하','대전되지 않는다']),ans),exp:`대전열에서 (+)쪽에 있는 물체가 전자를 잃어 (+)전하, (−)쪽 물체가 전자를 얻어 (−)전하로 대전된다.<br>${pos}: (+), ${neg}: (−) → <b>${ans}</b>`}}});
+add(bank('s22-induct','R7','전기력과 정전기 유도',2,[
+ ['마찰 전기가 생기는 까닭으로 옳은 것은?','두 물체 사이에서 전자가 이동하기 때문이다.',['원자핵이 이동하기 때문이다.','양성자가 새로 생기기 때문이다.','물체가 녹기 때문이다.','전자가 사라지기 때문이다.'],'마찰하면 전자가 한 물체에서 다른 물체로 이동한다. 원자핵(양성자)은 이동하지 않는다.'],
+ ['(−)전하로 대전된 막대를 대전되지 않은 금속 캔에 가까이 할 때의 결과로 옳은 것은?','캔이 막대 쪽으로 끌려온다.',['캔이 막대에서 멀어진다.','아무 일도 일어나지 않는다.','캔 전체가 (−)전하가 된다.','캔의 원자핵이 이동한다.'],'정전기 유도로 막대에 가까운 쪽이 (+)전하를 띠어 인력이 작용한다.'],
+ ['(+)전하로 대전된 막대를 검전기의 금속판에 가까이 했을 때 금속박의 상태는?','(+)전하를 띠고 벌어진다.',['(−)전하를 띠고 벌어진다.','오므라든다.','(+)전하를 띠고 오므라든다.','전하를 띠지 않는다.'],'금속박의 전자가 금속판 쪽으로 이동 → 금속판 (−), 금속박 (+) → 같은 전하끼리 척력으로 벌어진다.'],
+ ['전기력에 대한 설명으로 옳은 것은?','같은 종류의 전하 사이에는 척력이 작용한다.',['다른 종류의 전하 사이에는 척력이 작용한다.','거리가 멀수록 전기력이 커진다.','대전되지 않은 물체 사이에서만 작용한다.','전하량과 관계없다.'],'같은 전하: 척력, 다른 전하: 인력. 거리가 가까울수록, 전하량이 클수록 크다.']]));
+add({id:'s22-ohm',u:'R7',name:'전압·전류·저항 (옴의 법칙)',lv:1,g:R=>{const k=R.pick(['I','V','R']);const Rr=R.pick([2,3,4,5,6,10,12,15,20]),I=R.pick([0.5,1,1.5,2,3,0.2,0.4]),V=S22_r(Rr*I);
+ const fig=svg(340,150,`<path class="ln" d="M40 40H120M180 40H260V120H40V40"/><rect class="ln" x="120" y="30" width="60" height="20"/>`+txt(k==='R'?'R = ?':`R = ${Rr} Ω`,150,22,'middle')+`<path class="ln" d="M135 120V105M135 120V135M150 112V128" style="stroke-width:2"/>`+txt(k==='V'?'V = ?':`V = ${V} V`,150,148,'middle')+txt(k==='I'?'I = ?':`I = ${I} A`,268,84,''));
+ if(k==='I')return{q:`그림과 같이 저항이 ${Rr} Ω인 니크롬선에 ${V} V의 전압을 걸었을 때 흐르는 전류의 세기는?`,fig,alt:`R=${Rr}, V=${V}`,...mc(R,I,[S22_r(V*Rr),S22_r(Rr/V),S22_r(I*2),S22_r(I/2),S22_r(V+Rr)],v=>v+' A'),exp:`I = ${fr('V','R')} = ${fr(V,Rr)} = <b>${I} A</b>`};
+ if(k==='V')return{q:`저항이 ${Rr} Ω인 전구에 ${I} A의 전류가 흐를 때, 전구에 걸린 전압은?`,fig,alt:`R=${Rr}, I=${I}`,...mc(R,V,[S22_r(Rr/I),S22_r(I/Rr),V*2,S22_r(V/2),Rr+I].map(S22_r),v=>v+' V'),exp:`V = IR = ${I} × ${Rr} = <b>${V} V</b>`};
+ return{q:`어떤 저항에 ${V} V의 전압을 걸었더니 ${I} A의 전류가 흘렀다. 이 저항의 크기는?`,fig,alt:`V=${V}, I=${I}`,...mc(R,Rr,[S22_r(V*I),S22_r(I/V),Rr*2,Rr/2,Rr+1].map(S22_r),v=>v+' Ω'),exp:`R = ${fr('V','I')} = ${fr(V,I)} = <b>${Rr} Ω</b>`}}});
+add({id:'s22-ivg',u:'R7',name:'전류-전압 그래프와 저항',lv:2,g:R=>{const ra=R.pick([2,4,5]),rb=R.pick([10,8,20].filter(v=>v!==ra));const k=R.pick(['ratio','val','same']);const Vm=R.pick([10,20]);
+ const fig=chart({w:300,h:200,x0:0,x1:Vm,y0:0,y1:Vm/ra,xt:[0,Vm/2,Vm],yt:[0,Vm/ra/2,Vm/ra].map(S22_r),xl:'전압(V)',yl:'전류(A)',series:[[[[0,0],[Vm,Vm/ra]],'A'],[[[0,0],[Vm,Vm/rb]],'B']]});
+ if(k==='val')return{q:`그래프는 두 니크롬선 A, B에 걸린 전압에 따른 전류의 세기를 나타낸 것이다. A의 저항은?`,fig,alt:`A: ${Vm}V에서 ${S22_r(Vm/ra)}A, B: ${Vm}V에서 ${S22_r(Vm/rb)}A`,...mc(R,ra,[rb,S22_r(1/ra),ra*2,S22_r(ra/2),ra+rb],v=>v+' Ω'),exp:`R = ${fr('V','I')} = ${fr(Vm,S22_r(Vm/ra))} = <b>${ra} Ω</b>`};
+ if(k==='ratio'){const g=gcd(ra,rb);return{q:`그래프는 두 니크롬선 A, B에 걸린 전압에 따른 전류의 세기를 나타낸 것이다. A와 B의 저항의 비(A : B)는?`,fig,alt:`A, B 기울기 비교`,...fixed(R.shuffle([`${ra/g} : ${rb/g}`,`${rb/g} : ${ra/g}`,'1 : 1',`${ra/g} : ${rb/g+1}`,`${ra/g+1} : ${rb/g}`]),`${ra/g} : ${rb/g}`),exp:`R_A = ${ra} Ω, R_B = ${rb} Ω → <b>${ra/g} : ${rb/g}</b><br>(같은 전압에서 전류가 더 많이 흐르는 쪽이 저항이 작다.)`}}
+ const V=Vm/2;return{q:`그래프는 두 니크롬선 A, B에 걸린 전압에 따른 전류의 세기를 나타낸 것이다. 같은 전압 ${V} V를 걸었을 때, 전류가 더 많이 흐르는 것과 그 전류의 세기는?`,fig,alt:'A, B 그래프',...fixed(R.shuffle([`A, ${S22_r(V/ra)} A`,`B, ${S22_r(V/rb)} A`,`A, ${S22_r(V/rb)} A`,`B, ${S22_r(V/ra)} A`,`A, ${S22_r(V*ra)} A`]),`A, ${S22_r(V/ra)} A`),exp:`A의 저항(${ra} Ω)이 더 작으므로 전류가 더 많이 흐른다. I = ${V} ÷ ${ra} = <b>${S22_r(V/ra)} A</b>`}}});
+add(bank('s22-circuit','R7','직렬연결과 병렬연결',2,[
+ ['전구 두 개를 직렬로 연결했을 때의 특징으로 옳은 것은?','각 전구에 흐르는 전류의 세기가 같다.',['각 전구에 걸리는 전압이 항상 같다.','하나가 꺼져도 나머지는 켜져 있다.','전구를 더 연결할수록 전체 저항이 작아진다.','멀티탭은 직렬연결이다.'],'직렬연결: 전류가 같고, 전압은 나누어 걸리며, 하나가 끊어지면 모두 꺼진다.'],
+ ['전구 두 개를 병렬로 연결했을 때의 특징으로 옳은 것은?','각 전구에 걸리는 전압이 같다.',['각 전구에 흐르는 전류는 항상 같다.','하나가 꺼지면 다른 전구도 꺼진다.','저항을 더 연결할수록 전체 저항이 커진다.','장식용 꼬마전구는 대부분 병렬이다.'],'병렬연결: 전압이 같고, 전류는 나뉘어 흐르며, 하나가 꺼져도 나머지는 켜진다.'],
+ ['가정의 전기 기구들은 대부분 어떻게 연결되어 있으며, 그 까닭은?','병렬, 각 기구에 같은 전압이 걸리고 따로 켜고 끌 수 있다.',['직렬, 전류를 아끼기 위해서','직렬, 모두 같은 전류가 흐르게 하기 위해서','병렬, 전체 저항을 크게 하기 위해서','직렬, 하나만 끄면 전체가 꺼지게 하기 위해서'],'가정의 전기 기구는 병렬연결 → 같은 전압(220 V), 독립적으로 사용'],
+ ['같은 전구 2개를 직렬로 연결할 때와 병렬로 연결할 때(전원 전압은 같음)를 비교한 것으로 옳은 것은?','병렬로 연결할 때 각 전구가 더 밝다.',['직렬로 연결할 때 각 전구가 더 밝다.','두 경우 밝기가 같다.','직렬일 때 전체 저항이 더 작다.','병렬일 때 전체 전류가 더 작다.'],'병렬연결에서는 각 전구에 전원 전압이 그대로 걸려 더 밝다.']]));
+add({id:'s22-power',u:'R7',name:'소비 전력과 전력량',lv:2,g:R=>{const k=R.pick(['P','W','cmp']);
+ if(k==='P'){const V=220,I=R.pick([0.5,1,2,3,5,0.2]);const P=S22_r(V*I);return{q:`220 V의 전압에서 ${I} A의 전류가 흐르는 전기 기구의 소비 전력은?`,...mc(R,P,[S22_r(V/I),S22_r(I/V*1000),P*2,S22_r(P/2),V+I],v=>v+' W'),exp:`P = VI = 220 × ${I} = <b>${P} W</b>`}}
+ if(k==='W'){const P=R.pick([20,40,50,100,200,500,1000,1500]),h=R.pick([2,3,4,5,6]);const W=P*h;return{q:`소비 전력이 ${P} W인 전기 기구를 하루에 ${h}시간씩 사용할 때, 하루 동안 사용한 전력량은?`,...mc(R,W,[P/h,P+h,W*2,W/2,P*h*60],v=>v+' Wh'),exp:`전력량 = 소비 전력 × 시간 = ${P} W × ${h} h = <b>${W} Wh</b>`}}
+ const items=[['선풍기',R.pick([40,50,60])],['전기밥솥',R.pick([800,1000,1200])],['LED 전구',R.pick([10,15,20])],['텔레비전',R.pick([100,120,150])],['전기다리미',R.pick([1200,1500])]];const hs=items.map(()=>R.pick([1,2,3,4,5,6]));const E=items.map((x,i)=>x[1]*hs[i]);const mx=Math.max(...E);if(E.filter(v=>v===mx).length>1)return null;const ans=items[E.indexOf(mx)][0];
+ return{q:`표는 220 V용 전기 기구의 소비 전력과 하루 사용 시간이다. 하루 동안 사용하는 전력량이 가장 많은 것은?<div class="tw"><table class="ft"><tr><th>기구</th><th>소비 전력(W)</th><th>사용 시간(h)</th></tr>${items.map((x,i)=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${hs[i]}</td></tr>`).join('')}</table></div>`,...fixed(items.map(x=>x[0]),ans),
+ exp:`전력량 = 소비 전력 × 사용 시간<br>${items.map((x,i)=>`${x[0]} ${E[i]} Wh`).join(', ')}<br>∴ <b>${ans}</b>`}}});
+add(bank('s22-mag','R7','전류의 자기 작용',2,[
+ ['직선 도선에 전류가 흐를 때 주위에 생기는 자기장에 대한 설명으로 옳은 것은?','도선을 중심으로 동심원 모양으로 생긴다.',['도선과 나란한 직선 모양이다.','전류의 세기와 관계없다.','도선에서 멀수록 세다.','전류가 흐르지 않아도 생긴다.'],'오른손 엄지를 전류 방향으로 하고 네 손가락으로 감아쥐는 방향이 자기장 방향이다. 도선에 가까울수록, 전류가 셀수록 세다.'],
+ ['코일에 전류가 흐를 때 코일 내부의 자기장에 대한 설명으로 옳은 것은?','코일 내부에는 코일의 축과 나란한 방향으로 자기장이 생긴다.',['코일 내부에는 자기장이 없다.','전류의 방향을 바꿔도 자기장 방향은 같다.','감은 수가 많을수록 약해진다.','막대자석과 전혀 다른 모양이다.'],'코일 주위 자기장은 막대자석과 비슷하며, 오른손 네 손가락을 전류 방향으로 감아쥘 때 엄지가 N극 방향이다.'],
+ ['자기장 속에서 전류가 흐르는 도선이 받는 힘의 크기를 크게 하는 방법은?','전류의 세기를 크게 한다.',['전류의 방향을 바꾼다.','자석을 약한 것으로 바꾼다.','도선을 자기장과 나란하게 놓는다.','전류를 끊는다.'],'전류가 셀수록, 자기장이 셀수록 힘이 크다. 도선이 자기장과 나란하면 힘을 받지 않는다.'],
+ ['자기장 속에서 전류가 흐르는 코일이 받는 힘을 이용한 장치는?','전동기',['전구','전기다리미','건전지','검전기'],'전동기(모터)는 자석 사이의 코일이 전류에 의해 힘을 받아 회전하는 원리를 이용한다. 선풍기, 세탁기 등에 쓰인다.'],
+ ['자기장 속 도선이 받는 힘의 방향을 반대로 바꾸는 방법은?','전류의 방향을 반대로 한다.',['전류의 세기를 2배로 한다.','같은 극의 자석을 하나 더 놓는다.','도선을 더 굵게 한다.','전압을 높인다.'],'전류의 방향이나 자기장의 방향 중 하나를 반대로 하면 힘의 방향이 반대가 된다.']]));
+add({id:'s22-edeep',u:'R7',name:'[심화] 직렬·병렬 회로에서 전류와 전압',lv:3,g:R=>{const k=R.pick(['ser','par']);const r1=R.pick([2,3,4,6]),r2=R.pick([4,6,8,12].filter(v=>v!==r1)),V=R.pick([12,24]);
+ if(k==='ser'){const I=S22_r(V/(r1+r2)),V1=S22_r(I*r1);return{q:`저항이 ${r1} Ω, ${r2} Ω인 두 저항을 직렬로 연결하고 전체에 ${V} V의 전압을 걸었다. ${r1} Ω인 저항에 걸리는 전압은?`,...mc(R,V1,[V,S22_r(V/2),S22_r(V-V1),S22_r(V*r2/(r1+r2)),S22_r(V/r1)],v=>v+' V'),
+  exp:`직렬연결: 전체 저항 = ${r1} + ${r2} = ${r1+r2} Ω → I = ${V} ÷ ${r1+r2} = ${I} A<br>${r1} Ω에 걸리는 전압 = ${I} × ${r1} = <b>${V1} V</b> (전압은 저항에 비례하여 나뉜다)`}}
+ const I1=S22_r(V/r1),I2=S22_r(V/r2),T=S22_r(I1+I2);return{q:`저항이 ${r1} Ω, ${r2} Ω인 두 저항을 병렬로 연결하고 ${V} V의 전압을 걸었다. 전원 장치에서 흘러나오는 전체 전류의 세기는?`,...mc(R,T,[I1,I2,S22_r(V/(r1+r2)),S22_r(T*2),S22_r(I1*I2)],v=>v+' A'),
+ exp:`병렬연결: 각 저항에 ${V} V가 걸린다.<br>I₁ = ${V} ÷ ${r1} = ${I1} A, I₂ = ${V} ÷ ${r2} = ${I2} A<br>전체 전류 = ${I1} + ${I2} = <b>${T} A</b>`}}});
+
+/* ===== Ⅷ 별과 우주 ===== */
+add({id:'s22-plx',u:'R8',name:'연주 시차와 별까지의 거리',lv:1,g:R=>{const k=R.pick(['d','p','cmp']);
+ if(k==='d'){const p=R.pick([0.1,0.2,0.25,0.5,0.05,0.01,0.02,0.04]);const d=S22_r(1/p);return{q:`연주 시차가 ${p}″인 별까지의 거리는?`,...mc(R,d,[S22_r(p),S22_r(1/(2*p)),S22_r(2/p),d*10,S22_r(d*3.26)],v=>v+' pc'),exp:`거리(pc) = ${fr(1,'연주 시차(″)')} = ${fr(1,p)} = <b>${d} pc</b>`}}
+ if(k==='p'){const d=R.pick([2,4,5,10,20,25,50]);const p=S22_r(1/d);return{q:`지구에서 ${d} pc 떨어진 별의 연주 시차는?`,...mc(R,p,[d,S22_r(2/d),S22_r(1/(2*d)),S22_r(p*10),S22_r(d/10)],v=>v+'″'),exp:`연주 시차 = ${fr(1,'거리(pc)')} = ${fr(1,d)} = <b>${p}″</b>`}}
+ const stars=['A','B','C','D','E'].map(n=>[n,R.pick([0.01,0.02,0.05,0.1,0.2,0.25,0.5,0.8])]);const ps=stars.map(s=>s[1]);const mx=Math.max(...ps);if(ps.filter(v=>v===mx).length>1)return null;const ans=stars[ps.indexOf(mx)][0];
+ return{q:`표는 별 A~E의 연주 시차를 나타낸 것이다. 지구에서 가장 가까운 별은?<div class="tw"><table class="ft"><tr><th>별</th>${stars.map(s=>`<th>${s[0]}</th>`).join('')}</tr><tr><th>연주 시차(″)</th>${stars.map(s=>`<td>${s[1]}</td>`).join('')}</tr></table></div>`,...fixed(['A','B','C','D','E'],ans),exp:`연주 시차는 거리에 반비례 → 연주 시차가 가장 큰 별이 가장 가깝다.<br>∴ <b>${ans}</b> (${mx}″, ${S22_r(1/mx)} pc)`}}});
+add({id:'s22-mag2',u:'R8',name:'별의 등급과 밝기',lv:2,g:R=>{const k=R.pick(['ratio','which','dist']);
+ if(k==='ratio'){const d=R.pick([1,2,3,5]);const ratio={1:'약 2.5배',2:'약 6.3배',3:'약 16배',5:'100배'}[d];const m1=R.i(-1,3),m2=m1+d;
+  return{q:`${MS22(m1)}등급인 별은 ${MS22(m2)}등급인 별보다 몇 배 밝은가?`,...fixed(R.shuffle(['약 2.5배','약 6.3배','약 16배','100배',`${d}배`].filter((v,i,a)=>a.indexOf(v)===i).concat(d===1?['약 40배']:[]).slice(0,5)),ratio),exp:`1등급 차이 ≈ 2.5배, 5등급 차이 = 100배<br>등급 차이 ${d} → <b>${ratio}</b> (등급이 작을수록 밝다)`}}
+ if(k==='dist'){const f=R.pick([2,3,4,10]);const b=f*f;return{q:`어떤 별까지의 거리가 지금의 ${f}배가 된다면, 이 별의 밝기는 어떻게 되는가?`,...mc(R,`${fr(1,b)}로 어두워진다.`,[`${fr(1,f)}로 어두워진다.`,`${b}배 밝아진다.`,`${f}배 밝아진다.`,'변하지 않는다.',`${fr(1,f*f*f)}로 어두워진다.`]),exp:`별의 밝기는 거리의 제곱에 반비례한다.<br>거리 ${f}배 → 밝기 ${fr(1,f)}² = <b>${fr(1,b)}</b>`}}
+ const ms=R.shuffle([-1,0,1,2,3,4,5]).slice(0,5);const mn=Math.min(...ms);const ans=['A','B','C','D','E'][ms.indexOf(mn)];
+ return{q:`별 A~E의 겉보기 등급이 다음과 같을 때, 우리 눈에 가장 밝게 보이는 별은?<div class="tw"><table class="ft"><tr><th>별</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr><tr><th>겉보기 등급</th>${ms.map(m=>`<td>${MS22(m)}</td>`).join('')}</tr></table></div>`,...fixed(['A','B','C','D','E'],ans),exp:`등급이 작을수록 밝은 별이다(음수가 가장 밝다).<br>가장 작은 등급 ${MS22(mn)} → <b>${ans}</b>`}}});
+const MS22=v=>String(v).replace(/^-/,'−');
+add({id:'s22-absmag',u:'R8',name:'[심화] 겉보기 등급과 절대 등급',lv:3,g:R=>{const st=['A','B','C','D'].map(n=>{const M=R.i(-3,6),m=R.i(-1,6);return[n,m,M]});const k=R.pick(['real','far','near10']);
+ const tab=`<div class="tw"><table class="ft"><tr><th>별</th>${st.map(s=>`<th>${s[0]}</th>`).join('')}</tr><tr><th>겉보기 등급</th>${st.map(s=>`<td>${MS22(s[1])}</td>`).join('')}</tr><tr><th>절대 등급</th>${st.map(s=>`<td>${MS22(s[2])}</td>`).join('')}</tr></table></div>`;
+ const pick=(arr,f)=>{const v=arr.map(f),best=Math.max(...v);return v.filter(x=>x===best).length>1?null:arr[v.indexOf(best)][0]};
+ let ans,q,exp;if(k==='real'){ans=pick(st,s=>-s[2]);q='실제로 가장 밝은 별은?';exp='실제 밝기는 절대 등급(10 pc 거리에 두었을 때의 등급)으로 비교한다. 절대 등급이 가장 작은 별'}
+ else if(k==='far'){ans=pick(st,s=>s[1]-s[2]);q='지구에서 가장 멀리 있는 별은?';exp='(겉보기 등급 − 절대 등급) 값이 클수록 멀리 있다.'}
+ else{const c=st.filter(s=>s[1]<s[2]);if(c.length!==1)return null;ans=c[0][0];q='지구로부터의 거리가 10 pc보다 가까운 별은?';exp='겉보기 등급 < 절대 등급이면 10 pc보다 가깝다(10 pc로 옮기면 더 어두워짐).'}
+ if(!ans)return null;return{q:`표는 별 A~D의 겉보기 등급과 절대 등급이다. ${q}${tab}`,...fixed(['A','B','C','D','알 수 없다'],ans),exp:`${exp}<br>${st.map(s=>`${s[0]}: ${MS22(s[1])} − (${MS22(s[2])}) = ${s[1]-s[2]}`).join(', ')}<br>∴ <b>${ans}</b>`}}});
+add({id:'s22-color',u:'R8',name:'별의 색과 표면 온도',lv:1,g:R=>{const C=[['청색','가장 높다'],['청백색',''],['백색',''],['황백색',''],['황색',''],['주황색',''],['적색','가장 낮다']];const k=R.pick(['hot','cold','order']);
+ if(k==='hot')return{q:'다음 중 표면 온도가 가장 높은 별의 색은?',...fixed(R.shuffle(['청색','황색','적색','주황색','백색']),'청색'),exp:'별의 표면 온도: 청색 > 청백색 > 백색 > 황백색 > 황색 > 주황색 > 적색 → <b>청색</b>'};
+ if(k==='cold')return{q:'다음 중 표면 온도가 가장 낮은 별의 색은?',...fixed(R.shuffle(['청색','황색','적색','청백색','백색']),'적색'),exp:'표면 온도가 낮을수록 붉은색을 띤다 → <b>적색</b>'};
+ const ok='청색 → 백색 → 황색 → 적색';return{q:'표면 온도가 높은 별부터 낮은 별의 색 순서로 옳은 것은?',...fixed(R.shuffle([ok,'적색 → 황색 → 백색 → 청색','백색 → 청색 → 황색 → 적색','황색 → 청색 → 적색 → 백색','청색 → 적색 → 황색 → 백색']),ok),exp:`<b>${ok}</b> (태양은 황색 별)`}}});
+add(bank('s22-gal','R8','우리은하와 성운·성단',1,[
+ ['위에서 본 우리은하의 모양으로 옳은 것은?','중심부에 막대 구조가 있는 나선 모양',['완전한 구 모양','불규칙한 모양','타원 모양','고리 모양'],'우리은하는 막대 나선 은하이다. 옆에서 보면 중심부가 볼록한 원반 모양'],
+ ['태양계의 위치로 옳은 것은?','우리은하 중심에서 약 8.5 kpc(약 3만 광년) 떨어진 나선팔',['우리은하의 중심','우리은하 밖','은하 중심부의 막대 구조 안','우리은하의 헤일로 끝'],'태양계는 은하 중심에서 약 8.5 kpc 떨어진 나선팔에 있다.'],
+ ['수많은 별이 공 모양으로 빽빽하게 모여 있고, 주로 늙은 붉은색 별로 이루어진 것은?','구상 성단',['산개 성단','방출 성운','반사 성운','암흑 성운'],'구상 성단: 늙고 붉은 별, 은하 중심부·헤일로에 분포 / 산개 성단: 젊고 파란 별, 나선팔에 분포'],
+ ['주변의 별빛을 반사하여 밝게 보이는 성운은?','반사 성운',['방출 성운','암흑 성운','구상 성단','산개 성단'],'방출 성운: 스스로 빛을 냄(붉은색), 반사 성운: 별빛 반사(파란색), 암흑 성운: 뒤쪽 빛을 가림'],
+ ['맑은 날 밤하늘에서 띠 모양으로 보이는 은하수의 정체는?','지구에서 본 우리은하의 일부',['태양계의 행성 모임','다른 은하','지구 대기의 구름','혜성의 꼬리'],'은하수는 지구에서 우리은하의 원반 방향을 바라볼 때 보이는 수많은 별의 모습이다.']]));
+add(bank('s22-univ','R8','우주의 팽창과 우주 탐사',2,[
+ ['우주 팽창을 설명하는 풍선 모형에서 풍선 표면의 스티커는 무엇에 해당하는가?','은하',['우주 전체','별의 내부','빅뱅','블랙홀'],'풍선 표면 = 우주, 스티커 = 은하, 풍선이 부푸는 것 = 우주 팽창'],
+ ['우주가 팽창할 때 나타나는 현상으로 옳은 것은?','멀리 있는 은하일수록 더 빨리 멀어진다.',['모든 은하가 가까워진다.','가까운 은하일수록 더 빨리 멀어진다.','우주의 중심이 존재한다.','은하 사이의 거리는 변하지 않는다.'],'우주 팽창: 은하들이 서로 멀어지며, 멀리 있는 은하일수록 빠르게 멀어진다. 팽창의 중심은 없다.'],
+ ['빅뱅 우주론에 대한 설명으로 옳은 것은?','매우 뜨겁고 밀도가 높은 한 점에서 대폭발로 시작되어 팽창해 왔다.',['우주는 항상 같은 크기였다.','우주는 점점 작아지고 있다.','우주의 온도는 점점 높아진다.','은하는 처음부터 지금과 같은 위치에 있었다.'],'빅뱅 이후 우주는 팽창하면서 온도와 밀도가 낮아졌다.'],
+ ['우주 탐사의 성과를 우리 생활에 이용한 예로 옳지 <u>않은</u> 것은?','종이 사전',['위성 위치 확인 시스템(GPS)','정수기 필터','메모리폼','기상 위성을 이용한 일기 예보'],'우주 탐사 기술은 GPS, 정수 장치, 메모리폼, 화재 경보기 등에 활용되었다.'],
+ ['우주 망원경을 지구 대기권 밖에 설치하는 까닭은?','대기의 영향을 받지 않고 천체를 선명하게 관측하기 위해서이다.',['천체에 더 가까이 가기 위해서이다.','태양을 피하기 위해서이다.','지구의 자기장을 측정하기 위해서이다.','비용을 줄이기 위해서이다.'],'대기에 의한 빛의 흡수·산란·흔들림 없이 관측할 수 있다.']]));
+
+_T.forEach(t=>{if(t.bank)return;const f=t.g;t.g=R=>{for(let i=0;i<400;i++){const r=f(R);if(r&&r.opts.length===5&&new Set(r.opts).size===5&&r.opts.includes(r.ans))return r}throw new Error('gen fail '+t.id)}});
+SEMS['2-2'].sci={name:'과학',book:'미래엔 과학 2 · 2학기 (2022 개정)',T:_T,
+ units:[{id:'Q5',tag:'Ⅴ',name:'식물과 에너지',subs:[['R5','광합성·호흡·양분의 이용']]},
+  {id:'Q6',tag:'Ⅵ',name:'동물과 에너지',subs:[['R6','소화·순환·호흡·배설']]},
+  {id:'Q7',tag:'Ⅶ',name:'전기와 자기',subs:[['R7','전기력·전류·전압·저항·자기장']]},
+  {id:'Q8',tag:'Ⅷ',name:'별과 우주',subs:[['R8','별의 거리·등급·우리은하·우주']]}],
+ presets:[['2학기 전체',null],['중간 (Ⅴ~Ⅵ)',['R5','R6']],['기말 (Ⅶ~Ⅷ)',['R7','R8']]]};
+
 
 </script>
 <script>
@@ -2156,7 +2905,7 @@ function setSubject(id){CUR=id;OV=null;document.documentElement.dataset.s=id;con
  LS.set('m12-subj',id);
  $('#subj').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sub===id));
  $('#hinfo').textContent=`${s.book} · ${T.length}개 유형`;
- $('#presets').innerHTML='<span>빠른 선택</span>'+s.presets.map((p,i)=>`<button class="chip" data-pre="${i}">${p[0]}</button>`).join('');
+ $('#presets').innerHTML='<span>빠른 선택</span>'+s.presets.map((p,i)=>`<button class="chip" data-pre="${i}">${p[0]}</button>`).join('')+'<button class="chip" data-pre="none">전체 해제</button><p class="muted" style="margin:6px 0 0;width:100%;font-size:12.5px">단원 이름을 누르면 그 단원 전체가 선택·해제되고, 소단원은 하나씩 눌러 고를 수 있습니다.</p>';
  P.n=0;P.ok=0;P.last=null;renderScope();newPractice();E=null;makeExam(2612,examN,null,null,{save:false});
  const tab=LS.get('m12-tab','practice');if(tab==='review')renderReview();if(tab==='stats')renderStats();onSubject(id)}
 function renderSem(){const [g,t,ey]=SEMNAME[SEM];$('#eyebrow').textContent=ey;$('#htitle').textContent=`${g} ${t} 문제은행`;
@@ -2167,13 +2916,13 @@ $('#sems').addEventListener('click',e=>{const b=e.target.closest('[data-sem]');i
 $('#subj').addEventListener('click',e=>{const b=e.target.closest('[data-sub]');if(b&&b.dataset.sub!==CUR)setSubject(b.dataset.sub)});
 
 /* ===== 범위 ===== */
-function renderScope(){$('#units').innerHTML=UNITS.map(U=>`<div class="unit"><button class="uh" data-u="${U.id}"><span class="rn">${U.tag}</span>${U.name}</button><div class="subs">${U.subs.map(([id,nm])=>`<button class="chip ${sel.has(id)?'on':''}" data-s="${id}" aria-pressed="${sel.has(id)}">${nm}<small>${T.filter(t=>t.u===id).length}</small></button>`).join('')}</div></div>`).join('');
+function renderScope(){$('#units').innerHTML=UNITS.map(U=>{const n=U.subs.filter(x=>sel.has(x[0])).length,st=n===U.subs.length?'all':n?'part':'none';return `<div class="unit"><button class="uh" data-u="${U.id}" data-st="${st}" aria-pressed="${st==='all'}" title="${st==='all'?'단원 전체 해제':'단원 전체 선택'}"><span class="ck">${st==='all'?'✓':st==='part'?'–':''}</span><span class="rn">${U.tag}</span>${U.name}</button><div class="subs">${U.subs.map(([id,nm])=>`<button class="chip ${sel.has(id)?'on':''}" data-s="${id}" aria-pressed="${sel.has(id)}">${nm}<small>${T.filter(t=>t.u===id).length}</small></button>`).join('')}</div></div>`}).join('');
  $('#scopeSum').textContent=`소단원 ${sel.size}/${SUBS.length} · ${scoped().length}개 유형`;LS.set('m12-sel-'+SK(),[...sel])}
-$('#scope').addEventListener('click',e=>{const s=e.target.closest('[data-s]'),u=e.target.closest('[data-u]'),p=e.target.closest('[data-pre]');
+$('#scope').addEventListener('click',e=>{const s=e.target.closest('button[data-s]'),u=e.target.closest('[data-u]'),p=e.target.closest('[data-pre]');
  if(s){sel.has(s.dataset.s)?sel.delete(s.dataset.s):sel.add(s.dataset.s)}
  else if(u){const subs=UNITS.find(x=>x.id===u.dataset.u).subs.map(x=>x[0]);const all=subs.every(x=>sel.has(x));subs.forEach(x=>all?sel.delete(x):sel.add(x))}
- else if(p){const pr=SJ[CUR].presets[+p.dataset.pre][1];sel=new Set(pr||SUBS)}
- else return;e.preventDefault();renderScope()});
+ else if(p){if(p.dataset.pre==='none')sel=new Set();else{const pr=SJ[CUR].presets[+p.dataset.pre][1];sel=new Set(pr||SUBS)}}
+ else return;e.preventDefault();renderScope();if(!P.it||!sel.has(TYPE[P.it.id].u))newPractice()});
 
 /* ===== 연습 ===== */
 const P={it:null,lv:0,n:0,ok:0,last:null};
@@ -2216,11 +2965,65 @@ function renderExam(){const v=$('#v-exam');
   score=`<div class="score"><div class="big">${Math.round(ok/E.items.length*100)}<small>점 · ${E.items.length}문항 중 ${ok}개 정답</small></div>
   <div class="omrrow">${E.items.map((i,k)=>`<span class="${okOf(i)?'o':'x'}">${k+1} ${okOf(i)?'○':'×'}</span>`).join('')}</div>
   <div class="muted">${Object.entries(by).map(([u,[n,c]])=>`${SUBNAME[u]} ${c}/${n}`).join(' · ')}</div>
-  <div class="bar">${ok<E.items.length?`<button class="btn pri sm" data-act="retry">틀린 유형 다시 풀기</button>`:''}<button class="btn sm" data-act="copy">시험지·정답 텍스트 복사</button></div>${copyBox}</div>`}
+  <div class="bar">${ok<E.items.length?`<button class="btn pri sm" data-act="retry">틀린 유형 다시 풀기</button>`:''}<button class="btn sm" data-act="copy">시험지·정답 텍스트 복사</button><button class="btn sm" data-act="pdf">A3 시험지 PDF</button></div>${copyBox}</div>`}
  v.innerHTML=cfg+`<div style="height:12px"></div>${score}<div class="sheet" style="margin-top:12px"><div class="ehead"><b>${SJ[CUR].name} ${E.label}</b><span class="muted">시험지 번호 ${E.seed} · ${E.items.length}문항</span></div>
  ${E.items.map((it,i)=>qHTML(it,i,{graded:E.graded,lock:true,fold:true})).join('')}</div>
- ${E.graded?'':`<div class="bar" style="margin-top:12px"><span class="tally">${ans}/${E.items.length} 표기</span><span class="sp"></span><button class="btn" data-act="copy">시험지 텍스트 복사</button><button class="btn pri" data-act="grade">채점하기</button></div>${copyBox}`}`}
-function examText(){let s=`중1 ${SJ[CUR].name} 2학기 ${E.label} (시험지 번호 ${E.seed})\n이름: ${$('#nm').value||''}\n\n`;
+ ${E.graded?'':`<div class="bar" style="margin-top:12px"><span class="tally">${ans}/${E.items.length} 표기</span><span class="sp"></span><button class="btn" data-act="pdf">A3 시험지 PDF</button><button class="btn" data-act="copy">텍스트 복사</button><button class="btn pri" data-act="grade">채점하기</button></div>${copyBox}`}`}
+
+/* ===== A3 시험지 PDF (가로 2단, 정답·풀이는 뒤쪽 별도 페이지) ===== */
+let _pdfL=null;
+function loadPdfLibs(){return _pdfL||(_pdfL=Promise.all(['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'].map(src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('라이브러리를 불러오지 못했습니다'));document.head.appendChild(s)}))).catch(e=>{_pdfL=null;throw e}))}
+function pdfToast(t,keep){let el=document.getElementById('pdftoast');if(!el){el=document.createElement('div');el.id='pdftoast';el.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99;background:var(--ink);color:var(--sheet);padding:10px 16px;border-radius:12px;font-size:14px;box-shadow:var(--shadow);max-width:90vw';document.body.appendChild(el)}
+ el.textContent=t;el.style.display='block';clearTimeout(el._t);if(!keep)el._t=setTimeout(()=>el.style.display='none',3500)}
+function pFrac(h){return h.replace(/<math>[\s\S]*?<\/math>/g,m=>{const p=m.match(/<mrow>([\s\S]*?)<\/mrow><mrow>([\s\S]*?)<\/mrow>/);const t=x=>x.replace(/<mo>\*<\/mo>/g,'×').replace(/<[^>]+>/g,'');return p?`<span class="pf"><span>${t(p[1])}</span><span>${t(p[2])}</span></span>`:t(m)})}
+const PDF_CSS=`.pp{--ink:#111;--muted:#555;--rule:#888;--chip:#f3f3f3;--ac:#333;--ac-s:#e6e6e6;--sheet:#fff;position:relative;width:1587px;height:1123px;background:#fff;color:#111;font:15px/1.6 var(--f-body);padding:46px 52px 40px;box-sizing:border-box;overflow:hidden}
+.pp .ph{display:flex;align-items:flex-end;gap:16px;border-bottom:2.5px solid #111;padding-bottom:8px;margin-bottom:12px}.pp .ph h1{font:700 26px/1.2 var(--f-body);margin:0}.pp .ph .m{color:#444;font-size:14px}.pp .ph .nm{margin-left:auto;display:flex;gap:8px;font-size:14px}.pp .ph .nm span{border:1.5px solid #111;padding:6px 10px;min-width:120px}
+.pp .cols{display:flex;gap:40px;height:calc(100% - var(--hd,0px));}.pp .col{flex:1;min-width:0}.pp .cols .col+.col{border-left:1px solid #999;padding-left:40px}
+.pp .pq{padding:6px 0 18px;break-inside:avoid}.pp .pqt{font-size:15.5px}.pp .pqt b.n{font-size:17px;margin-right:6px}.pp .po{list-style:none;padding:0;margin:8px 0 0;display:grid;grid-template-columns:1fr;gap:3px 14px}.pp .po.s{grid-template-columns:repeat(3,1fr)}.pp .po li{display:flex;gap:6px}
+.pp .fig{margin:6px 0;display:flex;justify-content:center}.pp .fig svg{max-width:250px;width:250px;height:auto}.pp .psg{max-width:none;font-size:14.5px;line-height:1.7}.pp .tag{display:block;font-size:11.5px;color:#666;margin-bottom:2px}
+.pp .pf{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.92em;line-height:1.15;margin:0 2px}.pp .pf>span:first-child{border-bottom:1px solid currentColor;padding:0 2px}
+.pp .pg{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:13px;color:#555}
+.pp .ak{display:grid;grid-template-columns:repeat(10,1fr);border:1.5px solid #111;margin-bottom:14px}.pp .ak div{border:1px solid #bbb;text-align:center;padding:4px 0;font-size:15px}.pp .ak b{display:block;font-size:12px;color:#555}
+.pp .ex{font-size:13.5px;line-height:1.55;padding:4px 0 10px}.pp .ex .tw,.pp .pq .tw{overflow:visible}`;
+function pqHTML(it,i,ans){const d=it.d,t=TYPE[it.id],C='①②③④⑤';const short=d.opts.every(x=>x.replace(/<[^>]+>/g,'').length<=12);
+ if(ans){const ai=d.opts.indexOf(d.ans);return `<div class="ex"><b>${i+1}. 정답 ${C[ai]}</b> ${pFrac(d.exp)}</div>`}
+ return `<div class="pq"><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?' · '+it.src:''}</span><div class="pqt"><b class="n">${i+1}.</b>${pFrac(d.q)}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}<ol class="po${short?' s':''}">${d.opts.map((x,j)=>`<li><span>${C[j]}</span><span>${pFrac(x)}</span></li>`).join('')}</ol></div>`}
+function svgInline(root){root.querySelectorAll('svg').forEach(sv=>{const r=sv.getBoundingClientRect();sv.setAttribute('width',Math.round(r.width));sv.setAttribute('height',Math.round(r.height));
+ sv.querySelectorAll('*').forEach(el=>{const cs=getComputedStyle(el);['stroke','stroke-width','fill','stroke-dasharray','stroke-linecap','opacity','font-size','font-family','font-weight','text-anchor'].forEach(k=>{const v=cs.getPropertyValue(k);if(v)el.style.setProperty(k,v)})})})}
+async function buildPages(head,blocks,ansBlocks){const host=document.createElement('div');host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1';const st=document.createElement('style');st.textContent=PDF_CSS;host.appendChild(st);document.body.appendChild(host);
+ const mk=(withHead)=>{const pg=document.createElement('div');pg.className='pp';pg.innerHTML=(withHead?head:'')+`<div class="cols"><div class="col"></div><div class="col"></div></div><div class="pg"></div>`;host.appendChild(pg);
+  const hd=withHead?pg.querySelector('.ph').offsetHeight+12:0;pg.style.setProperty('--hd',hd+'px');return pg};
+ const pages=[];const flow=(list,first)=>{let pg=mk(first),ci=0,col=pg.querySelectorAll('.col')[0];const lim=()=>pg.querySelector('.cols').clientHeight;pages.push(pg);
+  for(const html of list){const w=document.createElement('div');w.innerHTML=html;const el=w.firstElementChild;col.appendChild(el);
+   if(col.scrollHeight>lim()&&col.children.length>1){col.removeChild(el);ci++;if(ci>1){pg=mk(false);pages.push(pg);ci=0}col=pg.querySelectorAll('.col')[ci];col.appendChild(el)}}};
+ flow(blocks,true);if(ansBlocks)flow(ansBlocks,true);
+ pages.forEach((p,i)=>p.querySelector('.pg').textContent=`- ${i+1} / ${pages.length} -`);return{host,pages}}
+async function savePdf(blob,name){try{const dl=await (window.claude&&window.claude.use?window.claude.use('downloads'):null);if(dl){await dl.save({filename:name,data:blob});return 'saved'}}catch(e){if(e&&e.code==='declined')return 'declined'}
+ const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);return 'saved'}
+let _pdfBusy=false;
+async function examPdf(btn){if(_pdfBusy)return;if(!E||!E.items){pdfToast('먼저 시험지를 만들어 주세요.');return}_pdfBusy=true;const lb=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='PDF 만드는 중…'}pdfToast('A3 시험지 PDF를 만드는 중입니다…',true);
+ let host;try{await loadPdfLibs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+  const [g,t,ey]=SEMNAME[SEM],nm=SJ[CUR].name;const head=`<div class="ph"><div><div class="m">${ey}</div><h1>${g} ${nm} ${E.label}</h1><div class="m">${SJ[CUR].book||''} · 시험지 번호 ${E.seed} · ${E.items.length}문항</div></div><div class="nm"><span>반·번호</span><span>이름</span><span>점수</span></div></div>`;
+  const aHead=`<div class="ph"><div><div class="m">${ey}</div><h1>정답과 풀이 — ${g} ${nm} ${E.label}</h1><div class="m">시험지 번호 ${E.seed}</div></div></div>`;
+  const key=`<div class="ak">${E.items.map((it,i)=>`<div><b>${i+1}</b>${'①②③④⑤'[it.d.opts.indexOf(it.d.ans)]}</div>`).join('')}</div>`;
+  const r=await buildPages(head,E.items.map((it,i)=>pqHTML(it,i)),[key,...E.items.map((it,i)=>pqHTML(it,i,true))]);host=r.host;
+  // 정답 페이지 머리말 교체
+  const qn=r.pages.findIndex((p,i)=>i>0&&p.querySelector('.ak'));if(qn>0){const h=r.pages[qn].querySelector('.ph');if(h)h.outerHTML=aHead}
+  svgInline(host);const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a3',compress:true});
+  for(let i=0;i<r.pages.length;i++){pdfToast(`PDF 만드는 중… ${i+1}/${r.pages.length}쪽`,true);const cv=await html2canvas(r.pages[i],{scale:2,backgroundColor:'#ffffff',logging:false,useCORS:true});if(i)doc.addPage('a3','landscape');doc.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,420,297)}
+  const fn=`${g}-${t}-${nm}-${E.label}-${E.seed}.pdf`.replace(/[\\/:*?"<>|\s]+/g,'_');const st=await savePdf(doc.output('blob'),fn);
+  pdfToast(st==='declined'?'저장을 취소했습니다.':'PDF를 저장했습니다. A3 용지, 가로 방향으로 인쇄하세요.')}
+ catch(e){pdfToast('PDF를 만들지 못했습니다: '+(e&&e.message||e))}
+ finally{if(host)host.remove();_pdfBusy=false;if(btn){btn.disabled=false;btn.textContent=lb}}}
+async function origPdf(o,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn.textContent;btn.disabled=true;btn.textContent='PDF 만드는 중…';
+ try{await loadPdfLibs();const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a3',compress:true});
+  const load=src=>new Promise((ok,no)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>no(new Error('그림을 불러오지 못했습니다'));im.src=src});
+  for(let i=0;i<o.pages;i++){const im=await load(`jokbo/${o.key}/p-${i+1}.jpg`);const half=i%2;if(i&&!half)doc.addPage('a3','landscape');
+   const bw=200,bh=287,sc=Math.min(bw/im.naturalWidth,bh/im.naturalHeight),w=im.naturalWidth*sc,h=im.naturalHeight*sc;const cv=document.createElement('canvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;cv.getContext('2d').drawImage(im,0,0);
+   doc.addImage(cv.toDataURL('image/jpeg',0.92),'JPEG',5+half*210+(bw-w)/2,5+(bh-h)/2,w,h)}
+  const st=await savePdf(doc.output('blob'),`${o.title}.pdf`.replace(/[\\/:*?"<>|\s]+/g,'_'));pdfToast(st==='declined'?'저장을 취소했습니다.':'PDF를 저장했습니다. A3 가로로 인쇄하면 원본 2쪽이 한 장에 들어갑니다.')}
+ catch(e){pdfToast('PDF를 만들지 못했습니다: '+(e&&e.message||e))}finally{_pdfBusy=false;btn.disabled=false;btn.textContent=lb}}
+function examText(){let s=`${SEMNAME[SEM][0]} ${SJ[CUR].name} ${SEMNAME[SEM][1]} ${E.label} (시험지 번호 ${E.seed})\n이름: ${$('#nm').value||''}\n\n`;
  E.items.forEach((it,i)=>{s+=`${i+1}. ${plain(it.d.q)}\n`;if(it.d.alt)s+=`   [그림] ${it.d.alt}\n`;s+=it.d.opts.map((o,j)=>`   ${CIRC[j]} ${plain(o)}`).join('\n')+'\n\n'});
  s+='[정답]\n'+E.items.map((it,i)=>`${i+1}.${CIRC[it.d.opts.indexOf(it.d.ans)]}`).join('  ')+'\n\n[풀이]\n'+E.items.map((it,i)=>`${i+1}. ${plain(it.d.exp)}`).join('\n');return s}
 $('#v-exam').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
@@ -2228,6 +3031,7 @@ $('#v-exam').addEventListener('click',e=>{const b=e.target.closest('button');if(
  const a=b.dataset.act;
  if(a==='make'){const sv=parseInt($('#seedIn').value,10);makeExam(sv>0?sv:Math.floor(1000+Math.random()*9000),examN);return}
  if(a==='grade'){E.graded=true;E.copy=null;E.items.forEach(i=>record(i.id,i.seed,i.d.opts[i.pick]===i.d.ans));if(E.hk){const H=LS.get('m12-hist-'+SK(),[]),h=H.find(x=>x.k===E.hk);if(h){h.score=Math.round(E.items.filter(i=>i.d.opts[i.pick]===i.d.ans).length/E.items.length*100);LS.set('m12-hist-'+SK(),H)}}renderExam();window.scrollTo({top:$('#v-exam').offsetTop-60});return}
+ if(a==='pdf'){examPdf(b);return}
  if(a==='retry'){const wr=E.items.filter(i=>i.d.opts[i.pick]!==i.d.ans).map(i=>i.id);makeExam(Math.floor(1000+Math.random()*9000),wr.length,wr,'오답 유형 시험');return}
  if(a==='copy'){const t=examText();try{navigator.clipboard.writeText(t).then(()=>{b.textContent='복사했습니다'},()=>{E.copy=t;renderExam()})}catch(err){E.copy=t;renderExam()}return}
  if(b.dataset.j!=null&&!E.graded){const it=E.items[+b.dataset.q];it.pick=it.pick===+b.dataset.j?null:+b.dataset.j;
@@ -2251,7 +3055,7 @@ function playOurs(o){const types=scoped();if(!types.length){show('exam');E={err:
  else ids=pickTypes(mkR(o[1]),o[2],types).map(t=>t.id);
  makeExam(o[1],ids.length,ids,`${SJ[CUR].name} ${o[0]}`);show('exam');window.scrollTo({top:0})}
 function renderJokbo(){if(OV){renderOrig();return}const v=$('#v-jokbo'),H=LS.get('m12-hist-'+SK(),[]),J=JOKBO.filter(j=>j.subj===CUR&&SEM==='1-2');const fmt=t=>new Date(t).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'});
- let h=`<h2 class="sec">우리 문제은행 시험지</h2><div class="list" style="margin-top:8px">${OURS.map((o,i)=>`<div class="jcard"><div class="t"><b>${SJ[CUR].name} ${o[0]}</b><p>${o[2]}문항 · 현재 출제 범위 기준 · 번호가 고정되어 다시 풀어도 같은 시험지</p></div><div class="acts"><button class="btn sm pri" data-our="${i}">풀기</button></div></div>`).join('')}</div>`;
+ let h=`<h2 class="sec">우리 문제은행 시험지</h2><div class="list" style="margin-top:8px">${OURS.map((o,i)=>`<div class="jcard"><div class="t"><b>${SJ[CUR].name} ${o[0]}</b><p>${o[2]}문항 · 현재 출제 범위 기준 · 번호가 고정되어 다시 풀어도 같은 시험지</p></div><div class="acts"><button class="btn sm pri" data-our="${i}">풀기</button><button class="btn sm" data-our="${i}" data-pdf="1">A3 PDF</button></div></div>`).join('')}</div>`;
  if(H.length)h+=`<h2 class="sec" style="margin-top:16px">내가 푼 시험지</h2><div class="list" style="margin-top:8px">${H.slice(0,12).map(x=>`<div class="jcard"><div class="t"><b style="font-size:15px">${x.label}</b><p>${fmt(x.at)} · ${x.ids?x.ids.length:x.n}문항 · ${x.score==null?'채점 전':x.score+'점'}</p></div><div class="acts"><button class="btn sm" ${x.orig?`data-orig="${x.orig}"`:`data-hist="${x.k}"`}>다시 풀기</button></div></div>`).join('')}</div>`;
  h+=origList();
  if(!J.length&&SEM!=='1-2'){h+=`<h2 class="sec" style="margin-top:16px">타학교 기출</h2><div class="note">${SEMNAME[SEM][0]} ${SEMNAME[SEM][1]} 타학교 기출은 아직 넣지 않았습니다. 시험이 가까워지면 무료로 받을 수 있는 자료를 찾아 추가합니다. 지금은 위의 예상 시험지와 연습·모의고사로 공부하세요.</div>`;v.innerHTML=h;return}
@@ -2262,13 +3066,13 @@ function renderJokbo(){if(OV){renderOrig();return}const v=$('#v-jokbo'),H=LS.get
  <div class="jsum" style="margin-top:8px"><div><b>${fin.length}개</b><span>중1 2학기 기말 수집</span></div><div><b>${avg}문항</b><span>평균 문항 수</span></div><div><b>${c3}%</b><span>입체도형 출제</span></div><div><b>${stP}%</b><span>통계 출제</span></div><div><b>${saP}%</b><span>서술형 있음</span></div></div>
  <div class="note" style="margin-top:10px">원본 시험지는 학원·분석 사이트에서 유료 또는 로그인으로만 공개되어 앱에 옮기지 않았습니다. 대신 각 학교의 <b>문항 수·출제 범위·난이도</b>를 그대로 맞춘 재구성 시험지를 만듭니다. 문항별 분석이 공개된 시험은 <b>원문항 번호 순서대로 같은 유형</b>을 출제합니다. 학교 이름 아래 링크에서 원본 정보를 확인할 수 있습니다.</div>
  <div class="bar" style="margin-top:10px"><span class="muted">연도</span><button class="chip ${!jYear?'on':''}" data-jy="0">전체</button>${yrs.map(y=>`<button class="chip ${jYear===y?'on':''}" data-jy="${y}">${y}</button>`).join('')}</div>
- <div class="list" style="margin-top:8px">${F.map(j=>`<div class="jcard"><div class="t"><b>${j.school}</b> <span class="muted">${j.region}</span>${j.items?'<span class="pill hot">문항별 재현</span>':''}${j.level!=='중'?`<span class="pill hot">${j.level}</span>`:''}<p>${j.year} 1학년 2학기 ${j.exam}고사 · ${j.n}문항${j.sa?` (서술형 ${j.sa})`:''} · ${j.rangeName}</p>${j.note?`<p>${j.note}</p>`:''}<a href="${j.url}" target="_blank" rel="noopener">원본 정보 보기 ↗</a></div><div class="acts"><button class="btn sm pri" data-jk="${j.key}">풀기</button><button class="btn sm" data-jk="${j.key}" data-fresh="1">숫자 바꿔 풀기</button></div></div>`).join('')}</div>`;
+ <div class="list" style="margin-top:8px">${F.map(j=>`<div class="jcard"><div class="t"><b>${j.school}</b> <span class="muted">${j.region}</span>${j.items?'<span class="pill hot">문항별 재현</span>':''}${j.level!=='중'?`<span class="pill hot">${j.level}</span>`:''}<p>${j.year} 1학년 2학기 ${j.exam}고사 · ${j.n}문항${j.sa?` (서술형 ${j.sa})`:''} · ${j.rangeName}</p>${j.note?`<p>${j.note}</p>`:''}<a href="${j.url}" target="_blank" rel="noopener">원본 정보 보기 ↗</a></div><div class="acts"><button class="btn sm pri" data-jk="${j.key}">풀기</button><button class="btn sm" data-jk="${j.key}" data-fresh="1">숫자 바꿔 풀기</button><button class="btn sm" data-jk="${j.key}" data-pdf="1">A3 PDF</button></div></div>`).join('')}</div>`;
  v.innerHTML=h}
 $('#v-jokbo').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.dataset.orig){openOrig(b.dataset.orig);return}
  if(b.dataset.jy!=null){jYear=+b.dataset.jy;renderJokbo();return}
- if(b.dataset.our!=null){playOurs(OURS[+b.dataset.our]);return}
- if(b.dataset.jk){playJokbo(JOKBO.find(j=>j.key===b.dataset.jk),!!b.dataset.fresh);return}
+ if(b.dataset.our!=null){playOurs(OURS[+b.dataset.our]);if(b.dataset.pdf)examPdf();return}
+ if(b.dataset.jk){playJokbo(JOKBO.find(j=>j.key===b.dataset.jk),!!b.dataset.fresh);if(b.dataset.pdf)examPdf();return}
  if(b.dataset.hist){const x=LS.get('m12-hist-'+SK(),[]).find(h=>h.k===+b.dataset.hist);if(x){makeExam(x.seed,x.ids.length,x.ids.filter(id=>TYPE[id]),x.label,{srcs:x.srcs,save:false});show('exam');window.scrollTo({top:0})}}});
 
 /* ===== 내 기출 자료 (원본 + OMR 채점) ===== */
@@ -2282,7 +3086,7 @@ function renderOrig(){const v=$('#v-jokbo'),o=OV.o,its=OV.its,C='①②③④⑤
  let h=`<div class="bar"><button class="btn sm" data-ob="back">← 족보 목록</button></div>
  <div class="sheet" style="margin-top:10px;padding-block:12px"><div class="ehead" style="padding-top:0"><b>${o.title}</b><span class="muted">${o.meta}</span></div>
  <p class="muted" style="margin:8px 0 0">출처: ${o.src} · 원본 파일: 다운로드 폴더 「${o.file}」</p>${o.note?`<p class="note" style="margin-top:8px">${o.note}</p>`:''}
- <div class="aibar" data-aik="orig|${o.key}" style="margin-top:10px"><button class="aibtn" data-ai="o">AI 선생님에게 이 시험지 묻기</button></div>${o.pages?`<div class="pgs">${Array.from({length:o.pages},(_,i)=>`<img src="jokbo/${o.key}/p-${i+1}.jpg" alt="${o.title} ${i+1}쪽" loading="lazy">`).join('')}</div>`:''}</div>`;
+ <div class="aibar" data-aik="orig|${o.key}" style="margin-top:10px"><button class="aibtn" data-ai="o">AI 선생님에게 이 시험지 묻기</button>${o.pages?`<button class="btn sm" data-ob="pdf" style="margin-left:8px">원본 A3 PDF (2쪽 모아찍기)</button>`:''}</div>${o.pages?`<div class="pgs">${Array.from({length:o.pages},(_,i)=>`<img src="jokbo/${o.key}/p-${i+1}.jpg" alt="${o.title} ${i+1}쪽" loading="lazy">`).join('')}</div>`:''}</div>`;
  if(OV.graded)h+=`<div class="score" style="margin-top:12px"><div class="big">${obj.length?Math.round(ok/obj.length*100):0}<small>점 · 객관식 ${obj.length}문항 중 ${ok}개 정답${its.length>obj.length?` · 서술형 ${its.length-obj.length}문항은 모범 답안과 비교해 스스로 채점`:''}</small></div></div>`;
  h+=`<h2 class="sec" style="margin-top:14px">답안지</h2><div class="omr">${its.map((it,i)=>{const p=OV.pick[i]||[];
   if(!it.a){return `<div class="orow wide"><span class="on">${it.l}</span><span class="sa">서술형·단답형 — 종이에 쓰세요</span>${OV.graded?`<div class="model"><b>모범 답안</b> ${it.s}</div><div class="selfchk"><button class="chip ${OV.self[i]===1?'on':''}" data-self="${i}" data-v="1">맞음</button><button class="chip ${OV.self[i]===0?'on':''}" data-self="${i}" data-v="0">틀림</button></div>`:''}</div>`}
@@ -2295,7 +3099,7 @@ $('#v-jokbo').addEventListener('click',e=>{if(!OV)return;const b=e.target.closes
  if(b.dataset.oq!=null){const i=+b.dataset.oq,n=+b.dataset.n,it=OV.its[i];let p=OV.pick[i]||[];p=p.includes(n)?p.filter(x=>x!==n):(it.a.length>1?[...p,n]:[n]);OV.pick[i]=p;LS.set('m12-omr-'+OV.o.key,OV.pick);
   b.parentElement.querySelectorAll('.b').forEach(x=>x.classList.toggle('sel',p.includes(+x.dataset.n)));const t=document.querySelector('#v-jokbo .stick .tally');if(t)t.textContent=`표기 ${OV.its.filter((it,k)=>it.a&&(OV.pick[k]||[]).length).length}/${OV.its.filter(x=>x.a).length}`;e.stopPropagation();return}
  if(b.dataset.self!=null){OV.self[+b.dataset.self]=+b.dataset.v;renderOrig();e.stopPropagation();return}
- const a=b.dataset.ob;if(!a)return;e.stopPropagation();
+ const a=b.dataset.ob;if(!a)return;e.stopPropagation();if(a==='pdf'){origPdf(OV.o,b);return}
  if(a==='back'){OV=null;renderJokbo();return}
  if(a==='clear'){OV.pick={};LS.set('m12-omr-'+OV.o.key,{});renderOrig();return}
  if(a==='reset'){OV.pick={};OV.self={};OV.graded=false;LS.set('m12-omr-'+OV.o.key,{});renderOrig();return}
@@ -2358,9 +3162,9 @@ async function aiSvgBlob(svg){try{let s=new XMLSerializer().serializeToString(sv
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);await img.decode();
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,W,H);g.drawImage(img,0,0,W,H);
   return await new Promise(r=>cv.toBlob(r,'image/png'))}catch(e){return null}}
-const AI_RULES=`너는 중학교 1학년 학생의 기말고사 공부를 돕는 다정하고 정확한 선생님이야.
+const AI_RULES=`너는 중학생의 시험 공부를 돕는 다정하고 정확한 선생님이야.
 규칙:
-- 친근한 해요체로, 중1이 이해할 수 있게 짧게(대개 10줄 이내) 설명해요.
+- 친근한 해요체로, 중학생이 이해할 수 있게 짧게(대개 10줄 이내) 설명해요.
 - [학생 상태]가 '아직 풀지 않음'이면 정답 번호를 바로 말하지 말고 힌트와 생각하는 순서만 알려줘요. 학생이 정답을 직접 물어보면 그때 알려줘요.
 - 채점 뒤에는 정답의 근거와 풀이를 단계별(1. 2. 3.)로 설명하고, 학생 답이 틀렸으면 어디서 헷갈렸는지 짚어줘요.
 - 수식은 LaTeX를 쓰지 말고 3/4, ×, ÷, ², ∠, ° 같은 일반 기호로 써요. 표나 # 제목은 쓰지 말고 강조는 **굵게**만 써요.
