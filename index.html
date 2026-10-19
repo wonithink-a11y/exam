@@ -2589,6 +2589,42 @@ add({id:'n22-pdeep',u:'N9',name:'[심화] 주사위로 정하는 방정식·점�
  const v=n===2?N_fr(1,2):N_fr(3,8);return{q:`수직선 위의 원점에 있는 점 P가 동전을 던져 앞면이 나오면 오른쪽으로 1만큼, 뒷면이 나오면 왼쪽으로 1만큼 움직인다. 동전을 ${n}번 던졌을 때, 점 P가 ${n===2?'원점':'1의 위치'}에 있을 확률은?`,
  ...mc(R,v,[N_fr(1,4),N_fr(1,8),N_fr(3,4),N_fr(5,8),N_fr(1,3)].filter(x=>x!==v)),exp:n===2?`(앞, 뒤), (뒤, 앞) 2가지 → ${fr(2,4)} = <b>${v}</b>`:`앞면 2번, 뒷면 1번: (앞앞뒤), (앞뒤앞), (뒤앞앞) 3가지 → <b>${fr(3,8)}</b>`}}});
 
+/* ===== 중2-2 수학 보강 (2026-10-19): N3·N5·N9 상 유형 추가 ===== */
+add({id:'n22-pgfold',u:'N3',name:'[심화] 두 각의 이등분선과 EF의 길이',lv:3,g:R=>{
+ const a=R.pick([6,7,8,9,10,12]),b=a+R.pick([1,2,3,4,5]);if(b>=2*a)return null;
+ const {A,B,C,D}=N_pgram(55,200,110),G=N_cen(A,B,C,D);const E=N_at(B,C,a/b),F=N_at(B,C,(b-a)/b);
+ const fig=svg(330,190,N_ln([A,B,C,D],true)+N_ln([A,E])+N_ln([D,F])+N_ang(A,B,E,'',16)+N_ang(A,E,D,'',20)+N_ang(D,C,F,'',16)+N_ang(D,F,A,'',20)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G)+txt('E',E[0]+4,E[1]+16,'middle','v')+txt('F',F[0]-4,F[1]+16,'middle','v')+N_lab(A,B,a+' cm',G,16)+N_lab(A,D,b+' cm',G,16));
+ const ans=2*a-b;return{q:`그림의 평행사변형 ABCD에서 ∠A의 이등분선과 ∠D의 이등분선이 <span class="sg">BC</span>와 만나는 점을 각각 E, F라 하자. <span class="sg">AB</span> = ${a} cm, <span class="sg">AD</span> = ${b} cm일 때, <span class="sg">EF</span>의 길이는?`,fig,alt:`AB = ${a}, AD = ${b}, 두 각의 이등분선`,
+ ...mc(R,ans,[b-a,a,b,2*a,a+b-ans+1].filter(v=>v>0&&v!==ans),N_cm),exp:`∠BAE = ∠EAD = ∠AEB(엇각) → △ABE는 이등변삼각형이므로 <span class="sg">BE</span> = <span class="sg">AB</span> = ${a}<br>같은 방법으로 <span class="sg">CF</span> = <span class="sg">CD</span> = <span class="sg">AB</span> = ${a}<br><span class="sg">BF</span> = <span class="sg">BC</span> − <span class="sg">CF</span> = ${b} − ${a} = ${b-a}<br><span class="sg">EF</span> = <span class="sg">BE</span> − <span class="sg">BF</span> = ${a} − ${b-a} = <b>${ans} cm</b>`}}});
+const N_PC_OK=[['AB ∥ DC, AD ∥ BC','두 쌍의 대변이 각각 평행'],['AB = DC, AD = BC','두 쌍의 대변의 길이가 각각 같음'],['AB ∥ DC, AB = DC','한 쌍의 대변이 평행하고 그 길이가 같음'],['OA = OC, OB = OD','두 대각선이 서로를 이등분'],['∠A = ∠C, ∠B = ∠D','두 쌍의 대각의 크기가 각각 같음']];
+const N_PC_NO=[['AB ∥ DC, AD = BC','등변사다리꼴이 될 수 있다.'],['AB = DC, AD ∥ BC','등변사다리꼴이 될 수 있다.'],['AB = AD, BC = CD','연(이웃한 두 변이 같은 사각형)이 될 수 있다.'],['OA = OB, OC = OD','대각선이 서로를 이등분하는 조건(OA = OC, OB = OD)이 아니다.'],['∠A = ∠B, ∠C = ∠D','등변사다리꼴이 될 수 있다.'],['AB ∥ DC, ∠A = ∠B','등변사다리꼴이 될 수 있다.']];
+add({id:'n22-pgcond2',u:'N3',name:'[심화] 평행사변형이 되는 조건의 개수',lv:3,g:R=>{
+ const n=R.i(1,4),ok=R.shuffle(N_PC_OK).slice(0,n),no=R.shuffle(N_PC_NO).slice(0,5-n),L=R.shuffle([...ok.map(x=>[x,1]),...no.map(x=>[x,0])]),ab='가나다라마';
+ return{q:`사각형 ABCD에서 두 대각선의 교점을 O라 할 때, 다음 중 사각형 ABCD가 평행사변형이 되는 조건인 것의 개수는?<div class="data" style="font-family:var(--f-body)">${L.map((x,i)=>`(${ab[i]}) ${x[0][0]}`).join('<br>')}</div>`,
+ ...mc(R,n,[0,1,2,3,4,5].filter(v=>v!==n),v=>v+'개'),exp:`평행사변형이 되는 조건: ${L.map((x,i)=>x[1]?`(${ab[i]}) ${x[0][1]}`:'').filter(Boolean).join(' / ')}<br>아닌 것: ${L.map((x,i)=>x[1]?'':`(${ab[i]}) ${x[0][1]}`).filter(Boolean).join(' / ')}<br>∴ <b>${n}개</b>`}}});
+add({id:'n22-pgdia2',u:'N3',name:'[심화] 대각선의 교점과 삼각형의 둘레',lv:3,g:R=>{
+ const a=R.pick([7,8,9,10,11,12]),b=R.pick([4,5,6,7,8]),m=R.pick([5,6,7]),n=R.pick([5,6,7]);if(a===b||a>=m+n||b>=m+n)return null;
+ const {A,B,C,D}=N_pgram(60,200,110),G=N_cen(A,B,C,D),O=N_mid(A,C);const fig=svg(330,190,N_ln([A,B,C,D],true)+N_ln([A,C])+N_ln([B,D])+N_pt(O)+txt('O',O[0],O[1]-10,'middle','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G));
+ const L=2*(a+b),p=a+m+n,q=b+m+n;return{q:`그림의 평행사변형 ABCD에서 두 대각선의 교점을 O라 하자. 평행사변형 ABCD의 둘레의 길이가 ${L} cm, △OAB의 둘레의 길이가 ${p} cm, △OBC의 둘레의 길이가 ${q} cm일 때, <span class="sg">AB</span>의 길이는?`,fig,alt:`둘레 ${L}, △OAB = ${p}, △OBC = ${q}`,
+ ...mc(R,a,[b,a+1,a-1,L/2,p-q].filter(v=>v>0&&v!==a),N_cm),exp:`평행사변형에서 <span class="sg">OA</span> = <span class="sg">OC</span>, <span class="sg">OB</span>는 공통이므로<br>(△OAB의 둘레) − (△OBC의 둘레) = <span class="sg">AB</span> − <span class="sg">BC</span> = ${p} − ${q} = ${p-q}<br><span class="sg">AB</span> + <span class="sg">BC</span> = ${L} ÷ 2 = ${L/2}<br>두 식을 더하면 2<span class="sg">AB</span> = ${L/2+p-q} → <span class="sg">AB</span> = <b>${a} cm</b>`}}});
+add({id:'n22-simtrap',u:'N5',name:'[심화] 사다리꼴의 대각선과 넓이의 비',lv:3,g:R=>{
+ const [m,n]=R.pick([[1,2],[2,3],[1,3],[2,5],[3,4],[3,5],[1,4]]),t=R.pick([1,2,3,4,5]),S=m*m*t,k=34;
+ const B=[40,150],C=[40+n*k,150],A=[40+(n*k-m*k)/2,40],D=[A[0]+m*k,40],O=N_inter(A,C,B,D),G=N_cen(A,B,C,D);
+ const fig=svg(330,190,N_sh([A,O,D])+N_ln([A,B,C,D],true)+N_ln([A,C])+N_ln([B,D])+N_pt(O)+txt('O',O[0]+12,O[1]+4,'','v')+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+N_v('D',D,G));
+ const ans=(m+n)**2*t;return{q:`그림과 같이 <span class="sg">AD</span> ∥ <span class="sg">BC</span>인 사다리꼴 ABCD에서 두 대각선의 교점을 O라 하자. <span class="sg">AD</span> : <span class="sg">BC</span> = ${m} : ${n}이고 색칠한 △AOD의 넓이가 ${S} cm²일 때, 사다리꼴 ABCD의 넓이는?`,fig,alt:`AD:BC = ${m}:${n}, △AOD = ${S}`,
+ ...mc(R,ans,[(m*m+n*n)*t,(m*m+m*n+n*n)*t,(m+n)*S,ans+S,n*n*t].filter(v=>v!==ans),N_cm2),exp:`AD ∥ BC이므로 △AOD ∽ △COB (AA 닮음), 닮음비 ${m} : ${n} → 넓이의 비 ${m*m} : ${n*n}<br>△AOD = ${S} 이므로 ${m*m}t = ${S}, t = ${t}<br>△BOC = ${n*n}t = ${n*n*t}<br>△AOB = △DOC = ${m*n}t = ${m*n*t} (높이가 같은 삼각형의 넓이의 비 = 밑변의 비 ${m} : ${n})<br>∴ 사다리꼴 ABCD = ${S} + ${n*n*t} + ${m*n*t}×2 = <b>${ans} cm²</b>`}}});
+add({id:'n22-simeq',u:'N5',name:'[심화] 정삼각형에서 닮은 삼각형 찾기',lv:3,g:R=>{
+ const [s,x]=R.pick([[9,3],[9,6],[12,6],[16,4],[16,12],[16,8],[18,6],[18,12],[8,4],[20,10],[24,12]]);const c=x*(s-x)/s;if(!Number.isInteger(c))return null;
+ const B=[50,172],C=[230,172],A=[140,172-180*Math.sqrt(3)/2],D=N_at(B,C,x/s),E=N_at(C,A,c/s),G=N_cen(A,B,C);
+ const fig=svg(330,190,N_ln([A,B,C],true)+N_ln([A,D,E])+N_ang(D,A,E,'60°',22)+N_v('A',A,G)+N_v('B',B,G)+N_v('C',C,G)+txt('D',D[0],D[1]+16,'middle','v')+txt('E',E[0]+12,E[1]+6,'','v'));
+ return{q:`그림과 같이 한 변의 길이가 ${s} cm인 정삼각형 ABC의 변 BC 위의 점 D와 변 CA 위의 점 E에 대하여 ∠ADE = 60°이다. <span class="sg">BD</span> = ${x} cm일 때, <span class="sg">CE</span>의 길이는?`,fig,alt:`정삼각형 한 변 ${s}, BD = ${x}, ∠ADE = 60°`,
+ ...mc(R,c,[x,s-x,c+1,c*2,s/2].filter(v=>v>0&&v!==c&&Number.isFinite(v)),N_cm),exp:`∠B = ∠ADE = 60°이므로 ∠BAD + ∠ADB = 120° = ∠ADB + ∠CDE → ∠BAD = ∠CDE<br>∠B = ∠C = 60°이므로 △ABD ∽ △DCE (AA 닮음)<br><span class="sg">AB</span> : <span class="sg">DC</span> = <span class="sg">BD</span> : <span class="sg">CE</span> → ${s} : ${s-x} = ${x} : <span class="sg">CE</span><br><span class="sg">CE</span> = ${x} × ${s-x} ÷ ${s} = <b>${c} cm</b>`}}});
+add({id:'n22-pdeep2',u:'N9',name:'[심화] 적어도 하나·정확히 몇 개일 확률',lv:3,g:R=>{const k=R.pick(['coin','ball','ex']);
+ if(k==='coin'){const n=R.pick([3,4,5]),T=2**n,ans=N_fr(T-1,T);return{q:`동전 ${n}개를 동시에 던질 때, 적어도 한 개는 앞면이 나올 확률은?`,...mc(R,ans,[N_fr(1,T),N_fr(1,2),N_fr(n,T),N_fr(T-2,T),N_fr(T/2+1,T)].filter(v=>v!==ans)),exp:`(적어도 한 개는 앞면) = 1 − (모두 뒷면)<br>모든 경우의 수 2<sup>${n}</sup> = ${T}, 모두 뒷면인 경우 1가지<br>∴ 1 − ${fr(1,T)} = <b>${ans}</b>`}}
+ if(k==='ball'){const r=R.pick([2,3,4]),b=R.pick([3,4,5]),C2=v=>v*(v-1)/2,tot=C2(r+b),none=C2(b),ans=N_fr(tot-none,tot);
+  return{q:`빨간 공 ${r}개와 파란 공 ${b}개가 들어 있는 주머니에서 2개의 공을 동시에 꺼낼 때, 적어도 한 개는 빨간 공일 확률은?`,...mc(R,ans,[N_fr(none,tot),N_fr(r*b,tot),N_fr(C2(r),tot),N_fr(r,r+b),N_fr(tot-none+1,tot)].filter(v=>v!==ans)),exp:`모든 경우의 수: ${r+b}×${r+b-1}÷2 = ${tot}가지<br>2개 모두 파란 공인 경우: ${b}×${b-1}÷2 = ${none}가지<br>∴ 1 − ${N_fr(none,tot)} = <b>${ans}</b>`}}
+ const [a,bb]=R.pick([[1,2],[1,3],[2,3],[3,4]]),num=3*a*a*(bb-a),den=bb**3,ans=N_fr(num,den);
+ return{q:`어떤 학생이 한 문제를 맞힐 확률이 ${fr(a,bb)}이다. 이 학생이 서로 다른 세 문제를 풀 때, 정확히 두 문제만 맞힐 확률은? (단, 각 문제를 맞히는 사건은 서로 영향을 주지 않는다.)`,...mc(R,ans,[N_fr(a*a*(bb-a),den),N_fr(a**3,den),N_fr(3*a*(bb-a)**2,den),N_fr(a*a,bb*bb),N_fr(num+1,den)].filter(v=>v!==ans)),exp:`맞힌 문제 2개를 고르는 방법: 3가지 (맞, 맞, 틀 / 맞, 틀, 맞 / 틀, 맞, 맞)<br>각각의 확률 ${fr(a,bb)} × ${fr(a,bb)} × ${fr(bb-a,bb)} = ${N_fr(a*a*(bb-a),den)}<br>∴ 3 × ${N_fr(a*a*(bb-a),den)} = <b>${ans}</b>`}}});
 _T.forEach(t=>{if(t.bank)return;const f=t.g;t.g=R=>{for(let i=0;i<400;i++){const r=f(R);if(r&&r.opts.length===5&&new Set(r.opts).size===5&&r.opts.includes(r.ans))return r}throw new Error('gen fail '+t.id)}});
 SEMS['2-2'].math={name:'수학',book:'동아 수학 2 · 2학기 (2022 개정)',T:_T,
  units:[{id:'I',tag:'Ⅰ',name:'삼각형의 성질',subs:[['N1','이등변삼각형·직각삼각형의 합동'],['N2','외심과 내심']]},
@@ -2699,12 +2735,156 @@ add({id:'e22-dcnt',u:'B9',name:'[심화] 어법상 올바른 문장의 개수',l
 add(bank('e22-dord','B9','[심화] 글의 순서 배열',3,[
  ["주어진 글 다음에 이어질 순서로 알맞은 것은?"+psg("Every winter, a snow festival is held in a small town.<br>(A) After that, they make huge snow statues together.<br>(B) First, people from all over the world come to the town.<br>(C) At night, the statues shine with colorful lights."),"(B)-(A)-(C)",["(A)-(B)-(C)","(A)-(C)-(B)","(C)-(A)-(B)","(B)-(C)-(A)"],"First(B) → After that(A) → At night(C)"],
  ["주어진 글 다음에 이어질 순서로 알맞은 것은?"+psg("Jake got into the time machine.<br>(A) There, he saw a huge dinosaur eating leaves.<br>(B) It took him back to 65 million years ago.<br>(C) He was so scared that he ran back to the machine."),"(B)-(A)-(C)",["(A)-(B)-(C)","(A)-(C)-(B)","(C)-(B)-(A)","(B)-(C)-(A)"],"과거로 이동(B) → 공룡을 봄(A) → 겁이 나서 돌아감(C)"],
- ["주어진 글 다음에 이어질 순서로 알맞은 것은?"+psg("A foreign doctor came to Korea in 1916.<br>(A) Thanks to his effort, he could teach in Korean soon.<br>(B) He wanted to teach students in Korean.<br>(C) So he studied Korean very hard."),"(B)-(C)-(A)",["(A)-(B)-(C)","(C)-(A)-(B)","(B)-(A)-(C)","(C)-(B)-(A)"],"원함(B) → 그래서 공부(C) → 그 결과(A)"]]));
+ ["주어진 글 다음에 이어질 순서로 알맞은 것은?"+psg("A foreign doctor came to Korea in 1916.<br>(A) Thanks to his effort, he could teach in Korean soon.<br>(B) He wanted to teach students in Korean.<br>(C) So he studied Korean very hard."),"(B)-(C)-(A)",["(A)-(B)-(C)","(C)-(A)-(B)","(B)-(A)-(C)","(C)-(B)-(A)"],"원함(B) → 그래서 공부(C) → 그 결과(A)"],
+ ["주어진 글 다음에 이어질 순서로 알맞은 것은?"+psg("Mina entered the old museum.<br>(A) She was surprised because she had never seen such a big dinosaur.<br>(B) In the first hall, there was a huge skeleton.<br>(C) Then she walked to the next hall to find more."),"(B)-(A)-(C)",["(A)-(B)-(C)","(A)-(C)-(B)","(C)-(A)-(B)","(C)-(B)-(A)"],"큰 뼈 발견(B) → 놀람(A) → 다음 홀로 이동(C)"],
+ ["주어진 글 다음에 이어질 순서로 알맞은 것은?"+psg("People in my town hold a lantern festival every fall.<br>(A) Many families make their own lanterns at home.<br>(B) On the night of the festival, they put the lanterns on the river.<br>(C) The lanterns on the water look like a sea of stars."),"(A)-(B)-(C)",["(A)-(C)-(B)","(B)-(A)-(C)","(C)-(A)-(B)","(B)-(C)-(A)"],"등을 만든다(A) → 강에 띄운다(B) → 강 위의 모습(C)"],
+ ["주어진 글 다음에 이어질 순서로 알맞은 것은?"+psg("Tom wants to be a doctor.<br>(A) So he studies science every day.<br>(B) He thinks he can help sick people if he becomes a doctor.<br>(C) His parents want him to work hard."),"(B)-(A)-(C)",["(A)-(B)-(C)","(A)-(C)-(B)","(C)-(A)-(B)","(C)-(B)-(A)"],"이유(B) → So 결과(A) → 부모의 바람(C)"]]));
 add(bank('e22-dwr','B9','[심화] 우리말에 맞게 배열하기',3,[
  ["우리말과 같도록 주어진 단어를 배열할 때 4번째 오는 단어는?"+psg("나는 그가 노래하는 것을 들었다.<br>(him / I / singing / heard / a song)"),"singing",["him","heard","a song","I"],"I heard him singing a song. → I(1) heard(2) him(3) singing(4)"],
  ["우리말과 같도록 주어진 단어를 배열할 때 3번째 오는 단어는?"+psg("외국어를 배우는 것은 재미있다.<br>(is / to / it / fun / learn / a foreign language)"),"fun",["is","to","learn","it"],"It is fun to learn a foreign language. → It(1) is(2) fun(3)"],
  ["우리말과 같도록 주어진 단어를 배열할 때 5번째 오는 단어는?"+psg("선생님은 우리에게 일찍 오라고 말씀하셨다.<br>(told / come / the / teacher / us / to / early)"),"to",["us","come","told","early"],"The teacher told us to come early. → The(1) teacher(2) told(3) us(4) to(5)"],
- ["우리말과 같도록 주어진 단어를 배열할 때 4번째 오는 단어는?"+psg("나는 그렇게 큰 동물을 본 적이 없다.<br>(never / I've / such / seen / a huge animal)"),"such",["seen","never","a huge animal","I've"],"I've never seen such a huge animal. → I've(1) never(2) seen(3) such(4)"]]));
+ ["우리말과 같도록 주어진 단어를 배열할 때 4번째 오는 단어는?"+psg("나는 그렇게 큰 동물을 본 적이 없다.<br>(never / I've / such / seen / a huge animal)"),"such",["seen","never","a huge animal","I've"],"I've never seen such a huge animal. → I've(1) never(2) seen(3) such(4)"],
+ ["우리말과 같도록 주어진 단어를 배열할 때 5번째 오는 단어는?"+psg("그는 내가 방을 청소하기를 원했다.<br>(wanted / me / to / he / clean / my room)"),"clean",["to","me","wanted","my room"],"He wanted me to clean my room. → He(1) wanted(2) me(3) to(4) clean(5)"],
+ ["우리말과 같도록 주어진 단어를 배열할 때 3번째 오는 단어는?"+psg("나는 공원에서 그 소녀가 춤추는 것을 보았다.<br>(saw / dancing / I / the girl / at the park)"),"the girl",["I","saw","dancing","at the park"],"I saw the girl dancing at the park. → I(1) saw(2) the girl(3) dancing(4)"],
+ ["우리말과 같도록 주어진 단어를 배열할 때 4번째 오는 단어는?"+psg("이것은 내가 어제 산 책이다.<br>(the book / is / bought / this / that / I / yesterday)"),"that",["the book","I","is","bought"],"This is the book that I bought yesterday. → This(1) is(2) the book(3) that(4)"],
+ ["우리말과 같도록 주어진 단어를 배열할 때 4번째 오는 단어는?"+psg("나는 한 번도 서울에 가 본 적이 없다.<br>(never / I / been / have / to Seoul)"),"been",["never","have","to Seoul","I"],"I have never been to Seoul. → I(1) have(2) never(3) been(4)"]]));
+
+/* ===== 중2-2 영어 보강 (2026-10-19): 대화 순서·빈칸, 문법 전환·어법 심화, 독해 심화, 통합 어법 ===== */
+const E22_PM=c=>['(A)-(B)-(C)','(A)-(C)-(B)','(B)-(A)-(C)','(B)-(C)-(A)','(C)-(A)-(B)','(C)-(B)-(A)'].filter(x=>x!==c).slice(0,4);
+const E22_ORD=(first,a,b,c,ans)=>['다음 대화의 흐름이 자연스럽도록 (A)~(C)를 바르게 배열한 것은?'+psg(`${first}<br>(A) ${a}<br>(B) ${b}<br>(C) ${c}`),ans,E22_PM(ans),'질문과 대답이 짝을 이루고, 앞 말을 받아 자연스럽게 이어지는 순서를 찾는다. 정답: '+ans];
+
+/* 어법 틀린 곳 찾기 생성기: s = 올바른 5개 조각, w = [바꿀 위치, 틀린 조각, 이유] */
+function e22wrong(id,u,name,items){return{id,u,name,lv:3,_w22:1,g:R=>{const it=R.pick(items),w=R.pick(it.w),segs=it.s.slice();segs[w[0]]=w[1];const L='abcde';
+ const txt=segs.map((p,i)=>`<u>(${L[i]}) ${p}</u>`).join(' ');
+ return{q:`다음 문장의 밑줄 친 (a)~(e) 중 어법상 <u>틀린</u> 것은?${psg(txt)}`,...fixed(['(a)','(b)','(c)','(d)','(e)'],`(${L[w[0]]})`),exp:`(${L[w[0]]}) <b>${w[1]}</b> → <b>${it.s[w[0]]}</b><br>${w[2]}<br>바른 문장: ${it.s.join(' ')}`}}}}
+const E22_WP5=[
+ {s:["The girl","whom I met","at the park","is my","new neighbor."],w:[[1,"whom I met her","목적격 관계대명사(whom)가 목적어 역할을 하므로 her를 다시 쓰지 않는다."],[3,"are my","주어 The girl이 단수이므로 is"]]},
+ {s:["The bag","that I lost","yesterday","was a gift","from my aunt."],w:[[1,"that I lost it","목적격 관계대명사절에서는 목적어(it)를 중복해서 쓰지 않는다."],[3,"were a gift","주어 The bag이 단수이므로 was"]]},
+ {s:["There","used to be","a small bakery","near","our school."],w:[[1,"used to being","used to + 동사원형"],[1,"use to be","과거의 습관·상태는 used to로 쓴다."]]},
+ {s:["I","used to play","soccer","every day","after school."],w:[[1,"used to playing","used to + 동사원형"],[1,"am used to play","'~하곤 했다'의 used to 앞에는 be동사를 쓰지 않는다."]]},
+ {s:["This is","the place","that I","visited","last summer."],w:[[3,"visit","last summer(과거)와 시제를 맞춰 visited"],[3,"visiting","관계사절의 동사는 시제에 맞게 visited"]]},
+ {s:["The movie","that we watched","last night","was more","exciting than I expected."],w:[[1,"that we watched it","목적격 관계대명사절에서는 목적어(it)를 중복해서 쓰지 않는다."],[3,"was most","뒤에 than이 있으므로 비교급 more"]]}];
+const E22_WP6=[
+ {s:["I","heard","my sister","singing","in the shower."],w:[[3,"to sing","지각동사의 목적격 보어로 to부정사는 쓸 수 없다. (동사원형 또는 -ing)"],[3,"sang","목적격 보어 자리에 과거형 동사는 쓸 수 없다."]]},
+ {s:["She","saw","a dog","run","across the road."],w:[[3,"to run","지각동사 + 목적어 + 동사원형/-ing"],[3,"ran","목적격 보어 자리에 과거형 동사는 쓸 수 없다."]]},
+ {s:["He was","so tired","that he","couldn't","keep his eyes open."],w:[[1,"such tired","so + 형용사 / such + (a/an) + 형용사 + 명사"],[3,"can't","주절이 과거(was)이므로 couldn't"]]},
+ {s:["The music","was so","loud","that we","couldn't hear each other."],w:[[1,"was too","too ~ that은 쓰지 않는다. (so ~ that 또는 too ~ to)"],[3,"which we","결과를 이끄는 접속사는 that"]]},
+ {s:["We","watched","the birds","flying","over the lake."],w:[[3,"to fly","지각동사 + 목적어 + 동사원형/-ing"],[3,"flew","목적격 보어 자리에 과거형 동사는 쓸 수 없다."]]},
+ {s:["It was","so cold","that I","wore","a thick coat."],w:[[1,"such cold","so + 형용사"],[3,"wear","주절이 과거(was)이므로 wore"]]},
+ {s:["Everyone","heard","him","speak","for Korea's independence."],w:[[3,"to speak","지각동사 + 목적어 + 동사원형/-ing"],[2,"his","목적어 자리에는 목적격 him"]]}];
+const E22_WP7=[
+ {s:["It is","important","to wear","a helmet","when you ride a bike."],w:[[0,"That is","가주어는 It"],[2,"wear","진주어는 to부정사(to wear)"]]},
+ {s:["It is","fun","to learn","about festivals","from other countries."],w:[[0,"This is","가주어는 It"],[2,"learn","진주어는 to부정사(to learn)"]]},
+ {s:["People","call","this festival","the Festival","of Colors."],w:[[1,"call to","call + 목적어 + 명사(보어): to를 쓰지 않는다."],[2,"for this festival","call 뒤에는 전치사 없이 목적어가 온다."]]},
+ {s:["They","named","their baby","Minho","after his grandfather."],w:[[1,"named to","name + 목적어 + 명사(보어): to를 쓰지 않는다."],[3,"to Minho","보어(명사) 앞에는 to를 쓰지 않는다."]]},
+ {s:["It is","dangerous","to swim","in the river","alone."],w:[[0,"That is","가주어는 It"],[2,"swim","진주어는 to부정사(to swim)"]]},
+ {s:["The news","made","him","famous","overnight."],w:[[3,"famously","make + 목적어 + 형용사: 보어 자리에는 형용사"],[2,"his","목적어 자리에는 목적격 him"]]},
+ {s:["We","elected","her","class president","last week."],w:[[1,"elected to","elect + 목적어 + 명사(보어): to를 쓰지 않는다."],[2,"she","목적어 자리에는 목적격 her"]]}];
+const E22_WP8=[
+ {s:["I","have","never","seen","such a huge animal."],w:[[3,"saw","현재완료는 have + 과거분사(seen)"],[1,"has","주어 I에는 have"]]},
+ {s:["She","has","lived","in Busan","since 2019."],w:[[2,"live","현재완료는 has + 과거분사(lived)"],[4,"for 2019","since + 시점, for + 기간"],[1,"have","주어 She에는 has"]]},
+ {s:["My mom","wants","me","to clean","my room."],w:[[3,"clean","want + 목적어 + to부정사"],[2,"I","목적어 자리에는 목적격 me"]]},
+ {s:["The teacher","told","us","to be","quiet."],w:[[3,"being","tell + 목적어 + to부정사"],[2,"we","목적어 자리에는 목적격 us"]]},
+ {s:["Have","you","ever","been","to Japan?"],w:[[2,"never","의문문에서 경험을 물을 때는 ever"],[3,"be","현재완료는 have + 과거분사(been)"]]},
+ {s:["I","have","just","finished","my homework."],w:[[3,"finish","현재완료는 have + 과거분사(finished)"],[1,"am","현재완료는 have + 과거분사"]]}];
+add(e22wrong('e22-5g5','B5G','[심화] 어법상 틀린 부분 찾기',E22_WP5));
+add(e22wrong('e22-6g4','B6G','[심화] 어법상 틀린 부분 찾기',E22_WP6));
+add(e22wrong('e22-7g4','B7G','[심화] 어법상 틀린 부분 찾기',E22_WP7));
+add(e22wrong('e22-8g5','B8G','[심화] 어법상 틀린 부분 찾기',E22_WP8));
+add(e22wrong('e22-dwrong','B9','[심화] 통합 어법상 틀린 부분 찾기',[...E22_WP5,...E22_WP6,...E22_WP7,...E22_WP8]));
+
+/* --- 대화 보강: 순서 배열·빈칸 짝·내용 일치 --- */
+add(bank('e22-5d2','B5D','대화: 순서 배열·빈칸 짝 (교통·시간)',2,[
+ E22_ORD('A: Excuse me. How can I get to the science museum?','B: It will take about 15 minutes.','B: You can take bus number 11 and get off at City Hall.','A: How long will it take?','(B)-(C)-(A)'),
+ E22_ORD('A: How can I get to the airport?','A: How long will it take?','B: You can take the airport bus at Exit 3.','B: It will take about an hour.','(B)-(A)-(C)'),
+ ['대화의 빈칸 (A), (B)에 들어갈 말로 알맞게 짝지어진 것은?'+psg('A: (A) ___ can I get to the stadium?<br>B: You can take the subway line 2.<br>A: (B) ___ will it take?<br>B: About 20 minutes.'),'(A) How – (B) How long',['(A) What – (B) How long','(A) How – (B) How much','(A) Where – (B) How many','(A) How – (B) How far'],'교통수단(방법)은 How, 걸리는 시간은 How long으로 묻는다.'],
+ ['대화의 빈칸 (A), (B)에 들어갈 말로 알맞게 짝지어진 것은?'+psg('A: How long will it (A) ___?<br>B: It will take about 30 minutes by bus.<br>A: Where should I (B) ___ off?<br>B: Get off at the third stop.'),'(A) take – (B) get',['(A) go – (B) get','(A) spend – (B) go','(A) make – (B) get','(A) take – (B) put'],'How long will it take? / get off(내리다)']]));
+add(bank('e22-6d2','B6D','대화: 순서 배열·빈칸 짝·내용 일치 (종류·추천)',2,[
+ E22_ORD('A: I want to watch a movie this weekend.','A: I like action movies.','B: What kinds of movies do you like?','B: Then how about Space Hero? It\'s really exciting.','(B)-(A)-(C)'),
+ E22_ORD('A: Can you recommend a good book for me?','B: Then I recommend The Time Traveler. It\'s really exciting.','A: I like science fiction.','B: Sure. What kinds of books do you like?','(C)-(B)-(A)'),
+ ['대화의 빈칸 (A), (B)에 들어갈 말로 알맞게 짝지어진 것은?'+psg('A: I need a new book. (A) ___ you recommend one?<br>B: Sure. (B) ___ of books do you like?<br>A: I like mystery novels.'),'(A) Can – (B) What kinds',['(A) Do – (B) What kinds','(A) Are – (B) What kinds','(A) Can – (B) How long','(A) Can – (B) Why','(A) Is – (B) How many'].slice(0,4),'추천을 부탁할 때 Can you recommend ~?, 종류를 물을 때 What kinds of ~?'],
+ ['대화의 내용과 일치하는 것은?'+psg('A: I\'m looking for a gift for my dad. Can you recommend something?<br>B: What kinds of things does he like?<br>A: He likes hiking.<br>B: Then how about a backpack? It\'s light and strong.'),'A의 아버지는 등산을 좋아한다.',['B는 A에게 선물을 받았다.','A는 모자를 사기로 했다.','B는 A의 아버지가 좋아하는 것을 이미 알고 있었다.','B는 백팩이 무겁고 약하다고 말했다.'],'He likes hiking. → A의 아버지는 등산(하이킹)을 좋아한다.']]));
+add(bank('e22-7d2','B7D','대화: 순서 배열·빈칸 짝·내용 일치 (선호·이유)',2,[
+ E22_ORD('A: Which do you like more, summer or winter?','B: Because I can go swimming in the sea.','B: I like summer more.','A: Why do you like it more?','(B)-(C)-(A)'),
+ E22_ORD('A: We can go to the zoo or the aquarium. Which do you prefer?','A: Why do you prefer the aquarium?','B: Because I love watching dolphins.','B: I prefer the aquarium.','(C)-(A)-(B)'),
+ ['대화의 빈칸 (A), (B)에 들어갈 말로 알맞게 짝지어진 것은?'+psg('A: (A) ___ do you like more, pizza or pasta?<br>B: I like pasta more.<br>A: (B) ___ do you like it more?<br>B: Because it\'s not too heavy.'),'(A) Which – (B) Why',['(A) How – (B) Why','(A) Which – (B) How','(A) Who – (B) Why','(A) Which – (B) When'],'둘 중 선호는 Which, 이유는 Why로 묻는다.'],
+ ['대화의 내용과 일치하는 것은?'+psg('A: Which do you like more, the Mud Festival or the Lantern Festival?<br>B: I like the Lantern Festival more.<br>A: Why?<br>B: Because the lanterns are so beautiful at night.'),'B는 등 축제를 더 좋아한다.',['A는 머드 축제를 더 좋아한다고 말했다.','B는 머드 축제에 가 본 적이 있다.','B는 낮에 하는 축제를 좋아한다.','두 사람은 함께 축제에 가기로 했다.'],'B가 I like the Lantern Festival more라고 했고, 이유는 밤에 등이 아름답기 때문이다.']]));
+
+/* --- L5 문법 보강 --- */
+add(bank('e22-5g3','B5G','목적격 관계대명사: 문장 연결·생략',2,[
+ ['다음 두 문장을 한 문장으로 바르게 연결한 것은?'+psg('This is the song. I like it the most.'),'This is the song that I like the most.',['This is the song that I like it the most.','This is the song who I like the most.','This is the song what I like the most.','This is the song that I like most it.'],'목적어 it이 관계대명사 that으로 바뀌어 앞으로 나가므로 it은 쓰지 않는다.'],
+ ['다음 두 문장을 한 문장으로 바르게 연결한 것은?'+psg('The man is my uncle. I met him at the station.'),'The man whom I met at the station is my uncle.',['The man who I met him at the station is my uncle.','The man which I met at the station is my uncle.','The man whose I met at the station is my uncle.','The man that I met him at the station is my uncle.'],'선행사가 사람이고 목적격이므로 whom(또는 that)을 쓰고, 목적어 him은 지운다.'],
+ ['다음 중 관계대명사를 생략할 수 <u>없는</u> 문장은?','I know the girl who lives next door.',['The pizza that she made was delicious.','This is the book that I read last week.','He is the singer that I like the most.','The movie that we watched was fun.'],'목적격 관계대명사는 생략할 수 있지만, 주격(who lives)은 생략할 수 없다.'],
+ ['다음 밑줄 친 that의 쓰임이 나머지와 <u>다른</u> 하나는?','I think <u>that</u> he is kind.',['The bag <u>that</u> I bought is red.','The song <u>that</u> we sang was fun.','The man <u>that</u> I met was tall.','The cake <u>that</u> she baked was sweet.'],'나머지는 목적격 관계대명사이고, ①은 명사절을 이끄는 접속사 that이다.']]));
+add(bank('e22-5g4','B5G','used to 심화',2,[
+ ['빈칸에 들어갈 말로 가장 알맞은 것은?'+psg('There ___ be a small park here, but now it\'s a parking lot.'),'used to',['is used to','used to being','use to','was used'],'과거의 상태·습관: used to + 동사원형'],
+ ['다음 중 어법상 올바른 문장은?','She used to live in Daegu.',['She used to living in Daegu.','She use to live in Daegu.','She is used to live in Daegu.','She used live in Daegu.'],'used to + 동사원형'],
+ ['다음 중 used to의 쓰임이 나머지와 <u>다른</u> 하나는?','This tool is used to cut paper.',['I used to ride a bike to school.','My grandfather used to smoke.','There used to be a tree here.','We used to play baseball after school.'],'나머지는 과거의 습관·상태를 나타내는 used to + 동사원형이고, ①은 be used to(~하는 데 쓰이다)이다.'],
+ ['다음 우리말을 영어로 바르게 옮긴 것은?<div class="cond">나는 어렸을 때 매일 수영하러 가곤 했다.</div>','I used to go swimming every day when I was young.',['I am used to go swimming every day when I was young.','I used to going swimming every day when I was young.','I use to go swimming every day when I was young.','I used to went swimming every day when I was young.'],'~하곤 했다: used to + 동사원형']]));
+
+/* --- L6 문법 보강 --- */
+add(bank('e22-6g3','B6G','지각동사·so ~ that 문장 전환',2,[
+ ['다음 중 어법상 <u>어색한</u> 문장은?','I heard the dog to bark.',['I felt the ground shaking.','She watched the kids playing soccer.','We saw a bird flying over the house.','He heard someone calling his name.'],'지각동사의 목적격 보어로 to부정사는 쓸 수 없다. → I heard the dog bark(barking).'],
+ ['다음 우리말을 영어로 바르게 옮긴 것은?<div class="cond">나는 누군가가 문을 두드리는 소리를 들었다.</div>','I heard someone knocking on the door.',['I heard someone to knock on the door.','I heard someone knocked on the door.','I heard knocking someone on the door.','I heard that someone knocking on the door.'],'heard + 목적어(someone) + 현재분사(knocking)'],
+ ['다음 두 문장의 의미가 같도록 할 때, 빈칸에 알맞은 것은?'+psg('The bag was so heavy that I couldn\'t carry it.<br>= The bag was too heavy ___.'),'for me to carry',['for me carry','of me to carry','to me carry','for me carrying'],'too ~ for + 목적격 + to부정사: 너무 ~해서 …할 수 없다'],
+ ['다음 문장의 의미로 알맞은 것은?'+psg('She was so kind that everyone liked her.'),'그녀는 매우 친절해서 모두가 그녀를 좋아했다.',['그녀는 친절했지만 아무도 좋아하지 않았다.','그녀는 모두가 좋아하도록 친절해야 했다.','그녀는 너무 친절해서 모두가 부담스러워했다.','그녀가 친절하면 모두가 좋아할 것이다.'],'so + 형용사 + that ~: 매우 ~해서 …하다']]));
+
+/* --- L7 문법 보강 --- */
+add(bank('e22-7g3','B7G','가주어 it·5형식 문장 전환',2,[
+ ['다음 두 문장의 의미가 같도록 할 때, 빈칸에 알맞은 말을 짝지은 것은?'+psg('To learn English is not easy.<br>= (A) ___ is not easy (B) ___ learn English.'),'(A) It – (B) to',['(A) That – (B) to','(A) It – (B) for','(A) This – (B) learning','(A) It – (B) learning'],'주어 To learn English → 가주어 It + 진주어 to learn English'],
+ ['다음 문장을 가주어 It을 사용하여 바르게 바꾼 것은?'+psg('To read books every day is good.'),'It is good to read books every day.',['It is good reading books every day.','That is good to read books every day.','It is good for read books every day.','It to read books every day is good.'],'가주어 It + be + 형용사 + to부정사(진주어)'],
+ ['다음 밑줄 친 It의 쓰임이 나머지와 <u>다른</u> 하나는?','<u>It</u> is Sunday today.',['<u>It</u> is fun to watch the parade.','<u>It</u> is important to eat breakfast.','<u>It</u> is hard to wake up early.','<u>It</u> is dangerous to play with fire.'],'나머지는 to부정사를 대신하는 가주어이고, ①은 요일을 나타내는 비인칭 주어이다.'],
+ ['다음 중 어법상 올바른 문장은?','People call this dish bibimbap.',['People call to this dish bibimbap.','People call this dish as bibimbap.','People call bibimbap this dish to.','People call this dish for bibimbap.'],'call + 목적어 + 명사(보어): 전치사 없이 쓴다.']]));
+
+/* --- L8 문법 보강 --- */
+add(bank('e22-8g3','B8G','현재완료: 의문문·대답·for/since',2,[
+ ['대화의 빈칸에 알맞은 대답은?'+psg('A: Have you ever eaten kimchi?<br>B: ___'),'Yes, I have.',['Yes, I did.','Yes, I do.','No, I didn\'t have.','Yes, I am.'],'Have you ever ~?로 물으면 Yes, I have. / No, I haven\'t.로 답한다.'],
+ ['다음 중 어법상 올바른 문장은?','Have you ever been to Jeju Island?',['Did you ever been to Jeju Island?','Have you ever go to Jeju Island?','Are you ever been to Jeju Island?','Have you ever being to Jeju Island?'],'현재완료 의문문: Have/Has + 주어 + (ever) + 과거분사 ~?'],
+ ['다음 문장을 부정문으로 바르게 바꾼 것은?'+psg('She has visited Paris.'),'She hasn\'t visited Paris.',['She doesn\'t visited Paris.','She hasn\'t visit Paris.','She didn\'t has visited Paris.','She not has visited Paris.'],'현재완료의 부정: has/have + not + 과거분사'],
+ ['다음 문장의 의미로 알맞은 것은?'+psg('Tom has gone to Paris.'),'Tom은 파리에 가서 지금 여기에 없다.',['Tom은 파리에 가 본 적이 있다.','Tom은 파리에 간 적이 없다.','Tom은 파리에 막 도착했다.','Tom은 파리에서 돌아왔다.'],'have gone to: ~에 가고 없다(결과), have been to: ~에 가 본 적이 있다(경험)'],
+ ['빈칸에 들어갈 말로 알맞은 것은?'+psg('I have known Jisu ___ five years.'),'for',['since','during','from','ago'],'기간(five years) 앞에는 for, 시작 시점 앞에는 since'],
+ ['빈칸에 들어갈 말로 알맞은 것은?'+psg('She has lived here ___ 2020.'),'since',['for','during','in','ago'],'시작 시점(2020) 앞에는 since']]));
+add(bank('e22-8g4','B8G','want·ask·tell + 목적어 + to부정사 심화',2,[
+ ['다음 두 문장의 의미가 같도록 할 때, 빈칸에 알맞은 것은?'+psg('My mom said to me, "Clean your room."<br>= My mom told me ___.'),'to clean my room',['clean my room','cleaning my room','that clean my room','to cleaning my room'],'tell + 목적어 + to부정사'],
+ ['다음 우리말을 영어로 바르게 옮긴 것은?<div class="cond">나는 네가 일찍 오기를 바란다.</div>','I want you to come early.',['I want you come early.','I want that you come early.','I want to you come early.','I want you coming early.'],'want + 목적어 + to부정사'],
+ ['다음 중 어법상 올바른 문장은?','She asked me to open the window.',['She asked me opening the window.','She asked to me open the window.','She asked me that open the window.','She asked open the window me.'],'ask + 목적어 + to부정사'],
+ ['다음 중 어법상 <u>어색한</u> 문장은?','I want that you help me.',['I want to go home.','He wants me to stay.','They want us to wait.','She wants to be a doctor.'],'want 뒤에는 that절을 쓰지 않고 「want + 목적어 + to부정사」로 쓴다.']]));
+
+/* --- 독해 심화 (기존 지문 활용) --- */
+add(bank('e22-5r2','B5R','독해 심화: 거리 예술',3,[
+ [RQ2+EQ5+'윗글의 밑줄 친 <u>it</u>이 가리키는 것은? (In the past, many people thought <u>it</u> was just dirty writing.)','street art',['the old street','a wall','a tourist','a painting'],'앞 문장 This is street art의 street art를 가리킨다.'],
+ [RQ2+EQ5+'윗글의 제목으로 가장 알맞은 것은?','How Street Art Changed a Town',['Why Tourists Hate Old Streets','The History of Wall Painting Tools','Dirty Writing on City Walls','Famous Artists of the World'],'낡은 거리가 벽화로 활기를 되찾고 사람들이 자랑스러워하게 된 이야기이다.'],
+ [RQ2+EQ5+'윗글의 밑줄 친 who와 쓰임이 같은 것은? (The people <u>who</u> live there ~)','The girl who is singing is my sister.',['I don\'t know who she is.','Who made this cake?','Tell me who broke the window.','Guess who I met today.'],'선행사(The people)를 꾸미는 주격 관계대명사 who이다. 나머지는 의문사.'],
+ [RQ2+EQ5+'윗글의 내용과 일치하지 <u>않는</u> 것은?','과거에도 거리 예술은 세계적으로 알려져 있었다.',['거리 예술은 벽에 그려진 그림이다.','작은 마을의 낡은 거리에 벽화가 그려졌다.','지금은 많은 관광객이 그 거리를 찾는다.','주민들은 그림을 자랑스럽게 바라본다.'],'과거에는 많은 사람이 단순한 낙서로 생각했고, 오늘날 일부 작품이 세계적으로 알려졌다.']]));
+add(bank('e22-6r2','B6R','독해 심화: 한국을 사랑한 외국인',3,[
+ [RQ2+E22_P6+'윗글의 밑줄 친 문장 He studied so hard that he could teach in Korean과 의미가 가장 가까운 것은?','He studied hard enough to teach in Korean.',['He studied too hard to teach in Korean.','He didn\'t study hard, so he couldn\'t teach in Korean.','He studied hard in order not to teach in Korean.','Though he studied hard, he couldn\'t teach in Korean.'],'so ~ that + 주어 + could: 매우 ~해서 …할 수 있었다 = ~ enough to'],
+ [RQ2+E22_P6+'윗글의 제목으로 가장 알맞은 것은?','Homer Hulbert: A Foreigner Who Loved Korea',['The First Textbook in English','How to Learn Hangeul Fast','An American Teacher\'s Trip to Westminster','The History of Seoul\'s Schools'],'한국어와 한글을 사랑하고 한국을 위해 활동한 헐버트의 이야기이다.'],
+ [RQ2+E22_P6+'윗글의 마지막 말 "I would rather be buried in Korea than in Westminster Abbey."에 나타난 Hulbert의 마음으로 가장 알맞은 것은?','love for Korea',['fear of traveling','hatred of war','wish to be famous','regret about teaching'],'영국의 유명 성당보다 한국에 묻히기를 원했다 → 한국에 대한 깊은 사랑'],
+ [RQ2+E22_P6+'윗글의 빈칸에 알맞은 접속사는? (He loved Hangeul ___ it was easy to learn.)','because',['but','so','if','although'],'한글을 사랑한 이유(배우기 쉬워서) → because']]));
+add(bank('e22-7r2','B7R','독해 심화: 세계의 축제',3,[
+ [RQ2+E22_P7+'윗글의 요지로 가장 알맞은 것은?','Holi는 누구나 신분에 관계없이 친구가 되는 봄 축제이다.',['Holi는 겨울을 보내는 조용한 축제이다.','Holi는 불을 피우는 위험한 축제이다.','Holi는 인도 사람들만 즐길 수 있다.','Holi는 색 가루를 파는 시장이다.'],'마지막 두 문장: It doesn\'t matter who you are. Everyone becomes a friend during Holi.'],
+ [RQ2+E22_P7+'윗글의 밑줄 친 It doesn\'t matter who you are.의 의미로 알맞은 것은?','누구든 상관없이 Holi를 함께 즐긴다.',['당신이 누구인지 아무도 모른다.','당신은 Holi에 참가할 수 없다.','신분이 높은 사람만 참가한다.','Holi는 중요하지 않은 행사이다.'],'It doesn\'t matter ~: ~은 중요하지 않다 → 누구인지는 상관없다'],
+ [RQ2+E22_P7+'윗글의 밑줄 친 takes place와 의미가 가장 가까운 것은?','happens',['ends','moves','is cancelled','starts to grow'],'take place = happen(일어나다, 열리다)'],
+ [RQ2+E22_P7+'윗글을 읽고 알 수 있는 것은?','Holi 전날 밤 사람들은 불을 피우고 노래하고 춤춘다.',['Holi는 가을에 열린다.','사람들은 색 가루 대신 불을 던진다.','Holi 다음 날 거리는 텅 비어 있다.','Holi는 Festival of Fire라고도 불린다.'],'On the night before Holi, people make a big fire and sing and dance around it.']]));
+add(bank('e22-8r2','B8R','독해 심화: 시간 여행 이야기',3,[
+ [RQ2+E22_P8+'윗글의 밑줄 친 I don\'t want you to touch anything in the past.와 의미가 같은 것은?','I want you not to touch anything in the past.',['I don\'t want to touch anything in the past.','I want you to touch everything in the past.','You don\'t want to touch anything in the past.','I want to touch nothing in the past.'],'want + 목적어 + to부정사의 부정: want + 목적어 + not to + 동사원형'],
+ [RQ2+E22_P8+'윗글의 제목으로 가장 알맞은 것은?','A Small Change Can Change the Future',['The Best Time Machine Ever','How to Grow a Beautiful Flower','A Day in an Old Town','The Guide Who Loved the Past'],'가이드의 경고처럼 꽃 한 송이를 꺾은 작은 행동이 미래를 바꿨다.'],
+ [RQ2+E22_P8+'윗글의 밑줄 친 Mina had never seen such an old town before.의 의미로 알맞은 것은?','Mina는 전에 그렇게 오래된 마을을 본 적이 없었다.',['Mina는 전에 그렇게 오래된 마을에 살았다.','Mina는 그렇게 오래된 마을을 곧 볼 것이다.','Mina는 오래된 마을을 보고 싶어 하지 않았다.','Mina는 전에 그 마을을 여러 번 본 적이 있다.'],'had never seen: 그때까지 본 적이 없었다 + such an old town: 그렇게 오래된 마을'],
+ [RQ2+E22_P8+'윗글의 밑줄 친 it(picked <u>it</u> without thinking)이 가리키는 것은?','a beautiful flower',['the time machine','the path','the old town','the school'],'앞 문장의 a beautiful flower를 가리킨다.']]));
+
+/* --- B9 심화 문항 확장 --- */
+const E22_CIR=['①','②','③','④','⑤'];
+const E22_INS=(given,txt,k)=>['글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 알맞은 곳은?'+psg(`<b>${given}</b>`)+psg(txt),E22_CIR[k],E22_CIR.filter((_,i)=>i!==k),'주어진 문장의 연결어·대명사가 가리키는 내용 바로 뒤에 들어가야 흐름이 자연스럽다.'];
+add(bank('e22-dins','B9','[심화] 주어진 문장이 들어갈 위치',3,[
+ E22_INS('That is why many people call it the Festival of Colors.','Holi is a spring festival in India. ( ① ) People throw colorful powder and water at each other. ( ② ) The streets become full of pink, green, and yellow faces. ( ③ ) Everyone becomes a friend during the festival. ( ④ ) It usually takes place in March. ( ⑤ )',2),
+ E22_INS('The colorful paintings made the dark street a lively place.','In a small town, artists painted the walls of an old street. ( ① ) Many tourists began to visit the street. ( ② ) The people who live there look at the paintings with pride. ( ③ ) Now the street is known to people all over the country. ( ④ ) Street art can change a town. ( ⑤ )',0),
+ E22_INS('Without thinking, she picked it.','The machine took them back to the year 1900. ( ① ) Mina walked slowly along the path. ( ② ) She saw a beautiful flower. ( ③ ) When they returned to the present, everything looked a little different. ( ④ ) The school was gone, and a large park was in its place. ( ⑤ )',2),
+ E22_INS('However, he studied so hard that he could teach in Korean after a few years.','Homer Hulbert came to Korea in 1886 to teach young students. ( ① ) At first, he couldn\'t speak Korean at all. ( ② ) He loved Hangeul because it was easy to learn. ( ③ ) He even made the first Korean textbook written only in Hangeul. ( ④ ) Many people respect him today. ( ⑤ )',1)]));
+add(bank('e22-dcon','B9','[심화] 연결어·구문 빈칸 추론',3,[
+ ['빈칸에 들어갈 말로 가장 알맞은 것은?'+psg('I wanted to go hiking. ___, it rained all day, so I stayed home.'),'However',['Therefore','For example','In addition','Because'],'하고 싶었지만 비가 와서 못 갔다 → 역접 연결어 However'],
+ ['빈칸에 들어갈 말로 가장 알맞은 것은?'+psg('Mina saw a beautiful flower. ___ thinking, she picked it. But when they returned to the present, the school was gone.'),'Without',['With','By','After','For'],'생각 없이(생각하지 않고) → Without thinking'],
+ ['빈칸에 들어갈 말로 가장 알맞은 것은?'+psg('The festival is held every year. ___, many tourists visit the town in August.'),'As a result',['However','In contrast','For example','Instead'],'매년 열린다 → 그 결과 관광객이 찾아온다(결과)'],
+ ['빈칸 (A), (B)에 들어갈 말로 알맞은 것은?'+psg('The box was (A) ___ heavy (B) ___ I couldn\'t lift it.'),'(A) so – (B) that',['(A) too – (B) to','(A) such – (B) that','(A) very – (B) that','(A) enough – (B) to'],'so + 형용사 + that + 주어 + couldn\'t ~: 너무 ~해서 …할 수 없었다']]));
 
 _T.forEach(t=>{if(t.bank||t._w22)return;const f=t.g;t._w22=1;t.g=R=>{for(let i=0;i<400;i++){const r=f(R);if(r&&r.opts.length===5&&new Set(r.opts).size===5&&r.opts.includes(r.ans))return r}throw new Error('gen fail '+t.id)}});
 SEMS['2-2'].eng={name:'영어',book:'동아 영어 2 (윤정미) · Lesson 5–8',T:_T,
