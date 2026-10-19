@@ -90,21 +90,27 @@ math{font-size:1.08em}
 .tabs button:hover{color:var(--ac)}
 .tabs button[aria-selected="true"]{background:var(--ac);color:var(--on)}
 .tabs.six{grid-template-columns:repeat(6,1fr)}.tabs.six button{font-size:12.5px;letter-spacing:-.03em;white-space:nowrap;padding:9px 0}
-/* 영영 단어 */
+/* 영단어 */
 .wl-les{display:flex;flex-wrap:wrap;gap:6px}
 .wsec{margin-top:14px}.wsec h3{font:400 17px var(--f-disp);margin:0 0 4px}
-.wrow{padding:10px 0;border-bottom:1px solid var(--rule)}.wrow:last-child{border-bottom:0}
-.wrow .wh{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.wrow .wh b{font-size:17px}.wrow .wh i{color:var(--muted);font-size:12.5px}
-.wrow .ee{margin-top:3px;font-size:14.5px;line-height:1.55}.wrow .ws{margin-top:3px;font-size:13px;color:var(--muted)}.wrow .star{color:var(--bad);font-size:12px;font-weight:700}
-.cv.hid{color:transparent!important;background:var(--chip);border-radius:6px;cursor:pointer;user-select:none;min-width:5em;display:inline-block}
-.wq{padding:12px 0;border-bottom:1px solid var(--rule)}.wq:last-child{border-bottom:0}
-.wq .qp{font-size:15px;line-height:1.6}.wq .qp .n{font-weight:700;margin-right:6px}
-.wq .hint{font:500 14px var(--f-num);letter-spacing:.12em;color:var(--muted);margin-left:6px}
-.wq input.win{margin-top:6px;width:min(100%,20em);border:1px solid var(--rule);border-radius:8px;padding:7px 10px;font:500 16px var(--f-body);background:var(--sheet);color:var(--ink)}
-.wq.ok input.win{border-color:var(--ok);background:var(--ok-soft)}.wq.no input.win{border-color:var(--bad);background:var(--bad-soft)}
-.wq .wo{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.wq .wo .chip.ok{background:var(--ok);border-color:var(--ok);color:var(--on)}.wq .wo .chip.no{background:var(--bad);border-color:var(--bad);color:var(--on)}
-.wq .wa{margin-top:6px;font-size:13.5px}.wq.ok .wa b{color:var(--ok)}.wq.no .wa b{color:var(--bad)}
+.cv.hid{color:transparent!important;background:var(--chip);border-radius:6px;cursor:pointer;user-select:none;min-width:4em;display:inline-block}
+.star{color:var(--bad);font-size:12px;font-weight:700}
+.wbk{display:inline-block;min-width:4.5em;border-bottom:1.5px solid var(--muted);height:1em;vertical-align:-2px}
+.wrow2{display:grid;grid-template-columns:1.8em minmax(0,1fr) minmax(0,1fr);gap:2px 10px;padding:9px 0;border-bottom:1px solid var(--rule);align-items:baseline}.wrow2:last-child{border-bottom:0}
+.wrow2 .no{font:600 12.5px var(--f-num);color:var(--muted);text-align:right}.wrow2 .en{font-weight:700;font-size:16.5px}.wrow2 .en i{font-weight:400;font-size:12.5px;color:var(--muted);margin-left:6px}
+.wrow2 .ko{font-size:14.5px}.wrow2 .de{grid-column:2/-1;font-size:14.5px;line-height:1.55}.wrow2 .eg,.wtab .eg{font-size:13px;color:var(--muted);margin-top:2px}
+.wtab{display:grid;margin-top:4px}
+.wtr{display:grid;grid-template-columns:2em minmax(7.5em,11em) 2.8em minmax(0,1fr);border-bottom:1px solid var(--rule);align-items:start}
+.wtr>span{padding:8px 6px;min-width:0}.wtr>span+span{border-left:1px solid var(--rule)}
+.wth{font-size:12.5px;font-weight:700;color:var(--muted);border-bottom:2px solid var(--ac)}
+.wtr .no{font:600 13px var(--f-num);color:var(--muted);text-align:center}.wtr .ps{font-style:italic;font-size:12.5px;color:var(--muted);text-align:center}
+.wtr .dd{font-size:14.5px;line-height:1.5}
+.wtr input.win{width:100%;border:1px solid var(--rule);border-radius:8px;padding:6px 8px;font:500 15px var(--f-body);background:var(--sheet);color:var(--ink)}
+.wtr .hint{display:block;font:500 12px var(--f-num);letter-spacing:.08em;color:var(--muted);margin-top:3px}
+.wtr .wa{display:block;font-size:13px;margin-top:3px}
+.wtr.ok input.win{border-color:var(--ok);background:var(--ok-soft)}.wtr.no input.win{border-color:var(--bad);background:var(--bad-soft)}
+.wtr.ok .wa{color:var(--ok)}.wtr.no .wa{color:var(--bad)}.wtr .eg.ans{color:var(--ink)}
+@media (max-width:480px){.wtr{grid-template-columns:1.6em minmax(6.5em,8em) 2.4em minmax(0,1fr)}.wtr>span{padding:7px 4px}.wtr .dd{font-size:13.5px}}
 
 /* 출제 범위 */
 .scope{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:12px 16px}
@@ -2887,6 +2893,522 @@ SEMS['2-2'].sci={name:'과학',book:'미래엔 과학 2 · 2학기 (2022 개정)
   {id:'Q8',tag:'Ⅷ',name:'별과 우주',subs:[['R8','별의 거리·등급·우리은하·우주']]}],
  presets:[['2학기 전체',null],['중간 (Ⅴ~Ⅵ)',['R5','R6']],['기말 (Ⅶ~Ⅷ)',['R7','R8']]]};
 
+/* ===== 영단어 탭 · 교과서 단원 단어 (2022 개정 동아 윤정미) =====
+   단어 선정: 중1 L5~L8, 중2 L1~L6 = 영어과외TV 22개정 단원 단어표에서 유의어·파생어를 뺀 교과서 단어,
+             중2 L7·L8 = 교과서 대화문·본문(englishtutortv 본문 PDF)에 나오는 단어.
+   영영 풀이와 예문은 사전·교과서 문장을 옮기지 않은 자체 작성.
+   항목: [단어, 품사, 우리말 뜻, 영영 풀이, 예문(___ 자리에 들어감), 예문 속 형태(단어와 다를 때만)] */
+const WB={};
+WB.E5V=[
+["code","n","암호","a secret system of letters or numbers used to hide a message","The spy wrote the message in ___ so no one else could read it."],
+["secret","adj","비밀의","known by only a few people and hidden from others","This is a ___ room. Don't tell anyone about it."],
+["rule","n","규칙","a statement that tells you what you must or must not do","The first ___ of the library is to be quiet."],
+["explain","v","설명하다","to make something clear so that others can understand it","Can you ___ how this game works?"],
+["feed","v","먹이를 주다","to give food to a person or an animal","Please don't ___ the animals at the zoo."],
+["flash","n","플래시 (촬영)","a bright light on a camera used for taking pictures in a dark place","You can't use a ___ when you take pictures in the museum."],
+["sunflower","n","해바라기","a tall plant with a large yellow flower","The ___ always turns toward the sun."],
+["steal","v","훔치다","to take something from someone without permission","Someone tried to ___ my bike last night."],
+["criminal","n","범죄자","a person who breaks the law","The police caught the ___ near the station."],
+["eyewitness","n","목격자","a person who saw an event, such as a crime, happen","An ___ told the police what the thief looked like."],
+["janitor","n","청소부, 관리인","a person whose job is to clean and take care of a building","The ___ cleans the school hallways every evening."],
+["run away","phr","도망치다","to leave a place quickly to escape","The thief tried to ___ when he saw the police."],
+["wheelchair","n","휠체어","a seat on wheels used by people who cannot walk","My grandmother uses a ___ when she goes out."],
+["wig","n","가발","a cover of fake hair that you wear on your head","The actor wore a long black ___ in the play."],
+["bakery","n","빵집","a shop that makes and sells bread and cakes","I bought some fresh bread at the ___."],
+["crime","n","범죄","an action that is against the law","Stealing a car is a serious ___."],
+["guard","n","경비원","a person whose job is to protect a place or people","A ___ stands at the door of the bank."],
+["owner","n","주인","a person who has something","The ___ of the dog looked for it all day."],
+["scene","n","현장, 장면","the place where something, such as a crime, happened","The detective looked for clues at the ___ of the crime."],
+["height","n","키, 높이","how tall a person or thing is","What is your ___? — I'm 160 cm tall."],
+["language","n","언어","a system of words that people use to speak and write","Korean is the ___ that we speak at home."],
+["suspect","n","용의자","a person who the police think may have done a crime","The police asked the ___ where he was last night."],
+["damage","v","손상을 입히다","to harm something so that it is broken or does not work well","Strong winds can ___ old houses."],
+["expensive","adj","비싼","costing a lot of money","This watch is too ___. I can't buy it."],
+["reason","n","이유, 근거","the fact that explains why something happens","What is the ___ for your answer?"],
+["statement","n","진술","something that a person says or writes officially","The witness gave a ___ to the police."],
+["pet","n","반려동물","an animal that you keep at home and take care of","Do you have a ___? — Yes, I have a cat."],
+["fall off","phr","떨어지다","to drop to the ground from something","Be careful! Don't ___ the ladder."]];
+WB.E6V=[
+["challenge","n","도전","something new and difficult that tests your skills","Using no plastic for a week was a big ___ for me."],
+["completely","adv","완전히","in every way; totally","The bottle was ___ empty."],
+["own","adj","자신의","belonging to a particular person","Bring your ___ cup to the cafe."],
+["recycle","v","재활용하다","to treat used things so that they can be used again","We ___ paper, cans, and plastic bottles at school."],
+["secondhand","adj","중고의","used before by someone else","I bought a ___ bike. It was cheap."],
+["favor","n","호의, 친절","something kind that you do for someone","Can you do me a ___ and close the window?"],
+["plant","v","심다","to put a seed or a young tree in the ground to grow","We will ___ trees in the park next week."],
+["environment","n","환경","the air, water, and land around us","We should protect the ___ for the future."],
+["leader","n","리더","a person who guides or controls a group","She is the ___ of our school's green club."],
+["mean","v","의미하다","to have something as its sense or message","What does this word ___?"],
+["plog","v","플로깅하다","to pick up trash while you are jogging","Let's ___ along the river this Saturday."],
+["container","n","그릇, 용기","something such as a box or a jar that holds things","Bring your own ___ when you buy food to go."],
+["reduce","v","줄이다","to make something smaller in amount or size","We can ___ trash by using cloth bags."],
+["tear","v","찢다","to pull something into pieces","Don't ___ the paper. We can use it again."],
+["eat out","phr","외식하다","to have a meal at a restaurant","My family likes to ___ on Fridays."],
+["leftover","n","남은 음식","food that is not eaten at the end of a meal","Put the ___ in the fridge. We can eat them tomorrow.","leftovers"],
+["produce","v","생산하다","to make or grow something","Farms in this area ___ a lot of apples."],
+["delivery","n","배달","the act of bringing things to a person's home","Food ___ uses a lot of plastic containers."],
+["sew","v","바느질하다","to join cloth with a needle and thread","My grandmother can ___ a button on my shirt."],
+["single","adj","단 하나의","only one","Don't waste a ___ drop of water."],
+["in return","phr","대신에, 답례로","as a way of giving something back","She helped me, so I gave her a cookie ___."],
+["machine","n","기계","a thing with moving parts that does work","This ___ makes new bags out of old plastic."],
+["label","n","상표, 라벨","a piece of paper on a product that gives information about it","Read the ___ before you buy the juice."],
+["one by one","phr","하나하나씩","one after another, separately","The students came into the room ___."]];
+WB.E7V=[
+["engineer","n","기사, 엔지니어","a person who designs or fixes machines or systems","The sound ___ checks the microphones before filming."],
+["chess","n","체스","a board game for two players with kings and queens","My brother and I play ___ after dinner."],
+["calm","v","진정시키다","to make a person or an animal quiet and relaxed","The trainer tried to ___ the scared horse."],
+["capture","v","포착하다","to show or keep something in a photo or film","The photographer wanted to ___ the beautiful sunset."],
+["delete","v","지우다, 삭제하다","to remove words or files from a computer or phone","Please ___ the blurry photos from your phone."],
+["director","n","감독","a person who tells the actors what to do in a film","The ___ shouted, “Action!”"],
+["editor","n","편집자","a person who cuts and puts together parts of a film or a book","The film ___ chose the best scenes for the movie."],
+["location","n","장소","a place where something happens, such as filming","The movie was filmed at a ___ near the sea."],
+["manager","n","관리자","a person who is in charge of a team or a place","The location ___ found a perfect beach for the scene."],
+["photography","n","사진(촬영)술","the art or job of taking pictures","She took a ___ class to learn about cameras."],
+["wrangler","n","(동물) 조련사","a person who takes care of and trains animals for films","The animal ___ made the dog sit still for the scene."],
+["shoot","v","촬영하다","to make a film or take photos","They will ___ the last scene tomorrow."],
+["moment","n","순간","a very short period of time","Wait a ___, please."],
+["signal","n","신호","a sound or an action that gives a message","When I give the ___, start running."],
+["effect","n","효과","a special sound or picture made for a film","The movie used special ___ to show a flying car.","effects"],
+["record","v","녹음하다, 녹화하다","to store sounds or pictures so they can be played later","Let's ___ our song and listen to it."],
+["rice","n","쌀","small white grains that people cook and eat","We eat ___ almost every day in Korea."],
+["skill","n","기술","the ability to do something well","Drawing is a useful ___ for a designer."],
+["storytelling","n","이야기하기","the act of telling or writing stories","Good ___ makes people want to watch a movie."],
+["studio","n","작업실, 스튜디오","a room where artists work or where films are made","The singer recorded the song in a ___."],
+["wave","n","파도","a raised line of water moving across the sea","The surfer rode a big ___."],
+["interview","n","인터뷰","a meeting where someone asks another person questions","I read an ___ with my favorite actor."],
+["mall","n","쇼핑몰","a large building with many stores","Let's meet at the ___ and go shopping."],
+["photographer","n","사진작가","a person whose job is taking pictures with a camera","The ___ took pictures of wild birds."],
+["be in charge of","phr","~을 담당하다","to be responsible for something","Who ___ the costumes in this film?","is in charge of"],
+["take care of","phr","~을 돌보다","to look after someone or something","I ___ my little sister after school."]];
+WB.E8V=[
+["smart","adj","똑똑한, 영리한","able to think and learn quickly","My dog is so ___. It can open the door."],
+["boring","adj","지루한","not interesting","The movie was so ___ that I fell asleep."],
+["hole","n","구멍","an empty space in something","There is a ___ in my sock."],
+["personal","adj","개인적인","about or belonging to one particular individual","Don't share your ___ information online."],
+["post","v","게시하다","to put a message or a photo on a website","She will ___ the photos on her blog."],
+["social","adj","사회의","about people and the way they live and meet together","Many teens use ___ media every day."],
+["noisy","adj","시끄러운","making a lot of loud sounds","The classroom was ___ during lunch."],
+["spicy","adj","매운","having a hot, strong taste","This kimchi is too ___ for me."],
+["cottage","n","오두막","a small house in the countryside","They stayed in a small ___ in the forest."],
+["forgive","v","용서하다","to stop being angry with someone for a mistake","Please ___ me. I didn't mean it."],
+["permission","n","허락","the act of allowing someone to do something","Ask for ___ before you post a photo of your friend."],
+["selfie","n","셀피","a photo that you take of yourself","We took a ___ in front of the tower."],
+["follower","n","팔로워, 추종자","a person who sees someone's posts on social media","Her blog has more than 1,000 ___.","followers"],
+["knock","v","문을 두드리다","to hit a door with your hand to make a sound","Please ___ before you come in."],
+["shocking","adj","충격적인","very surprising and upsetting","The news about the fire was ___."],
+["asleep","adj","잠이 든","sleeping","The baby is ___. Please be quiet."],
+["shout","v","소리 지르다","to say something very loudly","Don't ___ in the library."],
+["upstairs","adv","위층으로","to or on a higher floor of a building","Go ___ and wash your hands."],
+["break into","phr","침입하다","to enter a building or an account without permission","Someone tried to ___ my online account."],
+["in surprise","phr","놀라서","feeling amazed because something is unexpected","She looked at me ___."],
+["list","v","열거하다","to write or say things one after another","Please ___ three things you did yesterday."],
+["forever","adv","영원히","for all time","Things you post online may stay there ___."],
+["press","v","누르다","to push something with your finger","___ the button to start the game."],
+["review","n","논평, 후기","a piece of writing that gives an opinion about something","I wrote a ___ of the new restaurant."],
+["unique","adj","독특한","very special and not like anything else","Everyone has a ___ way of thinking."]];
+/* --- 중2 1학기 --- */
+WB.A1V=[
+["activity","n","활동","something that you do for fun or for a purpose","Volunteering at the beach is a great ___."],
+["challenge","n","도전","something difficult that tests your ability","Running a marathon is a big ___ for me."],
+["culture","n","문화","the way of life, art, and beliefs of a group of people","I want to learn more about Korean ___."],
+["event","n","행사","a planned public activity or a special happening","The school festival is the biggest ___ of the year."],
+["flight","n","비행, 항공편","a trip in an airplane","Our ___ to Jeju leaves at 9 a.m."],
+["global","adj","지구의, 전 세계의","of or about the whole world","Plastic in the sea is a ___ problem."],
+["global warming","phr","지구 온난화","the slow rise in the Earth's temperature","___ is melting the ice in the Arctic."],
+["goal","n","목표","something that you hope to achieve","My ___ is to read 20 books this year."],
+["hold","v","열다, 개최하다","to have an event such as a meeting or a race","Our school will ___ a charity race next month."],
+["introduce","v","소개하다","to tell people someone's name when they first meet","Let me ___ my friend Jiho to you."],
+["main","adj","주된, 가장 중요한","most important","What is the ___ idea of this story?"],
+["prepared","adj","준비가 된","ready to do something","Are you ___ for the test?"],
+["race","n","경주","a competition to see who is the fastest","She won first place in the ___."],
+["teen","n","십 대","a person between 13 and 19 years old","Many ___ use smartphones every day.","teens"],
+["worried","adj","걱정하는","feeling unhappy because something bad may happen","You look ___. What's wrong?"],
+["be worried about","phr","~에 대해 걱정하다","to feel nervous or uneasy because of something","I ___ my math test tomorrow.","am worried about"],
+["do one's best","phr","최선을 다하다","to try as hard as you can","I will ___ in the race.","do my best"],
+["do well","phr","잘하다","to be successful at something","I hope you ___ on your exam."],
+["such as","phr","~와 같은","for example","I like sports ___ soccer and tennis."],
+["for the first time","phr","처음으로","happening once and never before","I saw a dolphin ___ last summer."],
+["make a difference","phr","변화를 가져오다","to have a good effect on a situation","Small actions can ___ in the world."],
+["take a trip","phr","여행하다","to travel to a place","We will ___ to Busan this weekend."],
+["aquarium","n","수족관","a building where people can see fish and sea animals","We saw sharks at the ___."],
+["dolphin","n","돌고래","a smart sea animal that looks like a small whale","The ___ jumped out of the water."],
+["emotional","adj","감정이 북받친","showing strong feelings","It was an ___ moment when we said goodbye."],
+["endangered","adj","멸종 위기에 처한","(of animals or plants) at risk of disappearing from the earth","The sea turtle is an ___ animal."],
+["experience","n","경험","something that happens to you and teaches you something","Volunteering was a great ___ for me."],
+["freely","adv","자유롭게","without being controlled or held","The dolphins can swim ___ in the sea."],
+["latest","adj","가장 최근의, 최신의","the newest","Did you hear the ___ news?"],
+["luckily","adv","운 좋게도","by good luck","___, nobody got hurt."],
+["net","n","그물","a material made of strings with holes, used to catch fish","The turtle was caught in a fishing ___."],
+["skill","n","기술, 기량","the ability to do something well","Swimming is an important ___."],
+["social","adj","사회적인","living together in a group","Dolphins are ___ animals. They live in groups."],
+["survive","v","살아남다","to continue to live after a difficult or dangerous time","Many sea animals can't ___ in dirty water."],
+["thought","n","생각","an idea in your mind","Do you have any ___ about the plan?","thoughts"],
+["wild","n","야생","nature, where animals live freely","The dolphin went back to the ___."],
+["at the same time","phr","동시에","together, at one moment","We all shouted ___."],
+["clean up","phr","청소하다, 치우다","to make a place tidy by removing dirt and trash","Let's ___ the beach this Saturday."],
+["ever after","phr","그 후 내내","from then on, for always","They lived happily ___."],
+["in fact","phr","사실은","used to add true and surprising information","It looks easy. ___, it is very hard."],
+["run an errand","phr","심부름하다","to go somewhere to do a small job for someone","I have to ___ for my mom."],
+["take part in","phr","~에 참여하다","to join an activity with other people","Many students will ___ the campaign."],
+["wave goodbye","phr","작별 인사로 손을 흔들다","to move your hand from side to side when someone leaves","We ___ to the dolphin as it swam away.","waved goodbye"],
+["deliver","v","배달하다","to take things to a person or a place","We ___ food to old people in our town."],
+["regularly","adv","규칙적으로","often, at the same times","I visit my grandmother ___."],
+["in need","phr","도움이 필요한","not having enough food, money, or help","We collected clothes for people ___."],
+["spend time with","phr","~와 시간을 보내다","to be together with someone for a while","I like to ___ my family on weekends."],
+["grow up","phr","자라다","to become an adult","I want to be a vet when I ___."]];
+WB.A2V=[
+["arrival","n","도착","the act of reaching a place","The ___ of the bus was late."],
+["capital","n","수도","the city where a country's government is","Seoul is the ___ of Korea."],
+["dish","n","요리","food prepared in a certain way","Bibimbap is my favorite Korean ___."],
+["expect","v","기대하다, 예상하다","to think that something will happen","I didn't ___ him to answer so quickly."],
+["gate","n","탑승구","the place at an airport where you get on a plane","Our plane leaves from ___ 12."],
+["list","n","명단, 목록","a set of names or things written one after another","Is my name on the ___?"],
+["spell","v","철자를 쓰다","to say or write the letters of a word in order","How do you ___ your name?"],
+["text","v","문자를 보내다","to send a written message by phone","I'll ___ you when I get home."],
+["tip","n","조언","a useful piece of advice","Here is a ___ for writing good messages."],
+["useful","adj","유용한","helpful for doing something","This app is very ___ for learning English."],
+["wedding","n","결혼식","a ceremony where two people get married","My aunt's ___ is next Saturday."],
+["begin with","phr","~로 시작하다","to have something as the first part","Many English words ___ the letter S."],
+["communicate","v","의사소통하다","to share ideas or feelings with others","Teens often ___ by text."],
+["focus on","phr","~에 집중하다","to give all your attention to something","Please ___ what your friend is saying."],
+["get married","phr","결혼하다","to become husband and wife","My cousin will ___ in June."],
+["look for","phr","~을 찾다","to try to find someone or something","I'm ___ my glasses.","looking for"],
+["say goodbye to","phr","~에게 작별 인사하다","to tell someone farewell when you leave","Don't forget to ___ your teacher."],
+["sign up for","phr","~에 등록하다","to put your name on a list to join something","I want to ___ the dance class."],
+["apologize","v","사과하다","to say that you are sorry","You should ___ to her first."],
+["casual","adj","평상시의, 격식 없는","relaxed and not formal","Texting is a ___ way of talking."],
+["correctly","adv","제대로, 정확하게","in a right way without mistakes","He didn't spell my name ___."],
+["differently","adv","다르게","in a way that is not the same","Teens talk ___ from adults."],
+["especially","adv","특히","more than usual; above all","I like fruit, ___ apples."],
+["expression","n","표현","a look on the face or words that show what you feel","Facial ___ can't be seen in a text.","expressions"],
+["facial","adj","얼굴의","of or on the face","Her ___ expression showed that she was angry."],
+["gift","n","선물","something that you give to someone","Thank you for the birthday ___."],
+["issue","n","문제, 사안","a problem or subject that people talk about","Texting while walking is a safety ___."],
+["kid","v","농담하다","to joke","Are you ___? That can't be true!","kidding"],
+["loud","adj","(소리가) 큰","making a lot of noise","The music is too ___."],
+["meaning","n","의미, 뜻","what a word or a sign expresses","Do you know the ___ of this emoji?"],
+["misunderstanding","n","오해","a situation where people do not understand each other correctly","A short text can cause a ___."],
+["probably","adv","아마도","very likely","She is ___ busy now."],
+["sensitive","adj","민감한, 예민한","easily hurt or upset","Be careful. He is ___ about his height."],
+["careful with","phr","~에 조심하는","paying attention to avoid problems with something","Be ___ your words when you text."],
+["in addition","phr","게다가","also; as well as that","Emojis are fun. ___, they show your feelings."],
+["in the same way","phr","같은 방식으로","like that; similarly","Treat others ___ you want to be treated."],
+["laugh out loud","phr","큰 소리로 웃다","to make a big happy sound because something is funny","The joke made me ___."],
+["pick up the phone","phr","전화를 받다","to answer a call","Nobody ___. Maybe they're out.","picked up the phone"],
+["say to oneself","phr","혼잣말하다, 속으로 말하다","to think or speak to yourself","“I can do it,” I ___.","said to myself"],
+["talk behind one's back","phr","~의 험담을 하다","to say bad things about someone when they are not there","It is rude to ___.","talk behind someone's back"],
+["these days","phr","요즘","at the present time","___, many people read the news on their phones."],
+["grade","n","학년; 성적","a level or year in school","I'm in the second ___ of middle school."],
+["rest","n","나머지; 휴식","the part that is left","I ate half the pizza and saved the ___."],
+["solution","n","해결책","a way to solve a problem","Let's find a ___ to this problem."],
+["look forward to","phr","~을 고대하다","to feel happy about something that will happen","I ___ seeing you soon."],
+["on time","phr","제시간에","at the right moment, not late","Please arrive ___."]];
+WB.A3V=[
+["forecast","n","예보","a statement about what will happen, especially the weather","The weather ___ says it will rain tomorrow."],
+["hurry","v","서두르다","to do something quickly","We have to ___. The bus is coming."],
+["lecture","n","강의, 강연","a talk given to a group to teach them something","We listened to a ___ about robots."],
+["mind","n","마음, 생각","the part of a person that thinks","What's on your ___?"],
+["player","n","선수","a person who plays a sport or a game","He is the best ___ on our team."],
+["quite","adv","꽤, 상당히","very; fairly","The test was ___ difficult."],
+["be interested in","phr","~에 관심이 있다","to want to know more about something","I ___ science.","am interested in"],
+["can't wait","phr","너무 기대된다","to be very excited about something in the future","I ___ to see the show!"],
+["change one's mind","phr","마음을 바꾸다","to make a new decision different from the first one","I wanted pizza, but I ___.","changed my mind"],
+["right away","phr","곧바로, 즉시","immediately; without waiting","Call me ___ when you get home."],
+["ash","n","재, 화산재","gray powder left after something burns","The volcano covered the town with ___."],
+["correct","v","바로잡다","to make something right by fixing mistakes","Please ___ the mistakes in your essay."],
+["disappointing","adj","실망스러운","not as good as you hoped","The test result was ___."],
+["empty","adj","비어 있는","having nothing inside","The box was ___."],
+["explode","v","폭발하다","to burst loudly into pieces","The volcano may ___ at any time."],
+["fail","v","흉작이 되다; 실패하다","to not grow well or not succeed","The crops ___ because of the cold weather.","failed"],
+["forward","adv","앞으로","toward the front","Take one step ___."],
+["huge","adj","거대한","very big","A ___ cloud of ash covered the sky."],
+["invent","v","발명하다","to make something new that did not exist before","Who ___ the telephone?","invented"],
+["laboratory","n","실험실, 연구실","a room where scientists do experiments","The scientists worked in the ___ all night."],
+["local","adj","지역의","of or about a particular area","We bought fruit at the ___ market."],
+["necessity","n","필요(성)","something that you really need","___ is the mother of invention."],
+["notice","v","알아차리다","to see or become aware of something","Did you ___ anything strange?"],
+["present-day","adj","현대의","of today; modern","This is how ___ bicycles look."],
+["push","v","밀다","to move something away from you with your hands or feet","Riders had to ___ the ground with their feet."],
+["researcher","n","연구원","a person who studies something to find new facts","The ___ found a new way to grow rice."],
+["result","n","결과","something that happens because of something else","The ___ of the experiment was surprising."],
+["rider","n","타는 사람","a person who rides a bike or a horse","The ___ fell off the bike."],
+["simply","adv","그냥, 간단히","only; just","He ___ said, “No.”"],
+["surprisingly","adv","놀랍게도","in a way that you did not expect","___, the first bike had no pedals."],
+["traveling","n","이동, 여행","the act of going from place to place","___ by horse was common in the past."],
+["typist","n","타자수","a person whose job is to type letters","The ___ made many mistakes."],
+["whole","adj","전체의","all of something","I read the ___ book in one day."],
+["wooden","adj","나무로 된","made of wood","The first bike was a ___ machine."],
+["effort","n","노력","hard work to do something","Thanks to her ___, the project was a success."],
+["around the world","phr","전 세계에서","in many countries","People ___ use this invention."],
+["as a result","phr","결과적으로","because of this","He practiced a lot. ___, he won the race."],
+["at that time","phr","그때(에)","at that moment in the past","___, there were no cars."],
+["in front of","phr","~의 앞에","in the position just before something","Let's meet ___ the library."],
+["in those days","phr","그 당시에는","during that period in the past","___, people traveled by horse."],
+["make a mistake","phr","실수하다","to do something wrong without meaning to","Don't worry if you ___."],
+["no more","phr","더 이상 ~않다","not any longer","There will be ___ paper waste."],
+["one day","phr","어느 날","on a certain day","___, she had a great idea."],
+["paint over","phr","~에 덧칠하다","to cover something with a new layer of color","Typists could ___ their mistakes."],
+["set up","phr","설치하다, 세우다","to build or put something in place","They ___ a tent near the lake."],
+["take a picture of","phr","~의 사진을 찍다","to photograph something","Can you ___ us?"],
+["burn","v","태우다; 타다","to destroy something with fire","Don't ___ the toast."],
+["serve","v","(음식을) 제공하다","to give food or drinks to people","This restaurant ___ great noodles.","serves"]];
+WB.A4V=[
+["allowance","n","용돈","money that parents give to their children regularly","I get a weekly ___ from my parents."],
+["discount","n","할인","a lower price than usual","I got a 20% ___ on these shoes."],
+["expensive","adj","비싼","costing a lot of money","This phone is too ___."],
+["fan","n","(영화·스포츠 등의) 팬","a person who likes a famous person or a team very much","I'm a big ___ of that singer."],
+["item","n","물품, 항목","one thing in a group or a list","Put each ___ in the basket."],
+["popular","adj","인기 있는","liked by many people","This snack is ___ among teens."],
+["total","n","합계, 총액","the whole amount","The ___ is 15,000 won."],
+["traditional","adj","전통적인","following old ways that have existed for a long time","Hanbok is ___ Korean clothing."],
+["unique","adj","독특한","very special and unlike anything else","This bag has a ___ design."],
+["give ~ a discount","phr","~에게 할인해 주다","to sell something to someone for less money","The clerk ___ because I'm a student.","gave me a discount"],
+["have a sale","phr","세일하다","to sell things at lower prices for a time","The store will ___ this weekend."],
+["keep a diary","phr","일기를 쓰다","to write about your day regularly","I ___ to remember special days."],
+["advice","n","조언, 충고","an opinion about what someone should do","Can you give me some ___ about saving money?"],
+["anchor","v","고정하다","to fix something firmly in one place","The first price can ___ your thinking."],
+["budget","n","예산","a plan for how much money you will spend","Make a ___ before you go shopping."],
+["decision","n","결정","a choice that you make after thinking","Buying the bike was a good ___."],
+["effect","n","효과","a change that something causes","Music can have a big ___ on shoppers."],
+["hot","adj","인기 있는, 뜨는","very popular right now","These sneakers are a ___ item these days."],
+["hunger","n","갈망","a strong wish for something","She has a ___ for new clothes."],
+["influence","v","영향을 주다","to change how someone thinks or acts","Ads ___ what we buy."],
+["information","n","정보","facts about something","Look for ___ before you buy a product."],
+["limited","adj","한정된","small in number or amount","These shoes are a ___ edition."],
+["miss","v","놓치다","to fail to get or do something","Don't ___ this great sale!"],
+["naturally","adv","자연스럽게, 당연히","as you would expect","___, I wanted to buy the new phone too."],
+["price","n","가격","the amount of money you pay for something","What is the ___ of this bag?"],
+["product","n","상품, 제품","something made to be sold","This ___ is very popular."],
+["salesperson","n","판매원","a person whose job is selling things in a store","The ___ showed me some sneakers."],
+["sneakers","n","운동화","sports shoes with rubber bottoms","I bought new ___ for running."],
+["spread","v","퍼지다","to move to more places or people","News can ___ quickly on the Internet."],
+["viral","adj","급속히 퍼지는","spreading quickly on the Internet","The funny video went ___."],
+["again and again","phr","반복해서","many times","The ad played the same song ___."],
+["a piece of information","phr","정보 한 가지","one fact","The first price is just ___."],
+["at a higher price","phr","더 비싼 가격에","for more money","They sold the shoes ___ later."],
+["fall for","phr","~에 속다","to be tricked into believing something","Don't ___ that trick!"],
+["hold on","phr","기다리다","to wait for a short time","___ a minute. I'll check the price."],
+["in one's case","phr","~의 경우에는","in the situation of a particular person","___, the ad worked very well.","in my case"],
+["over one's budget","phr","예산을 초과한","more than the money you planned to spend","The jacket was ___.","over my budget"],
+["rely on","phr","~에 의존하다","to depend on someone or something","Don't ___ other people's opinions too much."],
+["coin","n","동전","a small round piece of metal money","I found a 500-won ___ on the floor."],
+["donate","v","기부하다","to give money or things to help others","I want to ___ my old books."],
+["save","v","저축하다","to keep money to use later","I ___ half of my allowance every week."],
+["spend","v","(돈을) 쓰다","to use money to buy things","How much do you ___ on snacks?"],
+["star","v","주연을 맡다","to have an important role in a film or an ad","A famous actor will ___ in the ad."],
+["treadmill","n","러닝머신","a machine you walk or run on in one place","He runs on the ___ every morning."],
+["catch a cold","phr","감기에 걸리다","to become sick with a runny nose and a cough","Wear a coat, or you'll ___."],
+["make a donation","phr","기부하다","to give money to help others","We ___ to the animal shelter every year."],
+["make money","phr","돈을 벌다","to earn cash by working or selling things","He wants to ___ by selling his old toys."],
+["on one's own","phr","혼자서, 혼자 힘으로","alone; without help","She made the budget ___.","on her own"],
+["on sale","phr","할인 중인","sold at a lower price than usual","These shoes are ___ this week."]];
+WB.A5V=[
+["canvas","n","캔버스, 화폭","a piece of cloth that artists paint on","The artist painted on a large ___."],
+["cinema","n","영화관","a building where people watch movies","Let's watch a movie at the ___."],
+["far","adv","멀리","a long distance away","Is the museum ___ from here?"],
+["free","adj","한가한","not busy","Are you ___ this Saturday?"],
+["hall","n","(공공의) 건물, 회관","a large building for public events","The concert is at the city ___."],
+["perfect","adj","완벽한","having nothing wrong; the best possible","The wall was a ___ place for street art."],
+["straight","adv","똑바로, 곧장","in a line without turning","Go ___ two blocks and turn left."],
+["subway","n","지하철","a train that runs under the ground in a city","You can get there by ___."],
+["art fair","phr","미술 박람회","an event where artists show and sell their art","We saw many paintings at the ___."],
+["come with","phr","~와 동행하다","to go somewhere together with someone","Can you ___ me to the art fair?"],
+["get off","phr","(차에서) 내리다","to leave a bus, a train, or a plane","___ at the next stop."],
+["get on","phr","타다","to enter a bus, a train, or a plane","___ the bus in front of City Hall."],
+["get to","phr","~에 도착하다","to arrive at a place","How can I ___ the museum?"],
+["less than","phr","~보다 적은","smaller in amount or number","It takes ___ ten minutes."],
+["on one's right","phr","~의 오른편에","on the side that is opposite to the left","The bank will be ___.","on your right"],
+["area","n","지역","a part of a place or a city","This ___ is famous for street art."],
+["artist","n","예술가","a person who paints or makes art","The ___ painted a mural on the wall."],
+["carry","v","(의미를) 지니다; 운반하다","to have a certain meaning or message","Each painting ___ a special message.","carries"],
+["closely","adv","자세히","carefully, looking at details","Look ___ at the painting."],
+["clue","n","단서, 힌트","a piece of information that helps you find an answer","Can you find a ___ in the picture?"],
+["colorful","adj","다채로운","having many bright shades like red, blue, and yellow","The ___ paintings made the street bright."],
+["drop","n","방울","a very small amount of liquid","There was a ___ of paint on the floor."],
+["figure","n","인물(모습)","the shape of a person in a picture","There is a tiny ___ in the corner of the painting."],
+["finally","adv","마침내","after a long time","We ___ found the painting."],
+["form","n","형태","a type or kind of something","Street art is a ___ of art."],
+["hip","adj","세련된, 최신 유행의","cool and fashionable","This street became a ___ place for young people."],
+["internationally","adv","국제적으로","in many countries","Her art is known ___."],
+["leafless","adj","잎이 없는","having no leaves","A ___ tree stood in the snow."],
+["line","n","선, 줄","a long thin mark","Draw a straight ___."],
+["lively","adj","활기 넘치는","full of energy and activity","The market is ___ in the morning."],
+["personal","adj","개인적인, 사적인","belonging to or about one particular individual","This is my ___ opinion."],
+["pleasure","n","기쁨, 즐거움","a feeling of happiness","It is a ___ to walk on this street."],
+["present","n","현재","the time now","The painting shows both the past and the ___."],
+["represent","v","나타내다","to stand for or be a sign of something","The white dove can ___ peace."],
+["spray","v","뿌리다","to make liquid go out in tiny drops","Some artists ___ paint on walls."],
+["stop","n","정류장","a place where buses or trains wait for people","Get off at the next ___."],
+["through","prep","~을 통해","by means of","Artists share their messages ___ their art."],
+["tiny","adj","아주 작은","very, very small","Look closely. There is a ___ man in the picture."],
+["well-known","adj","잘 알려진","known by many people; famous","He is a ___ street artist."],
+["according to","phr","~에 따르면","as said by someone or something","___ the guide, the wall is 100 years old."],
+["as you can see","phr","보다시피","used to point out something clear","___, the town is full of art."],
+["be famous for","phr","~로 유명하다","to be well-known because of something","This street ___ its murals.","is famous for"],
+["have a hard time","phr","어려움을 겪다","to have problems doing something","I ___ finding the museum.","had a hard time"],
+["look down","phr","내려다보다","to turn your eyes toward something below you","___ from the top of the tower."],
+["next to","phr","~ 옆에","beside","The bakery is ___ the bank."],
+["take care of","phr","~을 돌보다","to look after someone or something","Who will ___ the plants?"],
+["ballet","n","발레","a kind of dance that tells a story with music","She has danced ___ since she was five."],
+["country","n","시골, 전원","the land outside cities and towns","My grandparents live in the ___."],
+["dirty","adj","더러운","not clean","In the past, this street was dark and ___."],
+["pride","n","자부심","a feeling of being pleased with what you or your group did","The people look at the mural with ___."],
+["be able to","phr","~할 수 있다","to have the ability to do something","You will ___ see the whole city."],
+["in the past","phr","과거에","at a time before now","___, this street was dirty."],
+["set the table","phr","밥상을 차리다","to put plates, spoons, and cups in place before a meal","Can you ___ for dinner?"]];
+/* --- 중2 2학기 (L5는 1학기와 같은 단원) --- */
+WB.B5V=WB.A5V;
+WB.B6V=[
+["actor","n","배우","a person who acts in films or plays","My favorite ___ won an award."],
+["famous","adj","유명한","known by many people","He became ___ after the movie."],
+["historical","adj","역사(상)의","about people or events of the past","I like reading ___ novels."],
+["introduce","v","소개하다","to tell people about someone for the first time","Let me ___ a great man to you."],
+["kind","n","종류","a type of thing","What ___ of books do you like?"],
+["magazine","n","잡지","a thin book with articles and pictures that comes out regularly","I read an article in a science ___."],
+["recommend","v","추천하다","to say that something is good and someone should try it","Can you ___ a good movie?"],
+["strongly","adv","강력하게","very much; with great force","I ___ recommend this book."],
+["touching","adj","감동적인","making you feel sad or warm feelings","The ending of the movie was ___."],
+["try","v","먹어 보다, 시도하다","to taste or test something to see if you like it","You should ___ this soup."],
+["usually","adv","보통","in most cases","I ___ read before bed."],
+["volunteer","n","자원봉사자","a person who helps others without being paid","She works as a ___ at the hospital."],
+["all kinds of","phr","모든 종류의","many different types of","The store sells ___ books."],
+["get back","phr","~을 되찾다","to have something again after losing it","Korea fought to ___ its freedom."],
+["move to","phr","~로 이사하다","to go to live in a new place","His family will ___ Seoul next year."],
+["bury","v","묻다, 매장하다","to put something in the ground and cover it","Squirrels ___ nuts in the ground."],
+["continue","v","계속하다","to keep doing something without stopping","He ___ to fight for Korea.","continued"],
+["country","n","나라","a nation with its own government","He loved Korea more than his own ___."],
+["event","n","사건","something important that happens","The photos showed the ___ to the world."],
+["favor","n","부탁","a request for help","Can I ask you a ___?"],
+["fight","v","싸우다","to try hard to stop or get something","Many people ___ for the freedom of Korea."],
+["foreign","adj","외국의","from another country","He was a ___ teacher who loved Korea."],
+["gather","v","모이다","to come together in one place","Thousands of people ___ in the square."],
+["hide","v","숨기다; 숨다","to put something where others cannot see it","He had to ___ his camera from the guards."],
+["independence","n","독립","freedom from control by another country","Many people fought for the ___ of Korea."],
+["invitation","n","초청, 초대","a request to come to a place or an event","Thank you for your kind ___."],
+["medicine","n","의학; 약","the study and treatment of illness","She went to Canada to study ___."],
+["movement","n","(사회적) 운동","a group of people working together for a shared goal","He joined the independence ___."],
+["national","adj","국가의","of or about a whole country","He is a ___ hero."],
+["poor","adj","가난한","having very little money","She gave food to ___ people."],
+["real","adj","진짜의, 실제의","true; not fake","Is this a ___ story?"],
+["right","n","권리","something that every person should be allowed to have or do","Everyone has the ___ to be free."],
+["situation","n","상황, 처지","what is happening at a certain time","He told the world about the ___ in Korea."],
+["speech","n","연설","a formal talk given to a group","She gave a ___ about peace."],
+["unbelievable","adj","믿을 수 없는","very surprising; hard to believe","His story was ___."],
+["watchful","adj","경계하는, 주의 깊은","looking carefully and paying close attention","The guard kept a ___ eye on him."],
+["a group of","phr","한 무리의","a number of people or things together","___ students visited the museum."],
+["be buried in","phr","~에 묻히다","to be put in the ground in a place after death","He wanted to ___ Korea."],
+["for the rest of one's life","phr","남은 인생 동안","from now until you die","She helped the poor ___.","for the rest of her life"],
+["return to","phr","~로 돌아오다","to go or come back to a place","He ___ Korea after the war.","returned to"],
+["shout for","phr","~을 위해 외치다","to call loudly for something you want","People ___ independence in the streets.","shouted for"],
+["similar to","phr","~와 비슷한","almost the same as","Your bag is ___ mine."],
+["under the watchful eye of","phr","~의 감시 아래","while being closely watched and controlled by someone","He worked ___ the guards."],
+["homeless","adj","집 없는","having no place to live","She made food for ___ people."],
+["hunger","n","배고픔, 굶주림","the feeling of needing food","Many children die from ___."],
+["respect","v","존경하다","to think highly of someone","I ___ my grandfather very much."],
+["selfless","adj","이타적인","caring more about others than yourself","Her ___ love helped many people."],
+["successful","adj","성공한","having good results","He became a ___ doctor."],
+["be born in","phr","~에서 태어나다","to start your life in a place or a year","He ___ America in 1863.","was born in"],
+["die from","phr","~로 인해 죽다","to die because of an illness or hunger","Many people ___ hunger every year."],
+["give away","phr","나누어 주다","to hand things to others for free","She ___ all her money to the poor.","gave away"],
+["get straight A's","phr","전 과목 A를 받다","to get the best grade in every subject","She ___ in school.","got straight A's"]];
+WB.B7V=[
+["face painting","n","얼굴 페인팅","drawing colorful pictures on someone's cheeks and forehead","Let's do ___ at the festival."],
+["souvenir","n","기념품","something you buy to remember a place","I bought a ___ for my sister."],
+["spicy","adj","매운","having a hot, strong taste","Tteokbokki is too ___ for me."],
+["order","v","주문하다","to ask for food or goods","Let's ___ gimbap and tteokbokki."],
+["delicious","adj","아주 맛있는","tasting very good","This soup is ___."],
+["fireworks","n","불꽃놀이","small objects that explode in the sky with colorful lights","We watched the ___ at night."],
+["participate","v","참가하다","to take part in an activity","Anyone can ___ in the race."],
+["boat ride","n","보트 타기","a short trip on the water for fun","Let's take a ___ on the lake."],
+["world-famous","adj","세계적으로 유명한","known by people in many countries","A ___ chef will teach the cooking class."],
+["chef","n","요리사","a professional cook","The ___ made a special dish for us."],
+["recipe","n","조리법","instructions for cooking a dish","Can you give me the ___ for this cake?"],
+["invite","v","초대하다","to ask someone to come to an event","I want to ___ you to my party."],
+["miss","v","놓치다","to fail to see or go to something","Don't ___ the fireworks festival!"],
+["heavy","adj","무거운","weighing a lot","This box is too ___ to carry."],
+["light","adj","가벼운","not heavy","The bag is ___. I can carry it."],
+["celebrate","v","기념하다, 축하하다","to do something fun for a special day","We ___ New Year's Day with our family."],
+["parade","n","퍼레이드, 행진","a line of people moving through the streets to celebrate","A long ___ went down the main street."],
+["giant","adj","거대한","very, very large","There was a ___ statue in the square."],
+["wooden","adj","나무로 된","made of wood","They burn ___ statues at the end of the festival."],
+["statue","n","조각상","a figure of a person or an animal made of stone, metal, or wood","People took pictures in front of the ___."],
+["surprisingly","adv","놀랍게도","in a way that you did not expect","___, they burn the statues at the end."],
+["burn","v","태우다","to destroy something with fire","People ___ the statues at night."],
+["symbolize","v","상징하다","to be a sign of an idea","The fire ___ the end of winter.","symbolizes"],
+["welcome","v","환영하다","to greet someone or something gladly","People ___ spring with music and dancing."],
+["especially","adv","특히","more than usual","I like summer, ___ the long days."],
+["decorate","v","장식하다","to make something look nicer by adding things","We ___ the room with flowers."],
+["pole","n","기둥, 막대","a long thin stick of wood or metal","People dance around a tall ___."],
+["traditional","adj","전통적인","following old customs","They wore ___ clothes at the festival."],
+["hardly","adv","거의 ~않다","almost not","In summer, it ___ gets dark there."],
+["dead","adj","죽은","no longer alive","People remember ___ family members at this festival."],
+["altar","n","제단","a table used in a religious ceremony","Families make an ___ with flowers and photos."],
+["cemetery","n","묘지","a place where dead people are buried","People visit the ___ with flowers."],
+["skeleton","n","해골","the frame of bones in a body","Some people dress up as a ___."],
+["reindeer","n","순록","a large deer that lives in cold places","There is a ___ race in the snow."],
+["costume","n","의상, 분장 복장","special clothes that make you look like someone else","She wore a funny ___ at the parade."],
+["various","adj","다양한","of many different kinds","You can enjoy ___ winter sports."],
+["hold","v","개최하다","to have an event","The town will ___ a snow festival."],
+["area","n","지역","a part of a place","People from many ___ come to the festival.","areas"],
+["matter","v","중요하다","to be important","It doesn't ___ who you are."],
+["take place","phr","열리다, 일어나다","to happen","The festival will ___ in March."],
+["set up","phr","설치하다, 차리다","to build or put something in place","Families ___ altars at home."],
+["come back","phr","돌아오다","to return","They believe the dead ___ to visit their families."],
+["dress up","phr","차려입다, 분장하다","to wear special clothes or a costume","Children ___ as skeletons."],
+["hundreds of","phr","수백의","a very large number of","___ people came to the festival."],
+["all night long","phr","밤새도록","from evening until morning without stopping","People dance ___."]];
+WB.B8V=[
+["future","n","미래","the time that will come","No one knows the ___."],
+["present","n","현재","the time now","They returned to the ___."],
+["founder","n","설립자","a person who starts a company","He is the ___ of the time travel company."],
+["president","n","대통령","the leader of a country","Who will be the next ___?"],
+["machine","n","기계","a thing with moving parts that does work","They got into the time ___."],
+["guide","n","안내인","a person who shows the way to others","The ___ told us to stay on the path."],
+["instruction","n","지시, 설명","information that tells you what to do","Follow the ___ carefully.","instructions"],
+["jungle","n","정글","a thick forest in a hot place","Dinosaurs lived in the ___."],
+["path","n","길","a narrow way for walking","Stay on the ___!"],
+["fog","n","안개","a thick cloud near the ground","We couldn't see because of the ___."],
+["dinosaur","n","공룡","a very large animal that lived millions of years ago","A huge ___ appeared in front of us."],
+["accident","n","사고","a bad event that happens by chance","He was hurt in a car ___."],
+["danger","n","위험","the chance of being hurt","The sign says, “___! Keep out!”"],
+["silence","n","침묵","complete quiet","There was a long ___ in the room."],
+["moment","n","순간","a very short time","For a ___, nobody moved."],
+["mud","n","진흙","wet, soft earth","His shoes were covered with ___."],
+["butterfly","n","나비","an insect with large, colorful wings","A ___ landed on the flower."],
+["fool","n","바보","a silly person","You ___! Why did you do that?"],
+["roar","n","포효 소리","a very loud, deep sound made by a big animal","We heard the ___ of a dinosaur."],
+["travel","v","여행하다","to go from one place to another","I want to ___ back to the past."],
+["whisper","v","속삭이다","to speak very quietly","“Be careful,” she ___.","whispered"],
+["appear","v","나타나다","to start to be seen","Suddenly, a huge animal ___.","appeared"],
+["breathe","v","숨 쉬다","to take air into your body and let it out","It was hard to ___ in the hot jungle."],
+["panic","v","당황하다","to suddenly feel so afraid that you cannot think clearly","Don't ___. Stay calm."],
+["stare","v","응시하다","to look at something for a long time","He ___ at the strange sign.","stared"],
+["return","v","돌아오다","to come back","When will you ___ home?"],
+["cause","v","일으키다, 초래하다","to make something happen","Small mistakes can ___ big problems."],
+["touch","v","만지다","to put your hand on something","Don't ___ anything in the past."],
+["foolish","adj","어리석은","not wise","It was a ___ mistake."],
+["careful","adj","조심하는","paying attention to avoid danger","Be ___ on the path."],
+["calm","adj","침착한","quiet and not nervous","Stay ___ and follow me."],
+["excited","adj","신이 난","very happy and eager","He was ___ about the trip."],
+["scared","adj","겁먹은","afraid","The boy was too ___ to move."],
+["terrified","adj","겁에 질린","extremely afraid","He was ___ when the dinosaur roared."],
+["confused","adj","혼란스러운","not able to understand clearly","I was ___ by the strange words on the sign."],
+["shocked","adj","충격을 받은","very surprised and upset","We were ___ at the news."],
+["unthinkable","adj","상상할 수 없는","too strange or bad to imagine","Changing the past was ___."],
+["covered","adj","덮인","having something all over it","His boots were ___ with mud."],
+["quietly","adv","조용히","without making much noise","Walk ___ so the animals don't hear you."],
+["safely","adv","안전하게","without being hurt","Everyone returned ___."],
+["angrily","adv","화가 나서","in an angry way","“You left the path!” the guide said ___."],
+["carefully","adv","주의 깊게","with great attention","Read the instructions ___."],
+["by accident","phr","우연히, 실수로","without planning or meaning to","I broke the cup ___."],
+["leave the path","phr","길을 벗어나다","to go off the way you should walk on","Never ___ in the jungle."],
+["put ~ in danger","phr","~을 위험에 빠뜨리다","to make someone or something unsafe","His mistake ___.","put everyone in danger"],
+["stay safe","phr","안전하게 지내다","to keep away from danger","Follow the rules to ___."],
+["walk into","phr","~ 안으로 들어가다","to enter a place on foot","He ___ the office.","walked into"],
+["get out of","phr","~에서 나가다","to leave a car, a machine, or a place","___ the machine slowly."],
+["turn around","phr","뒤돌아서다","to move so you face the other way","I ___ and saw a dinosaur.","turned around"],
+["look around","phr","둘러보다","to turn your head and see what is near you","He ___ but saw nothing.","looked around"]];
+
 /* ===== 영어 영영 풀이 (각 단원 어휘 · 하/중/상, 자체 작성 풀이) =====
    중1-2(V5~V8), 중2-1(W1~W5), 중2-2(W5=L5, E22_W6~W8) 단어 목록을 그대로 쓴다.
    EE_D: 단어 → [품사, 영영 풀이] */
@@ -3119,16 +3641,21 @@ shocked:['adj','very surprised and upset'],
 'by mistake':['phr','without meaning to; by accident']};
 /* 풀이가 서로 겹쳐 헷갈릴 수 있는 쌍은 같은 문항의 보기로 함께 내지 않는다 */
 const EE_NO=[['post','upload'],['trash','waste'],['reduce','save'],['clue','evidence'],['suspect','thief'],['endangered','in danger'],['article','review'],['take place','be held'],['scared','panic'],['scared','shocked'],['huge','giant'],['tiny','huge'],['main','latest'],['probably','expect'],['actor','role'],['event','festival'],['take part in','participate'],['these days','latest'],['result','as a result'],['effect','influence'],['gather','movement']].map(p=>p.join('|'));
-const EE_ok=(a,b)=>!EE_NO.includes(a+'|'+b)&&!EE_NO.includes(b+'|'+a);
-const EE_POS={n:'명사',v:'동사',adj:'형용사',adv:'부사',prep:'전치사',phr:'숙어'};
+/* 같은 어근이 들어간 표현끼리(danger / put ~ in danger, careful / carefully)도 같은 보기에 내지 않는다 */
+const EE_STOP=new Set(["one's",'a','an','the','to','of','in','on','at','for','with','up','out','into','back','off','be','get','take','make','have','do','~','and','down','away','by','one','all']);
+const EE_tok=w=>w.toLowerCase().split(/[\s-]+/).filter(t=>t.length>=4&&!EE_STOP.has(t));
+const EE_stem=(a,b)=>{const n=Math.min(a.length,b.length,5);return a.slice(0,n)===b.slice(0,n)};
+const EE_ok=(a,b)=>!EE_NO.includes(a+'|'+b)&&!EE_NO.includes(b+'|'+a)&&!EE_tok(a).some(x=>EE_tok(b).some(y=>EE_stem(x,y)));
+const EE_POS={n:'명사',v:'동사',adj:'형용사',adv:'부사',prep:'전치사',conj:'접속사',phr:'숙어'};
 const EE_fill=(s,w)=>s.replace(/(^|[.?!]\s+)___/,(m,p)=>p+'<b>'+w[0].toUpperCase()+w.slice(1)+'</b>').replace('___','<b>'+w+'</b>');
 const EE_bl=s=>s.replace('___','<u>&emsp;&emsp;&emsp;</u>');
 /* list의 항목 중 정답 w와 겹치지 않는 오답 n개 (samePos면 같은 품사 우선) */
-function EE_wr(R,list,w,n,samePos){let c=list.filter(x=>x[0]!==w[0]&&EE_D[x[0]]&&EE_ok(x[0],w[0]));
- if(samePos){const p=EE_D[w[0]][0],s=c.filter(x=>EE_D[x[0]][0]===p);if(s.length>=n)c=s.concat(R.shuffle(c.filter(x=>EE_D[x[0]][0]!==p)))}
+const EE_pos=x=>x[4]||EE_D[x[0]][0];
+function EE_wr(R,list,w,n,samePos){let c=list.filter(x=>x[0]!==w[0]&&(x[3]||EE_D[x[0]])&&EE_ok(x[0],w[0])&&(!x[3]||x[3]!==w[3]));
+ if(samePos){const p=EE_pos(w),s=c.filter(x=>EE_pos(x)===p);if(s.length>=n)c=s.concat(R.shuffle(c.filter(x=>EE_D[x[0]][0]!==p)))}
  const out=[];for(const x of samePos?c:R.shuffle(c)){if(out.length>=n)break;if(out.every(y=>EE_ok(y[0],x[0])))out.push(x)}
  return samePos?R.shuffle(out.slice(0,n)):out}
-function EE_types(code,list,pre){const L=list.filter(x=>EE_D[x[0]]),D=w=>EE_D[w[0]][1],P=w=>EE_POS[EE_D[w[0]][0]];
+function EE_types(code,list,pre){const L=list.filter(x=>x[3]||EE_D[x[0]]),D=w=>w[3]||EE_D[w[0]][1],P=w=>EE_POS[w[4]||EE_D[w[0]][0]];
  const T=[];
  /* 하: 풀이 ↔ 단어 */
  T.push({id:pre+'-ee1',u:code,name:'영영 풀이 (기본)',lv:1,g:R=>{const w=R.pick(L),o=EE_wr(R,L,w,4);
@@ -3136,8 +3663,8 @@ function EE_types(code,list,pre){const L=list.filter(x=>EE_D[x[0]]),D=w=>EE_D[w[
   return{q:`다음 단어의 영영 풀이로 알맞은 것은?<div class="data">${w[0]}</div>`,opts:R.shuffle([w,...o]).map(D),ans:D(w),exp:`<b>${w[0]}</b> (${w[1]}): ${D(w)}`}}});
  /* 중: 같은 품사 오답 / 빈칸 문장 → 풀이 / 연결이 틀린 것 */
  T.push({id:pre+'-ee2',u:code,name:'영영 풀이 (문장·연결)',lv:2,g:R=>{const k=R.i(0,2);
-  if(k===0){const w=R.pick(L),o=EE_wr(R,L,w,4,true);return{q:`다음 영영 풀이에 해당하는 단어로 알맞은 것은? <span class="muted">(${P(w)})</span><div class="psg">${D(w)}</div>`,opts:R.shuffle([w,...o]).map(x=>x[0]),ans:w[0],exp:`<b>${w[0]}</b> (${w[1]}): ${D(w)}`+(o.every(x=>EE_D[x[0]][0]===EE_D[w[0]][0])?`<br>보기가 모두 ${P(w)}이므로 품사가 아니라 뜻으로 구별해야 한다.`:'')}}
-  if(k===1){const S=L.filter(x=>x[2]);const w=R.pick(S),o=EE_wr(R,L,w,4,true);return{q:`다음 빈칸에 들어갈 단어의 영영 풀이로 알맞은 것은?${psg(EE_bl(w[2]))}`,opts:R.shuffle([w,...o]).map(D),ans:D(w),exp:`${EE_fill(w[2],w[0])}<br><b>${w[0]}</b> (${w[1]}): ${D(w)}`}}
+  if(k===0){const w=R.pick(L),o=EE_wr(R,L,w,4,true);return{q:`다음 영영 풀이에 해당하는 단어로 알맞은 것은? <span class="muted">(${P(w)})</span><div class="psg">${D(w)}</div>`,opts:R.shuffle([w,...o]).map(x=>x[0]),ans:w[0],exp:`<b>${w[0]}</b> (${w[1]}): ${D(w)}`+(o.every(x=>EE_pos(x)===EE_pos(w))?`<br>보기가 모두 ${P(w)}이므로 품사가 아니라 뜻으로 구별해야 한다.`:'')}}
+  if(k===1){const S=L.filter(x=>x[2]);const w=R.pick(S),o=EE_wr(R,L,w,4,true);return{q:`다음 빈칸에 들어갈 단어의 영영 풀이로 알맞은 것은?${psg(EE_bl(w[2]))}`,opts:R.shuffle([w,...o]).map(D),ans:D(w),exp:`${EE_fill(w[2],w[5]||w[0])}<br><b>${w[0]}</b> (${w[1]}): ${D(w)}`}}
   const pk=[R.pick(L)];pk.push(...EE_wr(R,L,pk[0],4));const bad=R.i(0,4),sw=EE_wr(R,L.filter(x=>!pk.includes(x)&&pk.every(y=>EE_ok(y[0],x[0]))),pk[bad],1)[0];
   const opt=pk.map((x,i)=>`${x[0]} : ${i===bad?D(sw):D(x)}`);
   return{q:'다음 중 단어와 영영 풀이가 바르게 연결되지 <u>않은</u> 것은?',opts:opt,ans:opt[bad],exp:`${opt[bad]}의 풀이는 <b>${sw[0]}</b>(${sw[1]})의 뜻이다.<br><b>${pk[bad][0]}</b> (${pk[bad][1]}): ${D(pk[bad])}`}}});
@@ -3153,17 +3680,20 @@ function EE_types(code,list,pre){const L=list.filter(x=>EE_D[x[0]]),D=w=>EE_D[w[
    return{q:`다음 (A), (B)의 영영 풀이에 해당하는 단어를 순서대로 바르게 짝지은 것은?<div class="psg">(A) ${D(a)}<br>(B) ${D(b)}</div>`,...mc(R,ans,wr),exp:`(A) <b>${a[0]}</b> (${a[1]})<br>(B) <b>${b[0]}</b> (${b[1]})`}}
   const S=L.filter(x=>x[2]);const w=R.pick(S),o=EE_wr(R,S,w,4);
   const opt=[w,...o].map(x=>EE_bl(x[2]));
-  return{q:`다음 영영 풀이에 해당하는 단어가 들어가기에 가장 알맞은 문장은?<div class="psg">${D(w)}</div>`,opts:R.shuffle(opt.slice()),ans:opt[0],exp:`풀이의 단어는 <b>${w[0]}</b>(${w[1]}).<br>${EE_fill(w[2],w[0])}<br>${o.map(x=>`· ${x[0]}: ${EE_fill(x[2],x[0])}`).join('<br>')}`}}});
+  return{q:`다음 영영 풀이에 해당하는 단어가 들어가기에 가장 알맞은 문장은?<div class="psg">${D(w)}</div>`,opts:R.shuffle(opt.slice()),ans:opt[0],exp:`풀이의 단어는 <b>${w[0]}</b>(${w[1]}).<br>${EE_fill(w[2],w[5]||w[0])}<br>${o.map(x=>`· ${x[0]}: ${EE_fill(x[2],x[5]||x[0])}`).join('<br>')}`}}});
  /* 보기 5개·중복 없음·정답 포함될 때까지 재생성 */
  T.forEach(t=>{const f=t.g;t.g=R=>{for(let i=0;i<400;i++){try{const r=f(R);if(r&&r.opts.length===5&&new Set(r.opts).size===5&&r.opts.includes(r.ans))return r}catch(e){}}throw new Error('gen fail '+t.id)}});
  return T}
 /* 각 학기 어휘 소단원 바로 뒤에 끼워 넣는다 */
 function EE_add(S,code,list,pre){const T=EE_types(code,list,pre);const i=S.T.map(t=>t.u).lastIndexOf(code);S.T.splice(i<0?S.T.length:i+1,0,...T)}
-[['E5V',V5,'e5'],['E6V',V6,'e6'],['E7V',V7,'e7'],['E8V',V8,'e8']].forEach(([c,l,p])=>EE_add(SUBJ.eng,c,l,p));
-[['A1V',W1,'e21-1'],['A2V',W2,'e21-2'],['A3V',W3,'e21-3'],['A4V',W4,'e21-4'],['A5V',W5,'e21-5']].forEach(([c,l,p])=>EE_add(SEMS['2-1'].eng,c,l,p));
-[['B5V',W5,'e22-5'],['B6V',E22_W6,'e22-6'],['B7V',E22_W7,'e22-7'],['B8V',E22_W8,'e22-8']].forEach(([c,l,p])=>EE_add(SEMS['2-2'].eng,c,l,p));
-/* 영영 단어 탭(단어장·단어 테스트·인쇄)용: 학기 → [[어휘 소단원 코드, 단어 목록]] */
-const EE_BOOK={'1-2':[['E5V',V5],['E6V',V6],['E7V',V7],['E8V',V8]],'2-1':[['A1V',W1],['A2V',W2],['A3V',W3],['A4V',W4],['A5V',W5]],'2-2':[['B5V',W5],['B6V',E22_W6],['B7V',E22_W7],['B8V',E22_W8]]};
+/* 교과서 단원 단어(data-eng-wb.js의 WB)로 3유형을 만든다. 항목: [단어, 뜻, 예문, 풀이, 품사, 예문 속 형태] */
+const WBL=k=>WB[k].map(x=>[x[0],x[2],x[4],x[3],x[1],x[5]]);
+Object.values(WB).flat().forEach(x=>{if(!EE_D[x[0]])EE_D[x[0]]=[x[1],x[3]]});
+[['E5V','e5'],['E6V','e6'],['E7V','e7'],['E8V','e8']].forEach(([c,p])=>EE_add(SUBJ.eng,c,WBL(c),p));
+[['A1V','e21-1'],['A2V','e21-2'],['A3V','e21-3'],['A4V','e21-4'],['A5V','e21-5']].forEach(([c,p])=>EE_add(SEMS['2-1'].eng,c,WBL(c),p));
+[['B5V','e22-5'],['B6V','e22-6'],['B7V','e22-7'],['B8V','e22-8']].forEach(([c,p])=>EE_add(SEMS['2-2'].eng,c,WBL(c),p));
+/* 영단어 탭(단어장·단어 테스트·인쇄)용: 학기 → 어휘 소단원 코드 목록 (단어는 WB[코드], data-eng-wb.js) */
+const EE_BOOK={'1-2':['E5V','E6V','E7V','E8V'],'2-1':['A1V','A2V','A3V','A4V','A5V'],'2-2':['B5V','B6V','B7V','B8V']};
 
 
 </script>
@@ -3425,96 +3955,109 @@ function renderStats(){const v=$('#v-stats');const A=allS();const rows=SUBS.map(
  <div class="bar" style="margin-top:12px"><span class="muted">정답률 60% 미만은 붉게 표시됩니다.</span><span class="sp"></span><button class="btn sm" data-act="reset">${confirmReset?`${SJ[CUR].name} 기록을 지울까요? 한 번 더 누르기`:'이 과목 기록 초기화'}</button></div>`}
 $('#v-stats').addEventListener('click',e=>{const b=e.target.closest('[data-act="reset"]');if(!b)return;if(!confirmReset){confirmReset=true;renderStats();return}S={t:{},w:[]};LS.set('m12-rec-'+SK(),S);onRecord();confirmReset=false;renderStats()});
 
-/* ===== 영영 단어 (단어장 · 단어 테스트 · 인쇄) ===== */
-const W={mode:'list',les:null,hideKo:false,hideEe:false,kind:'mix',n:20,hint:true,onlyWrong:false,paper:'a3',test:null};
-const eeHas=()=>CUR==='eng'&&typeof EE_BOOK!=='undefined'&&!!(EE_BOOK[SEM]||[]).length;
+/* ===== 영단어 (교과서 단원 단어 · 단어장 · 표 형식 학습지 · 인쇄) ===== */
+const W={mode:'list',les:null,hideEn:false,hideKo:false,hideEe:false,kind:'both',n:20,hint:false,mix:true,onlyWrong:false,paper:'a4',test:null};
+const eeHas=()=>CUR==='eng'&&typeof EE_BOOK!=='undefined'&&typeof WB!=='undefined'&&!!(EE_BOOK[SEM]||[]).length;
 const eeBook=()=>(typeof EE_BOOK!=='undefined'&&EE_BOOK[SEM])||[];
 const eeWK=()=>'m12-eew-'+SEM;
 const eeLesName=code=>{const U=UNITS.find(u=>u.subs.some(x=>x[0]===code));return U?{tag:U.tag,name:U.name}:{tag:code,name:''}};
-function eeWords(onlyWrong){if(!W.les)W.les=new Set(LS.get('m12-eel-'+SEM,null)||eeBook().map(x=>x[0]));const wr=new Set(LS.get(eeWK(),[]));const out=[],seen=new Set();
- eeBook().forEach(([code,list])=>{if(!W.les.has(code))return;list.forEach(x=>{const k=code+'|'+x[0];if(seen.has(k))return;seen.add(k);const d=EE_D[x[0]];
-  if(onlyWrong&&!wr.has(x[0]))return;out.push({w:x[0],ko:x[1],s:x[2]||'',pos:d?EE_POS[d[0]]:'',pa:d?d[0]:'',ee:d?d[1]:'',code})})});return out}
-const eeNorm=s=>String(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/[.!?,]+$/,'').replace(/\s+/g,' ').trim();
-const eeHint=w=>w.split(' ').map(p=>p[0]+' _'.repeat(Math.max(0,p.length-1))).join('   ');
-function eeKinds(x){const k=[];if(x.ee)k.push('ee');if(x.s&&x.s.includes('___'))k.push('sent');k.push('ko');return k}
+const EE_PS={n:'n.',v:'v.',adj:'adj.',adv:'adv.',prep:'prep.',conj:'conj.',phr:'phr.'};
+function eeWords(onlyWrong){if(!W.les)W.les=new Set((LS.get('m12-eel-'+SEM,null)||eeBook()).filter(c=>eeBook().includes(c)));if(!W.les.size)W.les=new Set(eeBook());const wr=new Set(LS.get(eeWK(),[]));const out=[];
+ eeBook().forEach(code=>{if(!W.les.has(code))return;(WB[code]||[]).forEach((x,i)=>{if(onlyWrong&&!wr.has(x[0]))return;out.push({w:x[0],pos:x[1],ko:x[2],ee:x[3],s:x[4]||'',f:x[5]||'',code,i})})});return out}
+const eeNorm=s=>String(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/[.!?,]+$/,'').replace(/~/g,' ').replace(/\s+/g,' ').trim();
+const eeEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function eeIsOk(x,v){v=eeNorm(v);if(!v)return false;const c=[x.w,x.f].filter(Boolean).map(eeNorm);if(c.includes(v))return true;
+ const re=new RegExp('^'+eeEsc(eeNorm(x.w)).replace(/one's/g,"(?:one's|my|your|his|her|its|our|their|someone's|[a-z]+'s)")+'$');return re.test(v)}
+const eeHint=w=>w.split(' ').map(p=>p==='~'?'~':p[0]+' _'.repeat(Math.max(0,p.length-1))).join('   ');
+const eeBlank=s=>s.replace('___','<span class="wbk"></span>');
+const eeShow=x=>EE_fill(x.s,x.f||x.w);
 function eeMakeTest(seed){const R=mkR(seed),pool=eeWords(W.onlyWrong);if(!pool.length)return null;
- const ok=pool.filter(x=>W.kind==='mix'||eeKinds(x).includes(W.kind));if(!ok.length)return null;
- const pick=R.shuffle(ok).slice(0,W.n>0?W.n:ok.length);const all=eeWords(false);
- const items=pick.map(x=>{const kind=W.kind==='mix'?R.pick(eeKinds(x)):W.kind;const it={x,kind,val:'',pick:null};
-  if(kind==='ko'){const c=R.shuffle(all.filter(y=>y.ko!==x.ko&&y.w!==x.w));const o=[];for(const y of c){if(o.length>=4)break;if(!o.includes(y.ko))o.push(y.ko)}it.opts=R.shuffle([x.ko,...o])}return it});
- const ord={ee:0,sent:1,ko:2};items.sort((a,b)=>ord[a.kind]-ord[b.kind]);return{seed,items,graded:false}}
-const EE_KN={ee:'영영 풀이를 보고 알맞은 단어를 쓰시오.',sent:'빈칸에 알맞은 단어를 쓰시오.',ko:'단어의 우리말 뜻을 고르시오.'};
-const EE_KNP={ee:'다음 영영 풀이에 해당하는 단어를 쓰시오.',sent:'다음 빈칸에 알맞은 단어를 쓰시오.',ko:'다음 단어의 우리말 뜻을 쓰시오.'};
-function eePrompt(it,print){const x=it.x;if(it.kind==='ee')return x.ee;if(it.kind==='sent')return print?x.s.replace('___','<span class="blank" style="min-width:5em"></span>'):EE_bl(x.s);return `<b>${x.w}</b>`+(print?' <span style="color:#777">('+x.pos+')</span>':'')}
+ let pick=W.mix?R.shuffle(pool):pool.slice();pick=pick.slice(0,W.n>0?W.n:pick.length);if(!W.mix)pick.sort((a,b)=>eeBook().indexOf(a.code)-eeBook().indexOf(b.code)||a.i-b.i);
+ const items=pick.map(x=>({x,kind:W.kind==='mix'?R.pick(['both','ee','sent','ko']):W.kind,val:''}));return{seed,items,graded:false}}
+/* 표의 Definition / Example 칸 */
+function eeCell(it,print){const x=it.x,k=it.kind;const eg=`<div class="eg">e.g. ${eeBlank(x.s)}</div>`;
+ if(k==='ee')return `<div class="df">${x.ee}</div>`;if(k==='sent')return `<div class="df">${eeBlank(x.s)}</div>`;if(k==='ko')return `<div class="df">${x.ko}</div>`;
+ return `<div class="df">${x.ee}</div>${eg}`}
+const EE_KH={both:'영영 풀이 + 예문',ee:'영영 풀이만',sent:'예문 빈칸만',ko:'우리말 뜻',mix:'섞어서'};
 function renderWords(){const v=$('#v-words');if(!eeHas()){v.innerHTML='';return}const L=eeBook(),all=eeWords(false),wr=new Set(LS.get(eeWK(),[]));
- const les=`<div class="cfg"><div class="wl-les"><span class="muted" style="align-self:center">단원</span>${L.map(([c])=>{const n=eeLesName(c);return `<button class="chip ${W.les.has(c)?'on':''}" data-les="${c}" title="${n.name}">${n.tag}<small>${EE_BOOK[SEM].find(y=>y[0]===c)[1].length}</small></button>`}).join('')}<button class="chip" data-les="*">전체</button></div>
- <div class="bar"><button class="chip ${W.mode==='list'?'on':''}" data-wm="list">단어장</button><button class="chip ${W.mode==='test'?'on':''}" data-wm="test">단어 테스트</button><span class="sp"></span><span class="muted">${all.length}단어${wr.size?` · 틀린 단어 ${[...wr].filter(w=>all.some(x=>x.w===w)).length}`:''}</span></div></div>`;
- const paper=`<label class="muted" style="display:inline-flex;gap:6px;align-items:center">용지 <button class="chip ${W.paper==='a3'?'on':''}" data-pp="a3">A3</button><button class="chip ${W.paper==='a4'?'on':''}" data-pp="a4">A4</button></label>`;
- if(W.mode==='list'){const groups=L.filter(([c])=>W.les.has(c)).map(([c])=>[c,all.filter(x=>x.code===c)]);
-  v.innerHTML=les+`<div class="bar" style="margin-top:12px"><button class="chip ${W.hideKo?'on':''}" data-hide="ko">뜻 가리기</button><button class="chip ${W.hideEe?'on':''}" data-hide="ee">영영 풀이 가리기</button><span class="sp"></span>${paper}<button class="btn" data-wact="listpdf">단어장 PDF</button></div>
-  <p class="muted" style="margin:6px 2px 0">가린 칸은 눌러서 하나씩 확인할 수 있습니다. 가린 상태로 PDF를 만들면 빈칸 학습지가 됩니다. <span class="star">★</span>는 테스트에서 틀린 단어.</p>`+
-  groups.map(([c,ws])=>{const n=eeLesName(c);return `<div class="wsec"><h3>${n.tag} ${n.name}</h3><div class="list">${ws.map(x=>`<div class="wrow"><div class="wh"><b>${x.w}</b>${x.pos?`<i>${x.pos}</i>`:''}<span class="cv ${W.hideKo?'hid':''}">${x.ko}</span>${wr.has(x.w)?'<span class="star">★</span>':''}</div>${x.ee?`<div class="ee"><span class="cv ${W.hideEe?'hid':''}">${x.ee}</span></div>`:''}${x.s?`<div class="ws">${EE_fill(x.s,x.w)}</div>`:''}</div>`).join('')}</div></div>`}).join('');return}
+ const les=`<div class="cfg"><div class="wl-les"><span class="muted" style="align-self:center">단원</span>${L.map(c=>{const n=eeLesName(c);return `<button class="chip ${W.les.has(c)?'on':''}" data-les="${c}" title="${n.name}">${n.tag}<small>${WB[c].length}</small></button>`}).join('')}<button class="chip" data-les="*">전체</button></div>
+ <div class="bar"><button class="chip ${W.mode==='list'?'on':''}" data-wm="list">단어장</button><button class="chip ${W.mode==='test'?'on':''}" data-wm="test">단어 테스트 (학습지)</button><span class="sp"></span><span class="muted">${all.length}단어${wr.size?` · 틀린 단어 ${all.filter(x=>wr.has(x.w)).length}`:''}</span></div>
+ <p class="muted" style="margin:0">단어는 교과서(2022 개정 동아 윤정미) 각 Lesson의 단어장과 대화문·본문에서 뽑았고, 영영 풀이와 예문은 새로 쓴 것입니다.</p></div>`;
+ const paper=`<span class="muted" style="display:inline-flex;gap:6px;align-items:center">용지 <button class="chip ${W.paper==='a4'?'on':''}" data-pp="a4">A4 세로</button><button class="chip ${W.paper==='a3'?'on':''}" data-pp="a3">A3 가로</button></span>`;
+ if(W.mode==='list'){const groups=L.filter(c=>W.les.has(c)).map(c=>[c,all.filter(x=>x.code===c)]);
+  v.innerHTML=les+`<div class="bar" style="margin-top:12px"><button class="chip ${W.hideEn?'on':''}" data-hide="En">영어 가리기</button><button class="chip ${W.hideKo?'on':''}" data-hide="Ko">뜻 가리기</button><button class="chip ${W.hideEe?'on':''}" data-hide="Ee">영영 풀이 가리기</button><span class="sp"></span>${paper}<button class="btn" data-wact="listpdf">단어장 PDF</button></div>
+  <p class="muted" style="margin:6px 2px 0">가린 칸은 눌러서 하나씩 확인할 수 있습니다. 가린 상태로 PDF를 만들면 빈칸 학습지가 되고 뒤쪽에 정답이 붙습니다. <span class="star">★</span> 테스트에서 틀린 단어</p>`+
+  groups.map(([c,ws])=>{const n=eeLesName(c);let k=0;return `<div class="wsec"><h3>${n.tag} ${n.name}</h3><div class="list wbk-list">${ws.map(x=>`<div class="wrow2"><span class="no">${++k}</span><div class="en"><span class="cv ${W.hideEn?'hid':''}">${x.w}</span>${wr.has(x.w)?' <span class="star">★</span>':''}<i>${EE_PS[x.pos]||x.pos}</i></div><div class="ko"><span class="cv ${W.hideKo?'hid':''}">${x.ko}</span></div><div class="de"><span class="cv ${W.hideEe?'hid':''}">${x.ee}</span><div class="eg">e.g. ${W.hideEn?eeBlank(x.s):eeShow(x)}</div></div></div>`).join('')}</div></div>`}).join('');return}
  const wrN=all.filter(x=>wr.has(x.w)).length;
- const cfg=`<div class="cfg" style="margin-top:12px"><div class="bar"><span class="muted">형식</span>${[['mix','섞어서'],['ee','영영 풀이 → 단어'],['sent','예문 빈칸 → 단어'],['ko','단어 → 뜻']].map(([k,t])=>`<button class="chip ${W.kind===k?'on':''}" data-wk="${k}">${t}</button>`).join('')}</div>
- <div class="bar"><span class="muted">문항 수</span>${[10,20,30,0].map(n=>`<button class="chip ${W.n===n?'on':''}" data-wn="${n}">${n||'전체'}</button>`).join('')}<span class="sp"></span><button class="chip ${W.hint?'on':''}" data-wopt="hint">첫 글자 힌트</button>${wrN?`<button class="chip ${W.onlyWrong?'on':''}" data-wopt="onlyWrong">틀린 단어만 (${wrN})</button>`:''}</div>
- <div class="bar"><button class="btn pri" data-wact="make">새 테스트</button><span class="sp"></span>${paper}<button class="btn" data-wact="testpdf">시험지 PDF</button></div></div>`;
- const T0=W.test;if(!T0){v.innerHTML=les+cfg+`<div class="empty" style="margin-top:12px">${all.length?'조건에 맞는 단어가 없습니다. 형식이나 단원을 바꿔 주세요.':'단원을 하나 이상 선택해 주세요.'}</div>`;return}
- let sec='',body='';T0.items.forEach((it,i)=>{if(it.kind!==sec){sec=it.kind;body+=`<h3 class="sec" style="margin:14px 0 2px;font-size:15px">${EE_KN[sec]}</h3>`}
-  const x=it.x,g=T0.graded,res=g?(it.ok?'ok':'no'):'';
-  body+=`<div class="wq ${res}" data-i="${i}"><div class="qp"><span class="n">${i+1}.</span>${eePrompt(it)}${it.kind!=='ko'&&W.hint?`<span class="hint">${eeHint(x.w)}</span>`:''}</div>`+
-  (it.kind==='ko'?`<div class="wo">${it.opts.map((o,j)=>`<button class="chip ${g?(o===x.ko?'ok':it.pick===j?'no':''):it.pick===j?'on':''}" data-wi="${i}" data-wj="${j}" ${g?'disabled':''}>${o}</button>`).join('')}</div>`
-   :`<input class="win" data-wi="${i}" value="${(it.val||'').replace(/"/g,'&quot;')}" autocomplete="off" autocapitalize="off" spellcheck="false" ${g?'disabled':''} placeholder="단어 쓰기">`)+
-  (g?`<div class="wa"><b>${it.ok?'정답':'오답'}</b> · ${x.w} (${x.pos||''}) ${x.ko}${x.ee&&it.kind!=='ee'?` — ${x.ee}`:''}</div>`:'')+`</div>`});
- const sc=T0.graded?T0.items.filter(i=>i.ok).length:null;
- v.innerHTML=les+cfg+`<div class="sheet" style="margin-top:12px"><div class="ehead"><b>영영 단어 테스트</b><span class="muted">번호 ${T0.seed} · ${T0.items.length}문항${sc!=null?` · <b>${sc}/${T0.items.length}</b>`:''}</span></div>${body}</div>
- <div class="bar" style="margin-top:12px"><span class="sp"></span>${T0.graded?`${T0.items.some(i=>!i.ok)?'<button class="btn" data-wact="retry">틀린 단어 다시</button>':''}<button class="btn pri" data-wact="make">새 테스트</button>`:'<button class="btn pri" data-wact="grade">채점하기</button>'}</div>`}
+ const cfg=`<div class="cfg" style="margin-top:12px"><div class="bar"><span class="muted">보여 줄 것</span>${['both','ee','sent','ko','mix'].map(k=>`<button class="chip ${W.kind===k?'on':''}" data-wk="${k}">${EE_KH[k]}</button>`).join('')}</div>
+ <div class="bar"><span class="muted">문항 수</span>${[10,20,30,0].map(n=>`<button class="chip ${W.n===n?'on':''}" data-wn="${n}">${n||'전체'}</button>`).join('')}<span class="sp"></span><button class="chip ${W.mix?'on':''}" data-wopt="mix">순서 섞기</button><button class="chip ${W.hint?'on':''}" data-wopt="hint">첫 글자 힌트</button>${wrN?`<button class="chip ${W.onlyWrong?'on':''}" data-wopt="onlyWrong">틀린 단어만 (${wrN})</button>`:''}</div>
+ <div class="bar"><button class="btn pri" data-wact="make">새 학습지</button><span class="sp"></span>${paper}<button class="btn" data-wact="testpdf">학습지 PDF</button></div></div>`;
+ const T0=W.test;if(!T0){v.innerHTML=les+cfg+`<div class="empty" style="margin-top:12px">${all.length?'조건에 맞는 단어가 없습니다.':'단원을 하나 이상 선택해 주세요.'}</div>`;return}
+ const g=T0.graded,sc=g?T0.items.filter(i=>i.ok).length:null;
+ v.innerHTML=les+cfg+`<div class="sheet" style="margin-top:12px"><div class="ehead"><b>영단어 학습지</b><span class="muted">번호 ${T0.seed} · ${T0.items.length}문항${sc!=null?` · <b>${sc}/${T0.items.length}</b>`:''}</span></div>
+ <div class="wtab"><div class="wtr wth"><span>No</span><span>English</span><span>P.o.s</span><span>Definition / Example</span></div>
+ ${T0.items.map((it,i)=>{const x=it.x;return `<div class="wtr ${g?(it.ok?'ok':'no'):''}"><span class="no">${i+1}</span><span class="in"><input class="win" data-wi="${i}" value="${(it.val||'').replace(/"/g,'&quot;')}" autocomplete="off" autocapitalize="off" spellcheck="false" ${g?'disabled':''} aria-label="${i+1}번 영어 단어">${W.hint&&!g?`<span class="hint">${eeHint(x.w)}</span>`:''}${g?`<span class="wa">${it.ok?'○':'×'} <b>${x.w}</b></span>`:''}</span><span class="ps">${EE_PS[x.pos]||x.pos}</span><span class="dd">${eeCell(it)}${g?`<div class="eg ans">${x.ko} · ${eeShow(x)}</div>`:''}</span></div>`}).join('')}</div></div>
+ <div class="bar" style="margin-top:12px"><span class="sp"></span>${g?`${T0.items.some(i=>!i.ok)?'<button class="btn" data-wact="retry">틀린 단어 다시</button>':''}<button class="btn pri" data-wact="make">새 학습지</button>`:'<button class="btn pri" data-wact="grade">채점하기</button>'}</div>`}
 function eeGrade(){const T0=W.test;if(!T0)return;const wr=new Set(LS.get(eeWK(),[]));
- T0.items.forEach(it=>{it.ok=it.kind==='ko'?it.pick!=null&&it.opts[it.pick]===it.x.ko:eeNorm(it.val)===eeNorm(it.x.w);if(it.ok)wr.delete(it.x.w);else wr.add(it.x.w)});
- T0.graded=true;LS.set(eeWK(),[...wr]);renderWords()}
+ T0.items.forEach(it=>{it.ok=eeIsOk(it.x,it.val);if(it.ok)wr.delete(it.x.w);else wr.add(it.x.w)});T0.graded=true;LS.set(eeWK(),[...wr]);renderWords()}
+const eeNew=()=>{W.test=eeMakeTest(Math.floor(1000+Math.random()*9000))};
 $('#v-words').addEventListener('input',e=>{const t=e.target;if(t.matches('input.win')&&W.test)W.test.items[+t.dataset.wi].val=t.value});
-$('#v-words').addEventListener('keydown',e=>{const t=e.target;if(e.key!=='Enter'||!t.matches('input.win'))return;e.preventDefault();const ins=[...document.querySelectorAll('#v-words input.win')],k=ins.indexOf(t);if(ins[k+1])ins[k+1].focus();else t.blur()});
+$('#v-words').addEventListener('keydown',e=>{const t=e.target;if(e.key!=='Enter'||e.isComposing||!t.matches('input.win'))return;e.preventDefault();const ins=[...document.querySelectorAll('#v-words input.win')],k=ins.indexOf(t);if(ins[k+1])ins[k+1].focus();else t.blur()});
 $('#v-words').addEventListener('click',e=>{const cv=e.target.closest('.cv');if(cv){cv.classList.toggle('hid');return}const b=e.target.closest('button');if(!b)return;const d=b.dataset;
- if(d.les){if(d.les==='*')W.les=new Set(eeBook().map(x=>x[0]));else{W.les.has(d.les)?W.les.delete(d.les):W.les.add(d.les)}LS.set('m12-eel-'+SEM,[...W.les]);W.test=null;if(W.mode==='test')W.test=eeMakeTest(Math.floor(1000+Math.random()*9000));renderWords();return}
- if(d.wm){W.mode=d.wm;if(W.mode==='test'&&!W.test)W.test=eeMakeTest(Math.floor(1000+Math.random()*9000));renderWords();return}
- if(d.hide){W[d.hide==='ko'?'hideKo':'hideEe']^=1;renderWords();return}
+ if(d.les){if(d.les==='*')W.les=new Set(eeBook());else{if(W.les.has(d.les)){if(W.les.size>1)W.les.delete(d.les)}else W.les.add(d.les)}LS.set('m12-eel-'+SEM,[...W.les]);W.test=null;if(W.mode==='test')eeNew();renderWords();return}
+ if(d.wm){W.mode=d.wm;if(W.mode==='test'&&!W.test)eeNew();renderWords();return}
+ if(d.hide){W['hide'+d.hide]=!W['hide'+d.hide];renderWords();return}
  if(d.pp){W.paper=d.pp;renderWords();return}
- if(d.wk){W.kind=d.wk;W.test=eeMakeTest(Math.floor(1000+Math.random()*9000));renderWords();return}
- if(d.wn!=null){W.n=+d.wn;W.test=eeMakeTest(Math.floor(1000+Math.random()*9000));renderWords();return}
- if(d.wopt){W[d.wopt]=!W[d.wopt];if(d.wopt==='onlyWrong')W.test=eeMakeTest(Math.floor(1000+Math.random()*9000));renderWords();return}
- if(d.wj!=null&&W.test&&!W.test.graded){const it=W.test.items[+d.wi];it.pick=it.pick===+d.wj?null:+d.wj;b.parentNode.querySelectorAll('.chip').forEach((c,j)=>c.classList.toggle('on',it.pick===j));return}
- const a=d.wact;if(a==='make'){W.test=eeMakeTest(Math.floor(1000+Math.random()*9000));renderWords();window.scrollTo({top:$('#v-words').offsetTop-60});return}
+ if(d.wk){W.kind=d.wk;eeNew();renderWords();return}
+ if(d.wn!=null){W.n=+d.wn;eeNew();renderWords();return}
+ if(d.wopt){W[d.wopt]=!W[d.wopt];if(d.wopt!=='hint')eeNew();renderWords();return}
+ const a=d.wact;if(a==='make'){eeNew();renderWords();window.scrollTo({top:$('#v-words').offsetTop-60});return}
  if(a==='grade'){eeGrade();return}
- if(a==='retry'){const ws=W.test.items.filter(i=>!i.ok).map(i=>i.x.w);const sv=W.onlyWrong;W.onlyWrong=true;const t=eeMakeTest(Math.floor(1000+Math.random()*9000));W.onlyWrong=sv;if(t){t.items=t.items.filter(i=>ws.includes(i.x.w))}W.test=t;renderWords();return}
+ if(a==='retry'){const ws=new Set(W.test.items.filter(i=>!i.ok).map(i=>i.x.w));const t=W.test;W.test={seed:Math.floor(1000+Math.random()*9000),graded:false,items:t.items.filter(i=>ws.has(i.x.w)).map(i=>({x:i.x,kind:i.kind,val:''}))};renderWords();return}
  if(a==='listpdf'){eePdf('list',b);return}
- if(a==='testpdf'){if(!W.test)W.test=eeMakeTest(Math.floor(1000+Math.random()*9000));if(!W.test){pdfToast('조건에 맞는 단어가 없습니다.');return}eePdf('test',b);return}});
-const EE_PDF_CSS=`.pp{--fs:1}
-.pp .wrp{padding:5px 0 6px;border-bottom:1px solid #ccc;font-size:calc(15px*var(--fs));line-height:1.45}.pp .wrp b{font-size:calc(16.5px*var(--fs))}.pp .wrp i{color:#555;font-size:calc(12.5px*var(--fs));margin:0 6px}
-.pp .wrp .ee{font-size:calc(13.5px*var(--fs));color:#222;margin-top:1px}.pp .blank{display:inline-block;min-width:9em;border-bottom:1px solid #777;height:1.1em;vertical-align:bottom}.pp .blank.l{display:block;width:100%;margin-top:4px}
-.pp .wlh{font:700 calc(17px*var(--fs))/1.3 var(--f-body);margin:6px 0 4px;padding:4px 8px;background:#eee;border-left:5px solid #333}
-.pp .wqp{padding:6px 0 calc(14px*var(--fs));font-size:calc(15px*var(--fs));line-height:1.55}.pp .wqp .n{font-weight:700;margin-right:6px}.pp .wqp .hint{letter-spacing:.12em;color:#666;margin-left:6px;font-size:.92em}
-.pp .wqp .ln{display:block;margin-top:8px;border-bottom:1px solid #777;width:62%;height:1.4em}
-.pp .wsh{font:700 calc(15.5px*var(--fs))/1.4 var(--f-body);margin:8px 0 6px}
-.pp .wans{font-size:calc(14px*var(--fs));padding:3px 0;border-bottom:1px dotted #bbb}.pp .wans b{margin-right:6px}`;
-async function eePdf(kind,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='PDF 만드는 중…'}pdfToast('PDF를 만드는 중입니다…',true);
- const st=document.createElement('style');st.textContent=EE_PDF_CSS;document.head.appendChild(st);let host;
+ if(a==='testpdf'){if(!W.test)eeNew();if(!W.test){pdfToast('조건에 맞는 단어가 없습니다.');return}eePdf('test',b);return}});
+/* --- 인쇄: 표 형식 (A4 세로 1단 / A3 가로 2단), 단마다 머리글 줄 --- */
+const EE_PDF_CSS=`.pp.wp{font-size:13.5px;line-height:1.42;padding:40px 44px 34px}
+.wp .wt{display:grid;border-bottom:1px solid #999;break-inside:avoid}.wp .wt>div{padding:5px 6px;min-width:0;overflow-wrap:anywhere}.wp .wt>div+div{border-left:1px solid #ccc}
+.wp .wt.wq4{grid-template-columns:34px 150px 46px 1fr}.wp .wt.b{grid-template-columns:30px 128px 48px 100px 1fr}.wp .wt.a{grid-template-columns:34px 1fr 1fr}
+.wp .wt.h{background:#ececec;font-weight:700;border-top:2px solid #111;border-bottom:1.5px solid #111;font-size:12.5px}
+.wp .wt .no{text-align:center;color:#444}.wp .wt .ps{text-align:center;font-style:italic;color:#333;font-size:12.5px}.wp .wt .en{font-weight:700;font-size:14.5px}
+.wp .eg{color:#444;font-size:12.5px;margin-top:2px}.wp .wbk{display:inline-block;min-width:5.5em;border-bottom:1px solid #444;height:1em;vertical-align:-1px}
+.wp .lh{font:700 15px/1.3 var(--f-body);margin:10px 0 4px;padding:4px 8px;background:#e6e6e6;border-left:5px solid #333}
+.wp .hint{letter-spacing:.1em;color:#888;font-size:12px}`;
+async function eeBuild(head,sections,fmt){const host=document.createElement('div');host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1';const st=document.createElement('style');st.textContent=PDF_CSS+EE_PDF_CSS;host.appendChild(st);document.body.appendChild(host);
+ const Wd=fmt==='a3'?1587:794,nc=fmt==='a3'?2:1;const pages=[];
+ const mk=(h)=>{const pg=document.createElement('div');pg.className='pp wp';pg.style.width=Wd+'px';pg.style.height='1123px';pg.innerHTML=(h||'')+`<div class="cols">${'<div class="col"></div>'.repeat(nc)}</div><div class="pg"></div>`;host.appendChild(pg);
+  const hd=h?pg.querySelector('.ph').offsetHeight+12:0;pg.style.setProperty('--hd',hd+'px');pages.push(pg);return pg};
+ for(const sec of sections){let pg=mk(sec.headHtml||head),ci=0,col=pg.querySelectorAll('.col')[0];const lim=()=>pg.querySelector('.cols').clientHeight;
+  const add=html=>{const w=document.createElement('div');w.innerHTML=html;const el=w.firstElementChild;col.appendChild(el);return el};
+  const startCol=()=>{if(sec.colHead)add(sec.colHead)};startCol();
+  for(const html of sec.rows){const el=add(html);if(col.scrollHeight>lim()&&col.children.length>(sec.colHead?2:1)){col.removeChild(el);ci++;if(ci>=nc){pg=mk(null);ci=0}col=pg.querySelectorAll('.col')[ci];startCol();col.appendChild(el)}}}
+ pages.forEach((p,i)=>p.querySelector('.pg').textContent=`- ${i+1} / ${pages.length} -`);return{host,pages}}
+async function eePdf(kind,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='PDF 만드는 중…'}pdfToast('PDF를 만드는 중입니다…',true);let host;
  try{await loadPdfLibs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-  const [g,t,ey]=SEMNAME[SEM],lesTxt=eeBook().filter(([c])=>W.les.has(c)).map(([c])=>eeLesName(c).tag).join('·');let head,blocks,ans=null,title;
-  if(kind==='list'){title=`${g} 영어 영영 단어장`+(W.hideKo||W.hideEe?' (학습지)':'');
-   head=`<div class="ph"><div><div class="m">${ey}</div><h1>${title}</h1><div class="m">${SJ.eng.book||''} · ${lesTxt}</div></div>${W.hideKo||W.hideEe?'<div class="nm"><span>반·번호</span><span>이름</span></div>':''}</div>`;
-   const all=eeWords(false);blocks=[];eeBook().filter(([c])=>W.les.has(c)).forEach(([c])=>{const n=eeLesName(c);all.filter(x=>x.code===c).forEach((x,k)=>blocks.push(`<div>${k?'':`<div class="wlh">${n.tag} ${n.name}</div>`}<div class="wrp"><b>${x.w}</b><i>${x.pos}</i>${W.hideKo?'<span class="blank"></span>':x.ko}${x.ee?`<div class="ee">${W.hideEe?'<span class="blank l"></span>':x.ee}</div>`:''}</div></div>`))});
-   if(W.hideKo||W.hideEe)ans=[`<div class="wlh">정답</div>`,...all.map(x=>`<div class="wans"><b>${x.w}</b> ${x.ko}${W.hideEe&&x.ee?` — ${x.ee}`:''}</div>`)]}
-  else{const T0=W.test;title=`${g} 영어 영영 단어 테스트`;
-   head=`<div class="ph"><div><div class="m">${ey}</div><h1>${title}</h1><div class="m">${lesTxt} · 번호 ${T0.seed} · ${T0.items.length}문항</div></div><div class="nm"><span>반·번호</span><span>이름</span><span>점수</span></div></div>`;
-   blocks=[];let sec='';T0.items.forEach((it,i)=>{let hd='';if(it.kind!==sec){sec=it.kind;hd=`<div class="wsh">${'ⅠⅡⅢ'[['ee','sent','ko'].indexOf(sec)]}. ${EE_KNP[sec]}</div>`}
-    blocks.push(`<div>${hd}<div class="wqp"><span class="n">${i+1}.</span>${eePrompt(it,true)}${it.kind!=='ko'&&W.hint?`<span class="hint">${eeHint(it.x.w)}</span>`:''}<span class="ln"></span></div></div>`)});
-   ans=[`<div class="wlh">정답 (번호 ${T0.seed})</div>`,...T0.items.map((it,i)=>`<div class="wans"><b>${i+1}.</b>${it.kind==='ko'?`${it.x.w} — <b>${it.x.ko}</b>`:`<b>${it.x.w}</b> (${it.x.ko})`}</div>`)]}
-  if(W.paper==='a4')st.textContent+=`.pp{--fs:1.38}`;const r=await buildPages(head,blocks,ans);host=r.host;
-  const fmt=W.paper,mm=fmt==='a4'?[297,210]:[420,297];const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'mm',format:fmt,compress:true});
-  for(let i=0;i<r.pages.length;i++){pdfToast(`PDF 만드는 중… ${i+1}/${r.pages.length}쪽`,true);const cv=await html2canvas(r.pages[i],{scale:2,backgroundColor:'#ffffff',logging:false});if(i)doc.addPage(fmt,'landscape');doc.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,mm[0],mm[1])}
+  const [g,t,ey]=SEMNAME[SEM],sel=eeBook().filter(c=>W.les.has(c)),lesTxt=sel.map(c=>eeLesName(c).tag).join('·');const fmt=W.paper;let head,secs,title;
+  const nameBox='<div class="nm"><span>반·번호</span><span>이름</span><span>점수</span></div>';
+  if(kind==='list'){const blank=W.hideEn||W.hideKo||W.hideEe;title=`${g} 영어 단어장`+(blank?' (학습지)':'');
+   head=`<div class="ph"><div><div class="m">${ey}</div><h1>${title}</h1><div class="m">${SJ.eng.book||''} · ${lesTxt}</div></div>${blank?nameBox.replace('<span>점수</span>',''):''}</div>`;
+   const all=eeWords(false),rows=[];const bk='<span class="wbk" style="min-width:100%"></span>';
+   sel.forEach(c=>{const n=eeLesName(c);let k=0;all.filter(x=>x.code===c).forEach(x=>{rows.push(`<div>${k?'':`<div class="lh">${n.tag} ${n.name}</div>`}<div class="wt b"><div class="no">${++k}</div><div class="en">${W.hideEn?'':x.w}</div><div class="ps">${EE_PS[x.pos]}</div><div>${W.hideKo?'':x.ko}</div><div>${W.hideEe?bk:x.ee}<div class="eg">e.g. ${W.hideEn?eeBlank(x.s):eeShow(x)}</div></div></div></div>`)})});
+   secs=[{colHead:'<div class="wt b h"><div>No</div><div>English</div><div>P.o.s</div><div>뜻</div><div>Definition / Example</div></div>',rows}];
+   if(blank){const ah=`<div class="ph"><div><div class="m">${ey}</div><h1>정답 — ${title}</h1><div class="m">${lesTxt}</div></div></div>`;
+    secs.push({headHtml:ah,colHead:'<div class="wt a h"><div>No</div><div>English</div><div>뜻</div></div>',rows:sel.flatMap(c=>{let k=0;const n=eeLesName(c);return all.filter(x=>x.code===c).map(x=>`<div>${k?'':`<div class="lh">${n.tag}</div>`}<div class="wt a"><div class="no">${++k}</div><div class="en">${x.w}</div><div>${x.ko}</div></div></div>`)})})}}
+  else{const T0=W.test;title=`${g} 영어 단어 학습지`;
+   head=`<div class="ph"><div><div class="m">${ey}</div><h1>${title}</h1><div class="m">${lesTxt} · ${EE_KH[W.kind]} · 번호 ${T0.seed} · ${T0.items.length}문항</div></div>${nameBox}</div>`;
+   const rows=T0.items.map((it,i)=>`<div class="wt wq4"><div class="no">${i+1}</div><div>${W.hint?`<span class="hint">${eeHint(it.x.w)}</span>`:''}</div><div class="ps">${EE_PS[it.x.pos]}</div><div>${eeCell(it,true)}</div></div>`);
+   const ah=`<div class="ph"><div><div class="m">${ey}</div><h1>정답 — ${title}</h1><div class="m">번호 ${T0.seed}</div></div></div>`;
+   secs=[{colHead:'<div class="wt wq4 h"><div>No</div><div>English</div><div>P.o.s</div><div>Definition / Example</div></div>',rows},
+    {headHtml:ah,colHead:'<div class="wt a h"><div>No</div><div>English</div><div>뜻</div></div>',rows:T0.items.map((it,i)=>`<div class="wt a"><div class="no">${i+1}</div><div class="en">${it.x.w}${it.x.f&&eeNorm(it.x.f)!==eeNorm(it.x.w)?` <span style="font-weight:400;color:#666">(예문: ${it.x.f})</span>`:''}</div><div>${it.x.ko}</div></div>`)}]}
+  const r=await eeBuild(head,secs,fmt);host=r.host;
+  const {jsPDF}=window.jspdf,mm=fmt==='a3'?[420,297]:[210,297];const doc=new jsPDF({orientation:fmt==='a3'?'landscape':'portrait',unit:'mm',format:fmt,compress:true});
+  for(let i=0;i<r.pages.length;i++){pdfToast(`PDF 만드는 중… ${i+1}/${r.pages.length}쪽`,true);const cv=await html2canvas(r.pages[i],{scale:2,backgroundColor:'#ffffff',logging:false});if(i)doc.addPage(fmt,fmt==='a3'?'landscape':'portrait');doc.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,mm[0],mm[1])}
   const fn=`${title}-${lesTxt}${kind==='test'?'-'+W.test.seed:''}.pdf`.replace(/[\\/:*?"<>|\s()]+/g,'_');const s2=await savePdf(doc.output('blob'),fn);
-  pdfToast(s2==='declined'?'저장을 취소했습니다.':`PDF를 저장했습니다. ${fmt.toUpperCase()} 용지, 가로 방향으로 인쇄하세요.`)}
+  pdfToast(s2==='declined'?'저장을 취소했습니다.':`PDF를 저장했습니다. ${fmt==='a3'?'A3 가로':'A4 세로'}로 인쇄하세요.`)}
  catch(e){pdfToast('PDF를 만들지 못했습니다: '+(e&&e.message||e))}
- finally{if(host)host.remove();st.remove();_pdfBusy=false;if(btn){btn.disabled=false;btn.textContent=lb}}}
+ finally{if(host)host.remove();_pdfBusy=false;if(btn){btn.disabled=false;btn.textContent=lb}}}
 
 /* ===== 탭 ===== */
 function show(tab){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));

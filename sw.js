@@ -1,6 +1,6 @@
 /* 중1 문제은행 PWA Service Worker — SRF 앱과 같은 방식
    네트워크 우선 + 캐시 폴백 (오프라인에서도 마지막으로 받은 화면으로 문제 풀이 가능). */
-const CACHE = 'exam-app-v9';
+const CACHE = 'exam-app-v10';
 self.addEventListener('install', (e) => { self.skipWaiting(); });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
