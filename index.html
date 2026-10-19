@@ -106,6 +106,7 @@ math{font-size:1.08em}
 .wtr .no{font:600 13px var(--f-num);color:var(--muted);text-align:center}.wtr .ps{font-style:italic;font-size:12.5px;color:var(--muted);text-align:center}
 .wtr .dd{font-size:14.5px;line-height:1.5}
 .wtr input.win{width:100%;border:1px solid var(--rule);border-radius:8px;padding:6px 8px;font:500 15px var(--f-body);background:var(--sheet);color:var(--ink)}
+.spk{border:0;background:none;cursor:pointer;font-size:15px;line-height:1;padding:2px 5px;margin-left:4px;border-radius:6px;vertical-align:middle;opacity:.75}.spk:hover,.spk:focus-visible{opacity:1;background:var(--rule)}.spk.sm{font-size:13px}.spk.blk{display:block;margin:0 0 4px -3px}
 .wtr .hint{display:block;font:500 12px var(--f-num);letter-spacing:.08em;color:var(--muted);margin-top:3px}
 .wtr .wa{display:block;font-size:13px;margin-top:3px}
 .wtr.ok input.win{border-color:var(--ok);background:var(--ok-soft)}.wtr.no input.win{border-color:var(--bad);background:var(--bad-soft)}
@@ -5389,7 +5390,7 @@ function renderStats(){const v=$('#v-stats');const A=allS();const rows=SUBS.map(
 $('#v-stats').addEventListener('click',e=>{const b=e.target.closest('[data-act="reset"]');if(!b)return;if(!confirmReset){confirmReset=true;renderStats();return}S={t:{},w:[]};LS.set('m12-rec-'+SK(),S);onRecord();confirmReset=false;renderStats()});
 
 /* ===== 영단어 (교과서 단원 단어 · 단어장 · 표 형식 학습지 · 인쇄) ===== */
-const W={mode:'list',les:null,hideEn:false,hideKo:false,hideEe:false,kind:'both',n:20,hint:false,mix:true,onlyWrong:false,paper:'a4',test:null};
+const W={mode:'list',les:null,hideEn:false,hideKo:false,hideEe:false,kind:'both',n:20,hint:false,audio:false,mix:true,onlyWrong:false,paper:'a4',test:null};
 const eeHas=()=>CUR==='eng'&&typeof EE_BOOK!=='undefined'&&typeof WB!=='undefined'&&!!(EE_BOOK[SEM]||[]).length;
 const eeBook=()=>(typeof EE_BOOK!=='undefined'&&EE_BOOK[SEM])||[];
 const eeWK=()=>'m12-eew-'+SEM;
@@ -5404,6 +5405,15 @@ function eeIsOk(x,v){v=eeNorm(v);if(!v)return false;const c=[x.w,x.f].filter(Boo
 const eeHint=w=>w.split(' ').map(p=>p==='~'?'~':p[0]+' _'.repeat(Math.max(0,p.length-1))).join('   ');
 const eeBlank=s=>s.replace('___','<span class="wbk"></span>');
 const eeShow=x=>EE_fill(x.s,x.f||x.w);
+/* 발음 듣기: 브라우저 내장 음성합성(en-US). 기기에 설치된 음성을 쓰므로 파일·API 불필요 */
+let _vs=[];const _lv=()=>{try{_vs=speechSynthesis.getVoices()}catch(e){}};
+if('speechSynthesis' in window){_lv();speechSynthesis.onvoiceschanged=_lv}
+function speak(t,rate){if(!('speechSynthesis' in window)||!t)return;const S=speechSynthesis;S.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate||.85;
+ const en=_vs.filter(v=>/^en[-_]US/i.test(v.lang));u.voice=en.find(v=>/Google US|Samantha|Aria|Jenny|Natural|Siri/i.test(v.name))||en[0]||_vs.find(v=>/^en/i.test(v.lang))||null;S.speak(u)}
+const eeAtt=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const eeSay=x=>x.w.replace(/~/g,' ').replace(/\s+/g,' ').trim();
+const eeSaySent=x=>x.s?x.s.replace('___',x.f||x.w):'';
+const eeSpk=(t,cls)=>t?`<button type="button" class="spk ${cls||''}" data-say="${eeAtt(t)}" aria-label="발음 듣기" title="발음 듣기">🔊</button>`:'';
 function eeMakeTest(seed){const R=mkR(seed),pool=eeWords(W.onlyWrong);if(!pool.length)return null;
  let pick=W.mix?R.shuffle(pool):pool.slice();pick=pick.slice(0,W.n>0?W.n:pick.length);if(!W.mix)pick.sort((a,b)=>eeBook().indexOf(a.code)-eeBook().indexOf(b.code)||a.i-b.i);
  const items=pick.map(x=>({x,kind:W.kind==='mix'?R.pick(['both','ee','sent','ko']):W.kind,val:''}));return{seed,items,graded:false}}
@@ -5420,30 +5430,30 @@ function renderWords(){const v=$('#v-words');if(!eeHas()){v.innerHTML='';return}
  if(W.mode==='list'){const groups=L.filter(c=>W.les.has(c)).map(c=>[c,all.filter(x=>x.code===c)]);
   v.innerHTML=les+`<div class="bar" style="margin-top:12px"><button class="chip ${W.hideEn?'on':''}" data-hide="En">영어 가리기</button><button class="chip ${W.hideKo?'on':''}" data-hide="Ko">뜻 가리기</button><button class="chip ${W.hideEe?'on':''}" data-hide="Ee">영영 풀이 가리기</button><span class="sp"></span>${paper}<button class="btn" data-wact="listpdf">단어장 PDF</button></div>
   <p class="muted" style="margin:6px 2px 0">가린 칸은 눌러서 하나씩 확인할 수 있습니다. 가린 상태로 PDF를 만들면 빈칸 학습지가 되고 뒤쪽에 정답이 붙습니다. <span class="star">★</span> 테스트에서 틀린 단어</p>`+
-  groups.map(([c,ws])=>{const n=eeLesName(c);let k=0;return `<div class="wsec"><h3>${n.tag} ${n.name}</h3><div class="list wbk-list">${ws.map(x=>`<div class="wrow2"><span class="no">${++k}</span><div class="en"><span class="cv ${W.hideEn?'hid':''}">${x.w}</span>${wr.has(x.w)?' <span class="star">★</span>':''}<i>${EE_PS[x.pos]||x.pos}</i></div><div class="ko"><span class="cv ${W.hideKo?'hid':''}">${x.ko}</span></div><div class="de"><span class="cv ${W.hideEe?'hid':''}">${x.ee}</span><div class="eg">e.g. ${W.hideEn?eeBlank(x.s):eeShow(x)}</div></div></div>`).join('')}</div></div>`}).join('');return}
+  groups.map(([c,ws])=>{const n=eeLesName(c);let k=0;return `<div class="wsec"><h3>${n.tag} ${n.name}</h3><div class="list wbk-list">${ws.map(x=>`<div class="wrow2"><span class="no">${++k}</span><div class="en"><span class="cv ${W.hideEn?'hid':''}">${x.w}</span>${eeSpk(eeSay(x))}${wr.has(x.w)?' <span class="star">★</span>':''}<i>${EE_PS[x.pos]||x.pos}</i></div><div class="ko"><span class="cv ${W.hideKo?'hid':''}">${x.ko}</span></div><div class="de"><span class="cv ${W.hideEe?'hid':''}">${x.ee}</span><div class="eg">e.g. ${W.hideEn?eeBlank(x.s):eeShow(x)}${eeSpk(eeSaySent(x),'sm')}</div></div></div>`).join('')}</div></div>`}).join('');return}
  const wrN=all.filter(x=>wr.has(x.w)).length;
  const cfg=`<div class="cfg" style="margin-top:12px"><div class="bar"><span class="muted">보여 줄 것</span>${['both','ee','sent','ko','mix'].map(k=>`<button class="chip ${W.kind===k?'on':''}" data-wk="${k}">${EE_KH[k]}</button>`).join('')}</div>
- <div class="bar"><span class="muted">문항 수</span>${[10,20,30,0].map(n=>`<button class="chip ${W.n===n?'on':''}" data-wn="${n}">${n||'전체'}</button>`).join('')}<span class="sp"></span><button class="chip ${W.mix?'on':''}" data-wopt="mix">순서 섞기</button><button class="chip ${W.hint?'on':''}" data-wopt="hint">첫 글자 힌트</button>${wrN?`<button class="chip ${W.onlyWrong?'on':''}" data-wopt="onlyWrong">틀린 단어만 (${wrN})</button>`:''}</div>
+ <div class="bar"><span class="muted">문항 수</span>${[10,20,30,0].map(n=>`<button class="chip ${W.n===n?'on':''}" data-wn="${n}">${n||'전체'}</button>`).join('')}<span class="sp"></span><button class="chip ${W.mix?'on':''}" data-wopt="mix">순서 섞기</button><button class="chip ${W.hint?'on':''}" data-wopt="hint">첫 글자 힌트</button><button class="chip ${W.audio?'on':''}" data-wopt="audio">🔊 듣기(받아쓰기)</button>${wrN?`<button class="chip ${W.onlyWrong?'on':''}" data-wopt="onlyWrong">틀린 단어만 (${wrN})</button>`:''}</div>
  <div class="bar"><button class="btn pri" data-wact="make">새 학습지</button><span class="sp"></span>${paper}<button class="btn" data-wact="testpdf">학습지 PDF</button></div></div>`;
  const T0=W.test;if(!T0){v.innerHTML=les+cfg+`<div class="empty" style="margin-top:12px">${all.length?'조건에 맞는 단어가 없습니다.':'단원을 하나 이상 선택해 주세요.'}</div>`;return}
  const g=T0.graded,sc=g?T0.items.filter(i=>i.ok).length:null;
  v.innerHTML=les+cfg+`<div class="sheet" style="margin-top:12px"><div class="ehead"><b>영단어 학습지</b><span class="muted">번호 ${T0.seed} · ${T0.items.length}문항${sc!=null?` · <b>${sc}/${T0.items.length}</b>`:''}</span></div>
  <div class="wtab"><div class="wtr wth"><span>No</span><span>English</span><span>P.o.s</span><span>Definition / Example</span></div>
- ${T0.items.map((it,i)=>{const x=it.x;return `<div class="wtr ${g?(it.ok?'ok':'no'):''}"><span class="no">${i+1}</span><span class="in"><input class="win" data-wi="${i}" value="${(it.val||'').replace(/"/g,'&quot;')}" autocomplete="off" autocapitalize="off" spellcheck="false" ${g?'disabled':''} aria-label="${i+1}번 영어 단어">${W.hint&&!g?`<span class="hint">${eeHint(x.w)}</span>`:''}${g?`<span class="wa">${it.ok?'○':'×'} <b>${x.w}</b></span>`:''}</span><span class="ps">${EE_PS[x.pos]||x.pos}</span><span class="dd">${eeCell(it)}${g?`<div class="eg ans">${x.ko} · ${eeShow(x)}</div>`:''}</span></div>`}).join('')}</div></div>
+ ${T0.items.map((it,i)=>{const x=it.x;return `<div class="wtr ${g?(it.ok?'ok':'no'):''}"><span class="no">${i+1}</span><span class="in">${W.audio?eeSpk(eeSay(x),'blk'):''}<input class="win" data-wi="${i}" value="${(it.val||'').replace(/"/g,'&quot;')}" autocomplete="off" autocapitalize="off" spellcheck="false" ${g?'disabled':''} aria-label="${i+1}번 영어 단어">${W.hint&&!g?`<span class="hint">${eeHint(x.w)}</span>`:''}${g?`<span class="wa">${it.ok?'○':'×'} <b>${x.w}</b></span>`:''}</span><span class="ps">${EE_PS[x.pos]||x.pos}</span><span class="dd">${eeCell(it)}${g?`<div class="eg ans">${x.ko} · ${eeShow(x)}</div>`:''}</span></div>`}).join('')}</div></div>
  <div class="bar" style="margin-top:12px"><span class="sp"></span>${g?`${T0.items.some(i=>!i.ok)?'<button class="btn" data-wact="retry">틀린 단어 다시</button>':''}<button class="btn pri" data-wact="make">새 학습지</button>`:'<button class="btn pri" data-wact="grade">채점하기</button>'}</div>`}
 function eeGrade(){const T0=W.test;if(!T0)return;const wr=new Set(LS.get(eeWK(),[]));
  T0.items.forEach(it=>{it.ok=eeIsOk(it.x,it.val);if(it.ok)wr.delete(it.x.w);else wr.add(it.x.w)});T0.graded=true;LS.set(eeWK(),[...wr]);renderWords()}
 const eeNew=()=>{W.test=eeMakeTest(Math.floor(1000+Math.random()*9000))};
 $('#v-words').addEventListener('input',e=>{const t=e.target;if(t.matches('input.win')&&W.test)W.test.items[+t.dataset.wi].val=t.value});
 $('#v-words').addEventListener('keydown',e=>{const t=e.target;if(e.key!=='Enter'||e.isComposing||!t.matches('input.win'))return;e.preventDefault();const ins=[...document.querySelectorAll('#v-words input.win')],k=ins.indexOf(t);if(ins[k+1])ins[k+1].focus();else t.blur()});
-$('#v-words').addEventListener('click',e=>{const cv=e.target.closest('.cv');if(cv){cv.classList.toggle('hid');return}const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+$('#v-words').addEventListener('click',e=>{const sp=e.target.closest('button.spk');if(sp){speak(sp.dataset.say);return}const cv=e.target.closest('.cv');if(cv){cv.classList.toggle('hid');return}const b=e.target.closest('button');if(!b)return;const d=b.dataset;
  if(d.les){if(d.les==='*')W.les=new Set(eeBook());else{if(W.les.has(d.les)){if(W.les.size>1)W.les.delete(d.les)}else W.les.add(d.les)}LS.set('m12-eel-'+SEM,[...W.les]);W.test=null;if(W.mode==='test')eeNew();renderWords();return}
  if(d.wm){W.mode=d.wm;if(W.mode==='test'&&!W.test)eeNew();renderWords();return}
  if(d.hide){W['hide'+d.hide]=!W['hide'+d.hide];renderWords();return}
  if(d.pp){W.paper=d.pp;renderWords();return}
  if(d.wk){W.kind=d.wk;eeNew();renderWords();return}
  if(d.wn!=null){W.n=+d.wn;eeNew();renderWords();return}
- if(d.wopt){W[d.wopt]=!W[d.wopt];if(d.wopt!=='hint')eeNew();renderWords();return}
+ if(d.wopt){W[d.wopt]=!W[d.wopt];if(d.wopt!=='hint'&&d.wopt!=='audio')eeNew();renderWords();return}
  const a=d.wact;if(a==='make'){eeNew();renderWords();window.scrollTo({top:$('#v-words').offsetTop-60});return}
  if(a==='grade'){eeGrade();return}
  if(a==='retry'){const ws=new Set(W.test.items.filter(i=>!i.ok).map(i=>i.x.w));const t=W.test;W.test={seed:Math.floor(1000+Math.random()*9000),graded:false,items:t.items.filter(i=>ws.has(i.x.w)).map(i=>({x:i.x,kind:i.kind,val:''}))};renderWords();return}
