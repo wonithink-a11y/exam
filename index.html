@@ -106,6 +106,7 @@ math{font-size:1.08em}
 .wtr .no{font:600 13px var(--f-num);color:var(--muted);text-align:center}.wtr .ps{font-style:italic;font-size:12.5px;color:var(--muted);text-align:center}
 .wtr .dd{font-size:14.5px;line-height:1.5}
 .wtr input.win{width:100%;border:1px solid var(--rule);border-radius:8px;padding:6px 8px;font:500 15px var(--f-body);background:var(--sheet);color:var(--ink)}
+.vset{display:grid;gap:8px}.vset>.chip{justify-self:start}.vrow{display:flex;flex-wrap:nowrap;gap:6px;align-items:center;white-space:nowrap}.vrow .muted{min-width:3.2em}
 .spk{border:0;background:none;cursor:pointer;font-size:15px;line-height:1;padding:2px 5px;margin-left:4px;border-radius:6px;vertical-align:middle;opacity:.75}.spk:hover,.spk:focus-visible{opacity:1;background:var(--rule)}.spk.sm{font-size:13px}.spk.blk{display:block;margin:0 0 4px -3px}
 .wtr .hint{display:block;font:500 12px var(--f-num);letter-spacing:.08em;color:var(--muted);margin-top:3px}
 .wtr .wa{display:block;font-size:13px;margin-top:3px}
@@ -5390,7 +5391,7 @@ function renderStats(){const v=$('#v-stats');const A=allS();const rows=SUBS.map(
 $('#v-stats').addEventListener('click',e=>{const b=e.target.closest('[data-act="reset"]');if(!b)return;if(!confirmReset){confirmReset=true;renderStats();return}S={t:{},w:[]};LS.set('m12-rec-'+SK(),S);onRecord();confirmReset=false;renderStats()});
 
 /* ===== 영단어 (교과서 단원 단어 · 단어장 · 표 형식 학습지 · 인쇄) ===== */
-const W={mode:'list',les:null,hideEn:false,hideKo:false,hideEe:false,kind:'both',n:20,hint:false,audio:false,voice:LS.get('m12-eev','f'),spd:(v=>[0.6,0.7,0.85,1].includes(v)?v:0.85)(LS.get('m12-eesp',0.85)),mix:true,onlyWrong:false,paper:'a4',test:null};
+const W={mode:'list',les:null,hideEn:false,hideKo:false,hideEe:false,kind:'both',n:20,hint:false,audio:false,voice:LS.get('m12-eev','f'),vopen:false,spd:(v=>[0.6,0.7,0.85,1].includes(v)?v:0.85)(LS.get('m12-eesp',0.85)),mix:true,onlyWrong:false,paper:'a4',test:null};
 const eeHas=()=>CUR==='eng'&&typeof EE_BOOK!=='undefined'&&typeof WB!=='undefined'&&!!(EE_BOOK[SEM]||[]).length;
 const eeBook=()=>(typeof EE_BOOK!=='undefined'&&EE_BOOK[SEM])||[];
 const eeWK=()=>'m12-eew-'+SEM;
@@ -5436,8 +5437,9 @@ const EE_KH={both:'영영 풀이 + 예문',ee:'영영 풀이만',sent:'예문 �
 function renderWords(){const v=$('#v-words');if(!eeHas()){v.innerHTML='';return}const L=eeBook(),all=eeWords(false),wr=new Set(LS.get(eeWK(),[]));
  const les=`<div class="cfg"><div class="wl-les"><span class="muted" style="align-self:center">단원</span>${L.map(c=>{const n=eeLesName(c);return `<button class="chip ${W.les.has(c)?'on':''}" data-les="${c}" title="${n.name}">${n.tag}<small>${WB[c].length}</small></button>`}).join('')}<button class="chip" data-les="*">전체</button></div>
  <div class="bar"><button class="chip ${W.mode==='list'?'on':''}" data-wm="list">단어장</button><button class="chip ${W.mode==='test'?'on':''}" data-wm="test">단어 테스트 (학습지)</button><span class="sp"></span><span class="muted">${all.length}단어${wr.size?` · 틀린 단어 ${all.filter(x=>wr.has(x.w)).length}`:''}</span></div>
- <div class="bar"><span class="muted">발음 목소리</span><button class="chip ${W.voice==='f'?'on':''}" data-wv="f">여성 (Bella)</button><button class="chip ${W.voice==='m'?'on':''}" data-wv="m">남성 (Michael)</button><button class="chip ${W.voice==='mix'?'on':''}" data-wv="mix">남·여 섞어서</button></div>
- <div class="bar"><span class="muted">읽는 속도</span>${[0.6,0.7,0.85,1].map(n=>`<button class="chip ${W.spd===n?'on':''}" data-wsp="${n}">${n===1?'보통 1.0×':n+'×'}</button>`).join('')}<span class="muted">숫자가 작을수록 느림</span></div>
+ <div class="vset"><button class="chip ${W.vopen?'on':''}" data-wvt="1" aria-expanded="${W.vopen?'true':'false'}">🔊 발음 설정 <small>${W.voice==='f'?'여성':W.voice==='m'?'남성':'섞어서'} · ${W.spd===1?'1.0':W.spd}×</small> ${W.vopen?'▴':'▾'}</button>
+ ${W.vopen?`<div class="vrow"><span class="muted">목소리</span><button class="chip ${W.voice==='f'?'on':''}" data-wv="f">여성</button><button class="chip ${W.voice==='m'?'on':''}" data-wv="m">남성</button><button class="chip ${W.voice==='mix'?'on':''}" data-wv="mix">섞어서</button></div>
+ <div class="vrow"><span class="muted">속도</span>${[0.6,0.7,0.85,1].map(n=>`<button class="chip ${W.spd===n?'on':''}" data-wsp="${n}">${n===1?'1.0':n}×</button>`).join('')}</div>`:''}</div>
  <p class="muted" style="margin:0">단어는 교과서(2022 개정 동아 윤정미) 각 Lesson의 단어장과 대화문·본문에서 뽑았고, 영영 풀이와 예문은 새로 쓴 것입니다.</p></div>`;
  const paper=`<span class="muted" style="display:inline-flex;gap:6px;align-items:center">용지 <button class="chip ${W.paper==='a4'?'on':''}" data-pp="a4">A4 세로</button><button class="chip ${W.paper==='a3'?'on':''}" data-pp="a3">A3 가로</button></span>`;
  if(W.mode==='list'){const groups=L.filter(c=>W.les.has(c)).map(c=>[c,all.filter(x=>x.code===c)]);
@@ -5464,6 +5466,7 @@ $('#v-words').addEventListener('click',e=>{const sp=e.target.closest('button.spk
  if(d.wm){W.mode=d.wm;if(W.mode==='test'&&!W.test)eeNew();renderWords();return}
  if(d.hide){W['hide'+d.hide]=!W['hide'+d.hide];renderWords();return}
  if(d.pp){W.paper=d.pp;renderWords();return}
+ if(d.wvt){W.vopen=!W.vopen;renderWords();return}
  if(d.wv){W.voice=d.wv;LS.set('m12-eev',d.wv);renderWords();return}
  if(d.wsp){W.spd=+d.wsp;LS.set('m12-eesp',W.spd);renderWords();return}
  if(d.wk){W.kind=d.wk;eeNew();renderWords();return}
