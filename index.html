@@ -5390,7 +5390,7 @@ function renderStats(){const v=$('#v-stats');const A=allS();const rows=SUBS.map(
 $('#v-stats').addEventListener('click',e=>{const b=e.target.closest('[data-act="reset"]');if(!b)return;if(!confirmReset){confirmReset=true;renderStats();return}S={t:{},w:[]};LS.set('m12-rec-'+SK(),S);onRecord();confirmReset=false;renderStats()});
 
 /* ===== 영단어 (교과서 단원 단어 · 단어장 · 표 형식 학습지 · 인쇄) ===== */
-const W={mode:'list',les:null,hideEn:false,hideKo:false,hideEe:false,kind:'both',n:20,hint:false,audio:false,voice:LS.get('m12-eev','f'),mix:true,onlyWrong:false,paper:'a4',test:null};
+const W={mode:'list',les:null,hideEn:false,hideKo:false,hideEe:false,kind:'both',n:20,hint:false,audio:false,voice:LS.get('m12-eev','f'),spd:(v=>[0.6,0.7,0.85,1].includes(v)?v:0.85)(LS.get('m12-eesp',0.85)),mix:true,onlyWrong:false,paper:'a4',test:null};
 const eeHas=()=>CUR==='eng'&&typeof EE_BOOK!=='undefined'&&typeof WB!=='undefined'&&!!(EE_BOOK[SEM]||[]).length;
 const eeBook=()=>(typeof EE_BOOK!=='undefined'&&EE_BOOK[SEM])||[];
 const eeWK=()=>'m12-eew-'+SEM;
@@ -5417,8 +5417,8 @@ if('speechSynthesis' in window){_lv();speechSynthesis.onvoiceschanged=_lv}
 function speak(t,rate){if(!('speechSynthesis' in window)||!t)return;const S=speechSynthesis;S.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate||.85;
  const en=_vs.filter(v=>/^en[-_]US/i.test(v.lang));u.voice=en.find(v=>/Google US|Samantha|Aria|Jenny|Natural|Siri/i.test(v.name))||en[0]||_vs.find(v=>/^en/i.test(v.lang))||null;S.speak(u)}
 function say(t,code){if(!t)return;code=_ALI[code]||code;_tok++;const tok=_tok;if('speechSynthesis' in window)speechSynthesis.cancel();if(!_A)_A=new Audio();try{_A.pause()}catch(e){}
- const clip=P=>{const b=P&&P[eeKey(t)];if(!b){speak(t);return}_A.src='data:audio/mpeg;base64,'+b;const p=_A.play();if(p&&p.catch)p.catch(()=>{})};
- if(!code){speak(t);return}const v=audVoice(t),pk=_PK[v+code];if(pk){clip(pk);return}
+ const clip=P=>{const b=P&&P[eeKey(t)];if(!b){speak(t,W.spd);return}_A.src='data:audio/mpeg;base64,'+b;_A.defaultPlaybackRate=W.spd;_A.playbackRate=W.spd;_A.preservesPitch=true;const p=_A.play();if(p&&p.catch)p.catch(()=>{})};
+ if(!code){speak(t,W.spd);return}const v=audVoice(t),pk=_PK[v+code];if(pk){clip(pk);return}
  try{_A.src=_SIL;const p=_A.play();if(p&&p.catch)p.catch(()=>{})}catch(e){} /* iOS: 사용자 터치 안에서 재생을 한 번 열어 둠 */
  audLoad(code,v).then(P=>{if(tok===_tok)clip(P)})}
 const eeAtt=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
@@ -5437,6 +5437,7 @@ function renderWords(){const v=$('#v-words');if(!eeHas()){v.innerHTML='';return}
  const les=`<div class="cfg"><div class="wl-les"><span class="muted" style="align-self:center">단원</span>${L.map(c=>{const n=eeLesName(c);return `<button class="chip ${W.les.has(c)?'on':''}" data-les="${c}" title="${n.name}">${n.tag}<small>${WB[c].length}</small></button>`}).join('')}<button class="chip" data-les="*">전체</button></div>
  <div class="bar"><button class="chip ${W.mode==='list'?'on':''}" data-wm="list">단어장</button><button class="chip ${W.mode==='test'?'on':''}" data-wm="test">단어 테스트 (학습지)</button><span class="sp"></span><span class="muted">${all.length}단어${wr.size?` · 틀린 단어 ${all.filter(x=>wr.has(x.w)).length}`:''}</span></div>
  <div class="bar"><span class="muted">발음 목소리</span><button class="chip ${W.voice==='f'?'on':''}" data-wv="f">여성 (Bella)</button><button class="chip ${W.voice==='m'?'on':''}" data-wv="m">남성 (Michael)</button><button class="chip ${W.voice==='mix'?'on':''}" data-wv="mix">남·여 섞어서</button></div>
+ <div class="bar"><span class="muted">읽는 속도</span>${[0.6,0.7,0.85,1].map(n=>`<button class="chip ${W.spd===n?'on':''}" data-wsp="${n}">${n===1?'보통 1.0×':n+'×'}</button>`).join('')}<span class="muted">숫자가 작을수록 느림</span></div>
  <p class="muted" style="margin:0">단어는 교과서(2022 개정 동아 윤정미) 각 Lesson의 단어장과 대화문·본문에서 뽑았고, 영영 풀이와 예문은 새로 쓴 것입니다.</p></div>`;
  const paper=`<span class="muted" style="display:inline-flex;gap:6px;align-items:center">용지 <button class="chip ${W.paper==='a4'?'on':''}" data-pp="a4">A4 세로</button><button class="chip ${W.paper==='a3'?'on':''}" data-pp="a3">A3 가로</button></span>`;
  if(W.mode==='list'){const groups=L.filter(c=>W.les.has(c)).map(c=>[c,all.filter(x=>x.code===c)]);
@@ -5464,6 +5465,7 @@ $('#v-words').addEventListener('click',e=>{const sp=e.target.closest('button.spk
  if(d.hide){W['hide'+d.hide]=!W['hide'+d.hide];renderWords();return}
  if(d.pp){W.paper=d.pp;renderWords();return}
  if(d.wv){W.voice=d.wv;LS.set('m12-eev',d.wv);renderWords();return}
+ if(d.wsp){W.spd=+d.wsp;LS.set('m12-eesp',W.spd);renderWords();return}
  if(d.wk){W.kind=d.wk;eeNew();renderWords();return}
  if(d.wn!=null){W.n=+d.wn;eeNew();renderWords();return}
  if(d.wopt){W[d.wopt]=!W[d.wopt];if(d.wopt!=='hint'&&d.wopt!=='audio')eeNew();renderWords();return}
