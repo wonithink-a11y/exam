@@ -5734,12 +5734,14 @@ function aiBoxHTML(st){const o=st.kind==='o'&&OV?OV.o:null;
   <div class="ailog">${st.qa.map(m=>`<div class="aimsg me">${aiEsc(m.q)}</div>${m.a!=null?`<div class="aimsg t">${aiFmt(m.a)}</div>`:''}${m.err?`<p class="ainote">${aiEsc(m.err)}</p>`:''}`).join('')}${st.busy&&!(st.qa.at(-1)||{}).a?'<div class="aimsg t think">생각하는 중…</div>':''}</div>
   <div class="aiq">${aiQuick(st).map(q=>`<button class="chip" data-aiq="${aiEsc(q)}" ${st.busy?'disabled':''}>${q}</button>`).join('')}</div>
   <div class="aiin"><input id="ait-${hsh(st.key)}" data-aitxt="1" placeholder="궁금한 점을 적어 보세요" autocomplete="off" ${st.busy?'disabled':''}>${st.busy?'<button class="btn sm" data-aix="1">멈추기</button>':'<button class="btn pri sm" data-ais="1">보내기</button>'}</div></div>`}
-function aiAnchor(key){return document.querySelector(`[data-aik="${CSS.escape(key)}"]`)}
-function aiRender(key){const st=AIS.get(key),an=aiAnchor(key);if(!an)return;let box=document.querySelector(`[data-aib="${CSS.escape(key)}"]`);
-  if(!st||!st.open){if(box)box.remove();return}
-  const html=aiBoxHTML(st);if(box){const typed=box.querySelector('[data-aitxt]')?.value||'';box.outerHTML=html;box=document.querySelector(`[data-aib="${CSS.escape(key)}"]`);if(!st.busy&&typed)box.querySelector('[data-aitxt]').value=typed}
+const aiVis=l=>{const a=[...l];return a.find(x=>x.offsetParent!==null)||a[0]};
+function aiAnchor(key){return aiVis(document.querySelectorAll(`[data-aik="${CSS.escape(key)}"]`))}
+const aiBoxes=key=>document.querySelectorAll(`[data-aib="${CSS.escape(key)}"]`);
+function aiRender(key){const st=AIS.get(key),an=aiAnchor(key);if(!an)return;aiBoxes(key).forEach(x=>{if(!st||!st.open||x.offsetParent===null)x.remove()});let box=aiVis(aiBoxes(key));
+  if(!st||!st.open)return;
+  const html=aiBoxHTML(st);if(box){const typed=box.querySelector('[data-aitxt]')?.value||'';box.outerHTML=html;box=aiVis(aiBoxes(key));if(!st.busy&&typed)box.querySelector('[data-aitxt]').value=typed}
   else{an.tagName==='ARTICLE'?an.insertAdjacentHTML('beforeend',html):an.insertAdjacentHTML('afterend',html)}
-  const lg=document.querySelector(`[data-aib="${CSS.escape(key)}"] .ailog`);if(lg)lg.scrollTop=lg.scrollHeight}
+  const lg=aiVis(aiBoxes(key))?.querySelector('.ailog');if(lg)lg.scrollTop=lg.scrollHeight}
 const AI_ERR={rate_limited:'질문이 너무 많아요. 잠시 뒤에 다시 물어보세요.',session_expired:'claude.ai에 다시 로그인한 뒤 물어보세요.',refused:'이 질문에는 답할 수 없어요. 질문을 바꿔 보세요.',empty_completion:'답이 비어 있어요. 질문을 조금 바꿔 보세요.',image_rejected:'사진을 보낼 수 없어요. 문제 내용을 글로 적어 주세요.',prompt_too_large:'대화가 너무 길어요. 닫았다가 다시 열어 새로 물어보세요.'};
 async function aiAsk(key,q){const st=AIS.get(key);if(!st||st.busy||!SAMPLE||!q.trim())return;
   st.qa.push({q:q.trim(),a:null});st.busy=true;st.ctl=new AbortController();aiRender(key);
@@ -5758,8 +5760,8 @@ async function aiAsk(key,q){const st=AIS.get(key);if(!st||st.busy||!SAMPLE||!q.t
   finally{st.busy=false;st.ctl=null;aiRender(key)}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ai],[data-aic],[data-aiq],[data-ais],[data-aix]');if(!b)return;e.stopPropagation();e.preventDefault();
   if(b.dataset.ai){const an=b.closest('[data-aik]');if(!an)return;const key=an.dataset.aik;let st=AIS.get(key);
-    if(!st){st={key,kind:b.dataset.ai,qa:[],open:false,busy:false,page:1,num:''};AIS.set(key,st)}st.open=!st.open;aiRender(key);
-    if(st.open)document.querySelector(`[data-aib="${CSS.escape(key)}"] [data-aitxt]`)?.focus({preventScroll:true});return}
+    if(!st){st={key,kind:b.dataset.ai,qa:[],open:false,busy:false,page:1,num:''};AIS.set(key,st)}const shown=[...aiBoxes(key)].some(x=>x.offsetParent!==null);st.open=shown?false:true;aiRender(key);
+    if(st.open)aiVis(aiBoxes(key))?.querySelector('[data-aitxt]')?.focus({preventScroll:true});return}
   const box=b.closest('[data-aib]');if(!box)return;const key=box.dataset.aib,st=AIS.get(key);if(!st)return;
   if(b.dataset.aic){st.ctl?.abort();st.open=false;aiRender(key);return}
   if(b.dataset.aix){st.ctl?.abort();return}
@@ -5770,7 +5772,7 @@ document.addEventListener('input',e=>{const t=e.target;const box=t.closest&&t.cl
   if(t.dataset.ainum)st.num=t.value;if(t.dataset.aipg)st.page=+t.value},true);
 document.addEventListener('change',e=>{const t=e.target;const box=t.closest&&t.closest('[data-aib]');if(!box)return;const st=AIS.get(box.dataset.aib);if(st&&t.dataset.aipg)st.page=+t.value},true);
 /* 화면이 다시 그려져도 열어 둔 대화를 다시 붙임 */
-new MutationObserver(()=>{for(const [k,st] of AIS){if(st.open&&aiAnchor(k)&&!document.querySelector(`[data-aib="${CSS.escape(k)}"]`))aiRender(k)}}).observe(document.querySelector('.wrap'),{childList:true,subtree:true});
+new MutationObserver(()=>{for(const [k,st] of AIS){const an=st.open&&aiAnchor(k);if(an&&an.offsetParent!==null&&![...aiBoxes(k)].some(x=>x.offsetParent!==null))aiRender(k)}}).observe(document.querySelector('.wrap'),{childList:true,subtree:true});
 
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
