@@ -80,6 +80,8 @@ math{font-size:1.08em}
 .subj [data-sub="kor"]{--b:var(--kor)} .subj [data-sub="eng"]{--b:var(--eng)} .subj [data-sub="math"]{--b:var(--math)} .subj [data-sub="sci"]{--b:var(--sci)}
 .subj [data-sub="soc"]{--b:var(--soc)} .subj [data-sub="eth"]{--b:var(--eth)} .subj [data-sub="tech"]{--b:var(--tech)} .subj [data-sub="info"]{--b:var(--info)}
 .data.code{white-space:pre;overflow-x:auto;font-size:13px;line-height:1.6}
+.es{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:14px 16px;margin-bottom:12px}.es .est{font-size:12.5px;color:var(--muted);margin-bottom:6px}.es .esq{font-weight:600;line-height:1.6}.es .escd{margin:8px 0;padding:8px 12px;border:1px solid var(--rule);border-radius:10px;font-size:13.5px;line-height:1.6}.es textarea{width:100%;min-height:90px;border:1px solid var(--rule);border-radius:10px;padding:8px 10px;font:inherit;background:var(--sheet);color:inherit;box-sizing:border-box}.es .esr{margin-top:10px;font-size:13.5px;line-height:1.7}.es .esr .ok{color:#1a7f4b;font-weight:700}.es .esr .no{color:#c0392b;font-weight:700}.es .esm{margin-top:6px;padding:8px 12px;background:var(--chip);border-radius:10px}
+.dday{font-weight:700;color:var(--ac,#c0392b)}.plan{margin-bottom:12px}.plan input[type=date]{font:inherit;padding:3px 6px}
 .hmeta{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding-top:2px;font-size:13px;color:var(--muted)}
 .namebox{display:flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
 .namebox input{border:1px solid var(--rule);border-radius:8px;background:var(--sheet);width:7.5em;font:inherit;padding:3px 8px;color:var(--ink)}
@@ -294,7 +296,7 @@ b.src{color:var(--ac);font-weight:600}
     <h1 id="htitle">중1 2학기 문제은행</h1>
     <div class="sems" id="sems" role="group" aria-label="학년·학기"></div>
     <div class="subj" id="subj" role="group" aria-label="과목"></div>
-    <div class="hmeta"><span id="hinfo"></span>
+    <div class="hmeta"><span id="hinfo"></span><span id="dday" class="dday" hidden></span>
       <label class="namebox" for="nm">이름 <input id="nm" autocomplete="off"></label></div>
   </header>
 
@@ -305,6 +307,7 @@ b.src{color:var(--ac);font-weight:600}
     <button role="tab" data-tab="review" aria-selected="false">오답노트</button>
     <button role="tab" data-tab="stats" aria-selected="false">단원 현황</button>
     <button role="tab" data-tab="words" aria-selected="false" id="tabWords" hidden>영단어</button>
+    <button role="tab" data-tab="essay" aria-selected="false" id="tabEssay" hidden>서술형</button>
   </nav>
 
   <details class="scope" id="scope" open>
@@ -319,6 +322,7 @@ b.src{color:var(--ac);font-weight:600}
   <section id="v-review" hidden></section>
   <section id="v-stats" hidden></section>
   <section id="v-words" hidden></section>
+  <section id="v-essay" hidden></section>
 
   <p class="foot">문항은 교과서 단원과 시중 심화 유형을 본떠 새로 만든 연습 문제입니다(교과서·문제집 본문 수록 아님). 계산·그림 문제는 숫자와 그림이 매번 바뀌고, [심화] 표시 유형이 상 난이도입니다. 풀이 기록은 기기마다 저장되고, 단원 현황에서 모든 기기의 기록을 합쳐 볼 수 있습니다.</p>
 </div>
@@ -1284,7 +1288,7 @@ S.units=[
  {id:'S7',tag:'Ⅶ',name:'태양계',subs:[['K12','태양계 구성 천체와 태양의 활동'],['K13','지구와 달의 운동']]}];
 const ord={};let n=0;S.units.forEach(u=>u.subs.forEach(s=>{ord[s[0]]=n++}));
 S.T.sort((a,b)=>(ord[a.u]??99)-(ord[b.u]??99)||a.lv-b.lv);
-S.presets=[['전 단원',null],['Ⅲ~Ⅳ',['K5','K5b','K6','K7','K7b']],['Ⅳ~Ⅶ',['K6','K7','K7b','K8','K9','K9b','K10','K11','K12','K13']],['Ⅴ~Ⅶ',['K8','K9','K9b','K10','K11','K12','K13']]];
+S.presets=[['전 단원',null],['Ⅲ~Ⅳ',['K5','K5b','K6','K7','K7b']],['Ⅳ~Ⅶ',['K6','K7','K7b','K8','K9','K9b','K10','K11','K12','K13']],['기말(Ⅴ~Ⅶ)',['K8','K9','K9b','K10','K11','K12','K13']]];
 S.book='미래엔 과학 1 (김태일 · 2022 개정)';
 S.def=['K6','K7','K7b','K8','K9','K9b','K10','K11','K12','K13'];
 })();
@@ -2788,9 +2792,95 @@ M.units=[
  {id:'II',tag:'Ⅵ',name:'평면도형의 성질',subs:[['B1','다각형의 대각선·내각·외각'],['B2','원과 부채꼴 · 호의 길이와 넓이']]},
  {id:'III',tag:'Ⅶ',name:'입체도형의 성질',subs:[['C1','다면체와 회전체'],['C2','기둥·뿔·구의 겉넓이와 부피']]},
  {id:'IV',tag:'Ⅷ',name:'자료의 정리와 해석',subs:[['D1','대푯값 · 줄기와 잎 그림'],['D2','도수분포표·히스토그램·상대도수']]}];
-M.presets=[['2학기 전체',null],['기말(Ⅵ~Ⅷ)',['B1','B2','C1','C2','D1','D2']],['Ⅴ~Ⅵ(도형)',['A1','A2','A3','B1','B2']],['Ⅶ~Ⅷ',['C1','C2','D1','D2']]];
+M.presets=[['2학기 전체',null],['기말(작도·합동~통계)',['A3','B1','B2','C1','C2','D1','D2']],['Ⅴ~Ⅵ(도형)',['A1','A2','A3','B1','B2']],['Ⅶ~Ⅷ',['C1','C2','D1','D2']]];
 M.book='동아 수학 1 (강옥기 · 2022 개정)';
 SUBJ.eng.book='동아 영어 1 (윤정미 · 2022 개정) · Lesson 5–8';
+})();
+
+/* ===== 조건형 서술 문항 (자체 제작) — 기말 범위: 수학 작도·합동~통계, 과학 Ⅴ~Ⅶ =====
+   SUBJ.<과목>.essay=[{id,u,name,pts,q,conds[],kw[[필수용어(동의어…)]],model,fig?}]
+   kw: 답안에 들어가야 할 용어 묶음(묶음마다 하나라도 있으면 인정). 채점은 용어 포함 확인 + 스스로 채점. */
+(function(){
+const E=(s,list)=>{SUBJ[s].essay=(SUBJ[s].essay||[]).concat(list)};
+E('sci',[
+{id:'ES-K8a',u:'K8',name:'힘의 평형',pts:5,
+ q:'줄다리기에서 양쪽이 같은 크기의 힘으로 줄을 당겨 줄이 움직이지 않았다. 이때 줄에 작용하는 두 힘의 관계를 <조건>에 맞게 서술하시오.',
+ conds:['힘의 평형 상태라는 말을 포함할 것 (2점)','두 힘의 크기, 방향, 합력 용어를 모두 포함하여 문장으로 서술할 것 (3점)'],
+ kw:[['힘의 평형'],['크기'],['방향'],['합력']],
+ model:'두 힘은 크기가 같고 방향이 반대이므로 합력이 0이 되어 줄은 힘의 평형 상태에 있다.'},
+{id:'ES-K9a',u:'K9',name:'무게와 질량',pts:5,
+ q:'우주인이 지구에서 60 kg인 몸으로 달에 갔더니 저울(용수철저울)에 표시되는 값이 작아졌다. 이 까닭을 <조건>에 맞게 서술하시오.',
+ conds:['질량과 무게의 변화 여부를 각각 쓸 것 (2점)','중력 용어를 포함하여 까닭을 서술할 것 (3점)'],
+ kw:[['질량'],['무게'],['중력'],['변하지 않','일정','같']],
+ model:'질량은 장소가 달라져도 변하지 않지만, 달의 중력이 지구의 중력보다 작아서 무게는 작아진다.'},
+{id:'ES-K9b',u:'K9b',name:'마찰력',pts:5,
+ q:'빗길에서 자동차가 미끄러지기 쉬운 까닭과 이를 줄이기 위한 방법을 <조건>에 맞게 서술하시오.',
+ conds:['마찰력 용어를 포함하여 까닭을 서술할 것 (3점)','마찰력을 크게 하는 방법 한 가지를 쓸 것 (2점)'],
+ kw:[['마찰력'],['작아','줄어','감소','약'],['타이어','홈','접촉면','거칠','체인']],
+ model:'빗길에서는 물 때문에 타이어와 도로 사이의 마찰력이 작아져 미끄러지기 쉽다. 타이어 홈을 깊게 하거나 체인을 감아 접촉면을 거칠게 하면 마찰력이 커진다.'},
+{id:'ES-K10a',u:'K10',name:'보일 법칙',pts:5,
+ q:'과자 봉지를 가지고 높은 산에 올라가면 봉지가 부풀어 오른다. 그 까닭을 <조건>에 맞게 서술하시오.',
+ conds:['기체의 압력과 부피의 관계를 포함할 것 (3점)','높이 올라갈수록 달라지는 것을 포함할 것 (2점)'],
+ kw:[['압력'],['부피'],['낮아','작아','감소','줄어'],['반비례','커','증가','늘어']],
+ model:'높이 올라갈수록 대기압(바깥 압력)이 낮아지고, 온도가 일정할 때 기체의 압력이 낮아지면 부피가 커지므로(보일 법칙) 봉지가 부푼다.'},
+{id:'ES-K11a',u:'K11',name:'샤를 법칙',pts:5,
+ q:'찌그러진 탁구공을 뜨거운 물에 넣으면 펴진다. 그 까닭을 입자의 운동과 관련지어 <조건>에 맞게 서술하시오.',
+ conds:['온도, 부피, 압력 용어를 모두 포함할 것 (3점)','입자의 운동 용어를 포함하여 문장으로 서술할 것 (2점)'],
+ kw:[['온도'],['부피'],['압력'],['운동']],
+ model:'온도가 높아지면 공 속 기체 입자의 운동이 활발해져 입자가 벽에 충돌하는 횟수가 늘어 압력이 커지고, 압력이 일정하게 유지되려고 부피가 늘어나 찌그러진 부분이 펴진다.'},
+{id:'ES-K12a',u:'K12',name:'태양 활동',pts:5,
+ q:'흑점의 수가 많은 시기에 지구에서 일어나는 현상을 <조건>에 맞게 서술하시오.',
+ conds:['흑점의 온도를 주변과 비교하여 쓸 것 (2점)','태양 활동과 지구에 미치는 영향(오로라, 통신 장애 등)을 한 가지 이상 서술할 것 (3점)'],
+ kw:[['낮'],['태양 활동','활발'],['오로라','통신','전파','자기','정전']],
+ model:'흑점은 주변보다 온도가 낮아 어둡게 보이며, 흑점이 많을 때는 태양 활동이 활발하여 오로라가 자주 나타나고 통신 장애가 생길 수 있다.'},
+{id:'ES-K13a',u:'K13',name:'달의 위상',pts:5,
+ q:'달은 매일 모양이 다르게 보인다. 그 까닭을 <조건>에 맞게 서술하시오.',
+ conds:['지구, 달, 태양 용어를 모두 포함할 것 (3점)','달의 공전 용어를 포함하여 위상이 변하는 까닭을 서술할 것 (2점)'],
+ kw:[['지구'],['달'],['태양'],['공전'],['위치','위상']],
+ model:'달은 지구 둘레를 공전하면서 태양, 지구, 달의 위치 관계가 달라지므로 지구에서 보이는 달의 밝은 부분의 모양(위상)이 달라진다.'}
+]);
+E('math',[
+{id:'ES-A3a',u:'A3',name:'삼각형의 작도',pts:6,
+ q:'세 변의 길이가 각각 4 cm, 7 cm, 12 cm일 때 삼각형을 만들 수 없는 까닭을 <조건>에 맞게 서술하시오.',
+ conds:['삼각형의 세 변의 길이 사이의 관계를 이용할 것 (3점)','가장 긴 변과 나머지 두 변의 길이의 합을 비교하여 쓸 것 (3점)'],
+ kw:[['가장 긴','12'],['합','11','4+7','4 + 7'],['작','크','보다','<']],
+ model:'삼각형이 되려면 (가장 긴 변의 길이) < (나머지 두 변의 길이의 합)이어야 한다. 그런데 4+7=11 < 12 이므로 삼각형을 만들 수 없다.'},
+{id:'ES-A3b',u:'A3',name:'삼각형의 합동 조건',pts:6,
+ q:'△ABC와 △DEF에서 AB=DE, BC=EF, ∠B=∠E일 때 두 삼각형이 합동인 까닭을 <조건>에 맞게 서술하시오.',
+ conds:['합동 조건의 이름을 쓸 것 (3점)','대응하는 변과 각을 이용하여 서술할 것 (3점)'],
+ kw:[['SAS'],['두 변','끼인각','AB','BC'],['합동']],
+ model:'두 변의 길이가 각각 같고 그 끼인각의 크기가 같으므로(SAS 합동) △ABC ≡ △DEF이다.'},
+{id:'ES-B1a',u:'B1',name:'다각형의 내각의 크기의 합',pts:6,
+ q:'정다각형의 한 내각의 크기가 140°일 때 이 도형이 무엇인지 구하는 과정을 <조건>에 맞게 서술하시오.',
+ conds:['한 외각의 크기를 이용할 것 (3점)','외각의 크기의 합이 360°임을 이용하여 변의 수를 구하고 도형의 이름을 쓸 것 (3점)'],
+ kw:[['40'],['360'],['9','구각형']],
+ model:'한 외각의 크기는 180°−140°=40°이다. 정n각형의 외각의 크기의 합은 360°이므로 n=360°÷40°=9이다. 따라서 정구각형이다.'},
+{id:'ES-B2a',u:'B2',name:'부채꼴의 호의 길이와 넓이',pts:6,
+ q:'반지름이 6 cm, 중심각이 60°인 부채꼴의 호의 길이와 넓이를 구하는 과정을 <조건>에 맞게 서술하시오.',
+ conds:['공식 l=2πr×(중심각/360°)를 이용하여 호의 길이를 구할 것 (3점)','공식 S=πr²×(중심각/360°)를 이용하여 넓이를 구할 것 (3점)'],
+ kw:[['2π','2×π','2 × π','2π×6'],['2π cm','2π'],['6π'],['360']],
+ model:'호의 길이 l=2π×6×(60/360)=2π(cm), 넓이 S=π×6²×(60/360)=6π(cm²)이다.'},
+{id:'ES-C1a',u:'C1',name:'정다면체',pts:6,
+ q:'정다면체가 5가지뿐인 까닭을 <조건>에 맞게 서술하시오.',
+ conds:['한 꼭짓점에 모인 면의 개수와 꼭짓점에서 각의 크기의 합 용어를 포함할 것 (3점)','정다면체가 되기 위한 조건(합이 360°보다 작아야 함)을 쓸 것 (3점)'],
+ kw:[['꼭짓점'],['면'],['360'],['작','미만']],
+ model:'다면체의 한 꼭짓점에 모인 각의 크기의 합은 360°보다 작아야 한다. 이 조건을 만족하는 정다각형의 면의 모양과 개수는 정삼각형 3·4·5개, 정사각형 3개, 정오각형 3개뿐이므로 정다면체는 5가지이다.'},
+{id:'ES-C2a',u:'C2',name:'기둥의 겉넓이와 부피',pts:6,
+ q:'밑면의 반지름이 3 cm이고 높이가 5 cm인 원기둥의 겉넓이와 부피를 구하는 과정을 <조건>에 맞게 서술하시오.',
+ conds:['겉넓이를 (밑넓이)×2+(옆넓이)로 구할 것 (3점)','부피를 (밑넓이)×(높이)로 구할 것 (3점)'],
+ kw:[['9π'],['30π'],['48π'],['45π']],
+ model:'밑넓이는 π×3²=9π(cm²), 옆넓이는 2π×3×5=30π(cm²)이므로 겉넓이=9π×2+30π=48π(cm²), 부피=9π×5=45π(cm³)이다.'},
+{id:'ES-D1a',u:'D1',name:'대푯값',pts:6,
+ q:'자료 3, 5, 5, 7, 100의 대푯값으로 평균보다 중앙값이 더 적절한 까닭을 <조건>에 맞게 서술하시오.',
+ conds:['평균과 중앙값을 각각 구할 것 (3점)','극단적인 값의 영향 용어를 포함하여 까닭을 서술할 것 (3점)'],
+ kw:[['24'],['5'],['극단','100','매우 큰'],['영향']],
+ model:'평균은 (3+5+5+7+100)÷5=24이고 중앙값은 5이다. 100과 같은 극단적인 값의 영향을 평균은 크게 받지만 중앙값은 받지 않으므로 중앙값이 자료의 중심을 더 잘 나타낸다.'},
+{id:'ES-D2a',u:'D2',name:'상대도수',pts:6,
+ q:'총 도수가 다른 두 집단의 분포를 비교할 때 상대도수를 사용하는 것이 편리한 까닭을 <조건>에 맞게 서술하시오.',
+ conds:['상대도수의 뜻을 쓸 것 (3점)','도수의 총합이 다른 집단 비교와 관련지어 서술할 것 (3점)'],
+ kw:[['총','전체'],['비율','나눈','÷','/'],['비교']],
+ model:'상대도수는 각 계급의 도수를 도수의 총합으로 나눈 값(비율)이다. 도수의 총합이 다른 두 집단은 도수만으로 비교하기 어렵지만 상대도수는 전체에 대한 비율이므로 쉽게 비교할 수 있다.'}
+]);
 })();
 
 /* ===== 중2-1 수학 (동아 수학 2 · 2022 개정, 자체 제작 문항) ===== */
@@ -5151,11 +5241,11 @@ function setSubject(id){CUR=id;OV=null;document.documentElement.dataset.s=id;con
  sel=new Set(LS.get('m12-sel-'+SK(id),null)||(id==='math'&&SEM==='1-2'?LS.get('m12-sel',null):null)||s.def||SUBS);
  LS.set('m12-subj',id);
  $('#subj').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sub===id));
- $('#hinfo').textContent=`${s.book} · ${T.length}개 유형`;
+ $('#hinfo').textContent=`${s.book} · ${T.length}개 유형`;ddBadge();
  $('#presets').innerHTML='<span>빠른 선택</span>'+s.presets.map((p,i)=>`<button class="chip" data-pre="${i}">${p[0]}</button>`).join('')+'<button class="chip" data-pre="none">전체 해제</button><p class="muted" style="margin:6px 0 0;width:100%;font-size:12.5px">단원 이름을 누르면 그 단원 전체가 선택·해제되고, 소단원은 하나씩 눌러 고를 수 있습니다.</p>';
  P.n=0;P.ok=0;P.last=null;renderScope();newPractice();E=null;makeExam(2612,examN,null,null,{save:false});
- const wOn=eeHas();$('#tabWords').hidden=!wOn;document.querySelector('.tabs').classList.toggle('six',wOn);W.test=null;W.les=null;
- const tab=LS.get('m12-tab','practice');if(tab==='words'){show(wOn?'words':'practice')}if(tab==='review')renderReview();if(tab==='stats')renderStats();onSubject(id)}
+ const wOn=eeHas(),eOn=essHas();$('#tabWords').hidden=!wOn;$('#tabEssay').hidden=!eOn;{const tb=document.querySelector('.tabs'),n=5+wOn+eOn;tb.classList.toggle('six',n>=6);tb.style.gridTemplateColumns=n>5?`repeat(${n},1fr)`:''}W.test=null;W.les=null;
+ const tab=LS.get('m12-tab','practice');if(tab==='words'){show(wOn?'words':'practice')}if(tab==='essay'){show(eOn?'essay':'practice')}if(tab==='review')renderReview();if(tab==='stats')renderStats();onSubject(id)}
 function renderSem(){const [g,t,ey]=SEMNAME[SEM];$('#eyebrow').textContent=ey;$('#htitle').textContent=`${g} ${t} 문제은행`;
  $('#sems').innerHTML=Object.keys(SEMS).filter(k=>Object.keys(SEMS[k]).length).map(k=>`<button data-sem="${k}" aria-pressed="${k===SEM}">${SEMNAME[k][0]} ${SEMNAME[k][1]}</button>`).join('');
  $('#subj').innerHTML=ORDER.filter(k=>SJ[k]).map(k=>`<button data-sub="${k}" aria-pressed="false">${SJ[k].name}</button>`).join('')}
@@ -5385,10 +5475,41 @@ $('#v-review').addEventListener('click',e=>{const b=e.target.closest('button');i
 
 /* ===== 단원 현황 ===== */
 let confirmReset=false;
+/* 시험 D-day·학습 계획: 날짜는 학기·과목별로 저장(m12-dday-<SK>), 범위 안 소단원을 약한 순으로 남은 날짜에 나눠 배정 */
+const ddKey=()=>'m12-dday-'+SK();
+function ddLeft(){const d=LS.get(ddKey(),null);if(!d)return null;const t=new Date(d+'T00:00:00'),n=new Date();n.setHours(0,0,0,0);return Math.round((t-n)/864e5)}
+function ddBadge(){const el=$('#dday'),n=ddLeft();el.hidden=n===null;if(n!==null)el.textContent=n>0?'D-'+n:n===0?'D-DAY':'D+'+(-n)}
+function planToday(){const n=ddLeft(),A=allS(),acc={};T.forEach(t=>{const r=A.t[t.id];if(r){const a=acc[t.u]||(acc[t.u]=[0,0]);a[0]+=r[0];a[1]+=r[1]}});
+ const us=SUBS.filter(u=>sel.has(u)).map(u=>({u,n:acc[u]?acc[u][0]:0,p:acc[u]&&acc[u][0]?acc[u][1]/acc[u][0]:-1})).sort((a,b)=>a.p-b.p);
+ const k=Math.max(1,Math.ceil(us.length/Math.max(1,n||1)));return{n,us,today:us.slice(0,k)}}
+function planCard(){const d=LS.get(ddKey(),''),pl=planToday(),n=pl.n;
+ let h=`<div class="scope plan"><div class="bar"><b>📅 시험 D-day</b><input type="date" id="ddIn" value="${d||''}"><span class="sp"></span>${n===null?'':`<b class="dday">${n>0?'D-'+n:n===0?'D-DAY':'시험 종료'}</b>`}</div>`;
+ if(n===null)h+='<p class="muted" style="margin:6px 0 0">시험 날짜를 정하면 출제 범위 소단원을 약한 순서로 남은 날짜에 나눠 오늘 할 범위를 알려 드립니다.</p>';
+ else if(n<0)h+='<p class="muted" style="margin:6px 0 0">날짜가 지났습니다. 새 시험 날짜를 정해 주세요.</p>';
+ else if(!pl.us.length)h+='<p class="muted" style="margin:6px 0 0">출제 범위가 비어 있습니다. 연습·모의고사 탭에서 소단원을 선택하세요.</p>';
+ else h+=`<p style="margin:8px 0 4px;font-size:13.5px">출제 범위 ${pl.us.length}개 소단원 · 하루 약 ${pl.today.length}개씩 · <b>오늘 집중 범위</b></p><div style="display:flex;flex-wrap:wrap;gap:6px">${pl.today.map(x=>`<span class="chip">${SUBNAME[x.u]} <small>${x.n?Math.round(x.p*100)+'%':'미학습'}</small></span>`).join('')}</div><div class="bar" style="margin-top:8px"><button class="btn sm" data-ddgo="1">오늘 범위로 약점 집중 시험</button></div>`;
+ return h+'</div>'}
 function renderStats(){const v=$('#v-stats');const A=allS();const rows=SUBS.map(u=>{let n=0,c=0;T.filter(t=>t.u===u).forEach(t=>{const r=A.t[t.id];if(r){n+=r[0];c+=r[1]}});return{u,n,c}});
- v.innerHTML=`${statsExtra()}<div class="list">${rows.map(r=>{const p=r.n?Math.round(r.c/r.n*100):0;return `<div class="row"><div class="t"><b>${SUBNAME[r.u]}</b><p>${r.n?`${r.n}문제 풀이 · ${r.c}개 정답`:'아직 풀지 않음'}</p><div class="meter"><i class="${p<60?'lo':''}" style="width:${r.n?p:0}%"></i></div></div><div class="num">${r.n?p+'%':'—'}</div></div>`}).join('')}</div>
+ v.innerHTML=`${planCard()}${statsExtra()}<div class="list">${rows.map(r=>{const p=r.n?Math.round(r.c/r.n*100):0;return `<div class="row"><div class="t"><b>${SUBNAME[r.u]}</b><p>${r.n?`${r.n}문제 풀이 · ${r.c}개 정답`:'아직 풀지 않음'}</p><div class="meter"><i class="${p<60?'lo':''}" style="width:${r.n?p:0}%"></i></div></div><div class="num">${r.n?p+'%':'—'}</div></div>`}).join('')}</div>
  <div class="bar" style="margin-top:12px"><span class="muted">정답률 60% 미만은 붉게 표시됩니다.</span><span class="sp"></span><button class="btn sm" data-act="reset">${confirmReset?`${SJ[CUR].name} 기록을 지울까요? 한 번 더 누르기`:'이 과목 기록 초기화'}</button></div>`}
-$('#v-stats').addEventListener('click',e=>{const b=e.target.closest('[data-act="reset"]');if(!b)return;if(!confirmReset){confirmReset=true;renderStats();return}S={t:{},w:[]};LS.set('m12-rec-'+SK(),S);onRecord();confirmReset=false;renderStats()});
+$('#v-stats').addEventListener('change',e=>{if(e.target.id==='ddIn'){LS.set(ddKey(),e.target.value||null);ddBadge();renderStats()}});
+$('#v-stats').addEventListener('click',e=>{if(e.target.closest('[data-ddgo]')){sel=new Set(planToday().today.map(x=>x.u));renderScope();weakExam(examN);show('exam');return}const b=e.target.closest('[data-act="reset"]');if(!b)return;if(!confirmReset){confirmReset=true;renderStats();return}S={t:{},w:[]};LS.set('m12-rec-'+SK(),S);onRecord();confirmReset=false;renderStats()});
+
+/* ===== 서술형 (조건형 서술: 용어 포함 확인 + 모범답안 + 스스로 채점) ===== */
+const ES={ans:{},done:{}};
+const essHas=()=>!!((SJ[CUR]||{}).essay||[]).length;
+const esEsc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const esKey=()=>'m12-es-'+SK();
+const esCheck=(x,t)=>{t=t.replace(/\s+/g,'').toLowerCase();return x.kw.map(g=>g.some(k=>t.includes(k.replace(/\s+/g,'').toLowerCase())))};
+function renderEssay(){const v=$('#v-essay'),items=SJ[CUR].essay.filter(x=>sel.has(x.u)),rec=LS.get(esKey(),{});
+ v.innerHTML=(items.length?`<p class="muted" style="margin:0 0 10px;font-size:13px">출제 범위 안의 서술형 ${items.length}문항. 조건을 지켜 쓰고 [채점]을 누르면 필요한 용어가 들어갔는지 확인하고 모범답안을 보여 줍니다.</p>`:'<p class="muted">선택한 출제 범위에 서술형 문항이 없습니다.</p>')+items.map(x=>{const d=ES.done[x.id],a=ES.ans[x.id]||'',r=rec[x.id];let res='';
+  if(d){const hit=esCheck(x,a),n=hit.filter(Boolean).length;res=`<div class="esr">필수 용어 <b>${n}/${x.kw.length}</b> · ${x.kw.map((g,i)=>`<span class="${hit[i]?'ok':'no'}">${hit[i]?'✔':'✘'}${esEsc(g[0])}</span>`).join(' ')}<div class="esm"><b>모범답안</b><br>${esEsc(x.model)}</div><div class="bar" style="margin-top:8px"><span class="muted">내 답안과 비교해 스스로 채점</span><span class="sp"></span><button class="btn sm" data-esmk="${x.id}|2">충분히 썼다</button><button class="btn sm" data-esmk="${x.id}|1">일부 빠졌다</button><button class="btn sm" data-esmk="${x.id}|0">다시 공부</button></div></div>`}
+  return `<div class="es"><div class="est">${SUBNAME[x.u]} · ${esEsc(x.name)} · ${x.pts}점${r?` · 최근 ${['다시 공부','일부 빠졌다','충분히 썼다'][r[1]]} (${r[0]}회)`:''}</div><div class="esq">${esEsc(x.q)}</div><div class="escd"><b>&lt;조건&gt;</b><br>${x.conds.map((c,i)=>`${'ㄱㄴㄷㄹ'[i]}. ${esEsc(c)}`).join('<br>')}</div><textarea data-esid="${x.id}" placeholder="여기에 답안을 쓰세요">${esEsc(a)}</textarea><div class="bar" style="margin-top:8px"><button class="btn sm" data-esgo="${x.id}">채점</button><button class="btn sm" data-esclr="${x.id}">지우기</button></div>${res}</div>`}).join('')}
+$('#v-essay').addEventListener('input',e=>{const t=e.target.closest('textarea[data-esid]');if(t)ES.ans[t.dataset.esid]=t.value});
+$('#v-essay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.esgo){ES.done[b.dataset.esgo]=true;renderEssay()}
+ else if(b.dataset.esclr){delete ES.ans[b.dataset.esclr];delete ES.done[b.dataset.esclr];renderEssay()}
+ else if(b.dataset.esmk){const[id,m]=b.dataset.esmk.split('|'),rec=LS.get(esKey(),{});rec[id]=[((rec[id]||[0])[0])+1,+m];LS.set(esKey(),rec);renderEssay()}});
 
 /* ===== 영단어 (교과서 단원 단어 · 단어장 · 표 형식 학습지 · 인쇄) ===== */
 const W={mode:'list',les:null,hideEn:false,hideKo:false,hideEe:false,kind:'both',n:20,hint:false,audio:false,voice:LS.get('m12-eev','f'),vopen:false,spd:(v=>[0.6,0.7,0.85,1].includes(v)?v:0.85)(LS.get('m12-eesp',0.85)),mix:true,onlyWrong:false,paper:'a4',test:null};
@@ -5522,8 +5643,8 @@ async function eePdf(kind,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn&&bt
 
 /* ===== 탭 ===== */
 function show(tab){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));
- if(tab==='words'&&!eeHas())tab='practice';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));
- ['practice','exam','jokbo','review','stats','words'].forEach(t=>$('#v-'+t).hidden=t!==tab);if(tab==='words')renderWords();if(tab==='jokbo')renderJokbo();$('#scope').hidden=!(tab==='practice'||tab==='exam');
+ if(tab==='words'&&!eeHas())tab='practice';if(tab==='essay'&&!essHas())tab='practice';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));
+ ['practice','exam','jokbo','review','stats','words','essay'].forEach(t=>$('#v-'+t).hidden=t!==tab);if(tab==='words')renderWords();if(tab==='essay')renderEssay();if(tab==='jokbo')renderJokbo();$('#scope').hidden=!(tab==='practice'||tab==='exam'||tab==='essay');
  if(tab==='review')renderReview();if(tab==='stats'){confirmReset=false;renderStats()}LS.set('m12-tab',tab)}
 document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)show(b.dataset.tab)});
 
