@@ -5316,10 +5316,10 @@ function renderExam(){const v=$('#v-exam');
   score=`<div class="score"><div class="big">${Math.round(ok/E.items.length*100)}<small>점 · ${E.items.length}문항 중 ${ok}개 정답</small></div>
   <div class="omrrow">${E.items.map((i,k)=>`<span class="${okOf(i)?'o':'x'}">${k+1} ${okOf(i)?'○':'×'}</span>`).join('')}</div>
   <div class="muted">${Object.entries(by).map(([u,[n,c]])=>`${SUBNAME[u]} ${c}/${n}`).join(' · ')}</div>
-  <div class="bar">${ok<E.items.length?`<button class="btn pri sm" data-act="retry">틀린 유형 다시 풀기</button>`:''}<button class="btn sm" data-act="copy">시험지·정답 텍스트 복사</button><button class="btn sm" data-act="pdf">A3 시험지 PDF</button></div>${copyBox}</div>`}
+  <div class="bar">${ok<E.items.length?`<button class="btn pri sm" data-act="retry">틀린 유형 다시 풀기</button>`:''}<button class="btn sm" data-act="copy">시험지·정답 텍스트 복사</button><button class="btn sm" data-act="pdf">시험지 PDF</button></div>${copyBox}</div>`}
  v.innerHTML=cfg+`<div style="height:12px"></div>${score}<div class="sheet" style="margin-top:12px"><div class="ehead"><b>${SJ[CUR].name} ${E.label}</b><span class="muted">시험지 번호 ${E.seed} · ${E.items.length}문항</span></div>
  ${E.items.map((it,i)=>qHTML(it,i,{graded:E.graded,lock:true,fold:true})).join('')}</div>
- ${E.graded?'':`<div class="bar" style="margin-top:12px"><span class="tally">${ans}/${E.items.length} 표기</span><span class="sp"></span><button class="btn" data-act="pdf">A3 시험지 PDF</button><button class="btn" data-act="copy">텍스트 복사</button><button class="btn pri" data-act="grade">채점하기</button></div>${copyBox}`}`}
+ ${E.graded?'':popBar()+`<div class="bar" style="margin-top:12px"><span class="tally">${ans}/${E.items.length} 표기</span><span class="sp"></span><button class="btn" data-act="pdf">시험지 PDF</button><button class="btn" data-act="copy">텍스트 복사</button><button class="btn pri" data-act="grade">채점하기</button></div>${copyBox}`}`}
 
 /* ===== A3 시험지 PDF (가로 2단, 정답·풀이는 뒤쪽 별도 페이지) ===== */
 let _pdfL=null;
@@ -5333,6 +5333,8 @@ const PDF_CSS=`.pp{--ink:#111;--muted:#555;--rule:#888;--chip:#f3f3f3;--ac:#333;
 .pp .pq{padding:6px 0 18px;break-inside:avoid}.pp .pqt{font-size:15.5px}.pp .pqt b.n{font-size:17px;margin-right:6px}.pp .po{list-style:none;padding:0;margin:8px 0 0;display:grid;grid-template-columns:1fr;gap:3px 14px}.pp .po.s{grid-template-columns:repeat(3,1fr)}.pp .po li{display:flex;gap:6px}
 .pp .fig{margin:6px 0;display:flex;justify-content:center}.pp .fig svg{max-width:250px;width:250px;height:auto}.pp .psg{max-width:none;font-size:14.5px;line-height:1.7}.pp .tag{display:block;font-size:11.5px;color:#666;margin-bottom:2px}
 .pp .pf{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.92em;line-height:1.15;margin:0 2px}.pp .pf>span:first-child{border-bottom:1px solid currentColor;padding:0 2px}
+.pp{--gap:18px}.pp .pq{padding-bottom:var(--gap)}
+.pp.a4{width:794px;height:1123px;font-size:13px;padding:34px 34px 38px}.pp.a4 .ph h1{font-size:20px}.pp.a4 .ph .m{font-size:12px}.pp.a4 .ph .nm{font-size:12px;gap:5px}.pp.a4 .ph .nm span{min-width:70px;padding:4px 6px}.pp.a4 .cols{gap:24px}.pp.a4 .cols .col+.col{padding-left:24px}.pp.a4 .pqt{font-size:13.5px}.pp.a4 .pqt b.n{font-size:14.5px}.pp.a4 .psg,.pp.a4 .ex{font-size:12.5px}.pp.a4 .fig svg{max-width:190px;width:190px}.pp.a4 .ak{grid-template-columns:repeat(8,1fr)}
 .pp .pg{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:13px;color:#555}
 .pp .ak{display:grid;grid-template-columns:repeat(10,1fr);border:1.5px solid #111;margin-bottom:14px}.pp .ak div{border:1px solid #bbb;text-align:center;padding:4px 0;font-size:15px}.pp .ak b{display:block;font-size:12px;color:#555}
 .pp .ex{font-size:13.5px;line-height:1.55;padding:4px 0 10px}.pp .ex .tw,.pp .pq .tw{overflow:visible}`;
@@ -5341,8 +5343,8 @@ function pqHTML(it,i,ans){const d=it.d,t=TYPE[it.id],C='①②③④⑤';const s
  return `<div class="pq"><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?' · '+it.src:''}</span><div class="pqt"><b class="n">${i+1}.</b>${pFrac(d.q)}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}<ol class="po${short?' s':''}">${d.opts.map((x,j)=>`<li><span>${C[j]}</span><span>${pFrac(x)}</span></li>`).join('')}</ol></div>`}
 function svgInline(root){root.querySelectorAll('svg').forEach(sv=>{const r=sv.getBoundingClientRect();sv.setAttribute('width',Math.round(r.width));sv.setAttribute('height',Math.round(r.height));
  sv.querySelectorAll('*').forEach(el=>{const cs=getComputedStyle(el);['stroke','stroke-width','fill','stroke-dasharray','stroke-linecap','opacity','font-size','font-family','font-weight','text-anchor'].forEach(k=>{const v=cs.getPropertyValue(k);if(v)el.style.setProperty(k,v)})})})}
-async function buildPages(head,blocks,ansBlocks){const host=document.createElement('div');host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1';const st=document.createElement('style');st.textContent=PDF_CSS;host.appendChild(st);document.body.appendChild(host);
- const mk=(withHead)=>{const pg=document.createElement('div');pg.className='pp';pg.innerHTML=(withHead?head:'')+`<div class="cols"><div class="col"></div><div class="col"></div></div><div class="pg"></div>`;host.appendChild(pg);
+async function buildPages(head,blocks,ansBlocks,opt){opt=opt||{};const host=document.createElement('div');host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1';const st=document.createElement('style');st.textContent=PDF_CSS;host.appendChild(st);document.body.appendChild(host);
+ const mk=(withHead)=>{const pg=document.createElement('div');pg.className='pp'+(opt.a4?' a4':'');pg.style.setProperty('--gap',(opt.gap||18)+'px');pg.innerHTML=(withHead?head:'')+`<div class="cols"><div class="col"></div><div class="col"></div></div><div class="pg"></div>`;host.appendChild(pg);
   const hd=withHead?pg.querySelector('.ph').offsetHeight+12:0;pg.style.setProperty('--hd',hd+'px');return pg};
  const pages=[];const flow=(list,first)=>{let pg=mk(first),ci=0,col=pg.querySelectorAll('.col')[0];const lim=()=>pg.querySelector('.cols').clientHeight;pages.push(pg);
   for(const html of list){const w=document.createElement('div');w.innerHTML=html;const el=w.firstElementChild;col.appendChild(el);
@@ -5352,18 +5354,21 @@ async function buildPages(head,blocks,ansBlocks){const host=document.createEleme
 async function savePdf(blob,name){try{const dl=await (window.claude&&window.claude.use?window.claude.use('downloads'):null);if(dl){await dl.save({filename:name,data:blob});return 'saved'}}catch(e){if(e&&e.code==='declined')return 'declined'}
  const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);return 'saved'}
 let _pdfBusy=false;
+const POPT={paper:LS.get('m12-pdfp','a3'),gap:LS.get('m12-pdfg',null)};
+const popGap=()=>POPT.gap!==null?POPT.gap:(CUR==='math'?1:0);
+const popBar=()=>`<div class="bar" style="margin-top:12px;gap:6px"><span class="muted">PDF 용지</span><button class="chip ${POPT.paper==='a3'?'on':''}" data-popt="paper|a3">A3 가로 2단</button><button class="chip ${POPT.paper==='a4'?'on':''}" data-popt="paper|a4">A4 세로 2단</button><span class="muted" style="margin-left:10px">풀이 공간</span>${['없음','보통','넓게'].map((n,i)=>`<button class="chip ${popGap()===i?'on':''}" data-popt="gap|${i}">${n}</button>`).join('')}</div>`;
 async function examPdf(btn){if(_pdfBusy)return;if(!E||!E.items){pdfToast('먼저 시험지를 만들어 주세요.');return}_pdfBusy=true;const lb=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='PDF 만드는 중…'}pdfToast('A3 시험지 PDF를 만드는 중입니다…',true);
  let host;try{await loadPdfLibs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
   const [g,t,ey]=SEMNAME[SEM],nm=SJ[CUR].name;const head=`<div class="ph"><div><div class="m">${ey}</div><h1>${g} ${nm} ${E.label}</h1><div class="m">${SJ[CUR].book||''} · 시험지 번호 ${E.seed} · ${E.items.length}문항</div></div><div class="nm"><span>반·번호</span><span>이름</span><span>점수</span></div></div>`;
   const aHead=`<div class="ph"><div><div class="m">${ey}</div><h1>정답과 풀이 — ${g} ${nm} ${E.label}</h1><div class="m">시험지 번호 ${E.seed}</div></div></div>`;
   const key=`<div class="ak">${E.items.map((it,i)=>`<div><b>${i+1}</b>${'①②③④⑤'[it.d.opts.indexOf(it.d.ans)]}</div>`).join('')}</div>`;
-  const r=await buildPages(head,E.items.map((it,i)=>pqHTML(it,i)),[key,...E.items.map((it,i)=>pqHTML(it,i,true))]);host=r.host;
+  const A4=POPT.paper==='a4',gapPx=[18,A4?56:80,A4?110:150][popGap()];const r=await buildPages(head,E.items.map((it,i)=>pqHTML(it,i)),[key,...E.items.map((it,i)=>pqHTML(it,i,true))],{a4:A4,gap:gapPx});host=r.host;
   // 정답 페이지 머리말 교체
   const qn=r.pages.findIndex((p,i)=>i>0&&p.querySelector('.ak'));if(qn>0){const h=r.pages[qn].querySelector('.ph');if(h)h.outerHTML=aHead}
-  svgInline(host);const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a3',compress:true});
-  for(let i=0;i<r.pages.length;i++){pdfToast(`PDF 만드는 중… ${i+1}/${r.pages.length}쪽`,true);const cv=await html2canvas(r.pages[i],{scale:2,backgroundColor:'#ffffff',logging:false,useCORS:true});if(i)doc.addPage('a3','landscape');doc.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,420,297)}
+  svgInline(host);const {jsPDF}=window.jspdf;const doc=new jsPDF(A4?{orientation:'portrait',unit:'mm',format:'a4',compress:true}:{orientation:'landscape',unit:'mm',format:'a3',compress:true});
+  for(let i=0;i<r.pages.length;i++){pdfToast(`PDF 만드는 중… ${i+1}/${r.pages.length}쪽`,true);const cv=await html2canvas(r.pages[i],{scale:A4?2.4:2,backgroundColor:'#ffffff',logging:false,useCORS:true});if(i)A4?doc.addPage('a4','portrait'):doc.addPage('a3','landscape');doc.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,A4?210:420,297)}
   const fn=`${g}-${t}-${nm}-${E.label}-${E.seed}.pdf`.replace(/[\\/:*?"<>|\s]+/g,'_');const st=await savePdf(doc.output('blob'),fn);
-  pdfToast(st==='declined'?'저장을 취소했습니다.':'PDF를 저장했습니다. A3 용지, 가로 방향으로 인쇄하세요.')}
+  pdfToast(st==='declined'?'저장을 취소했습니다.':(A4?'PDF를 저장했습니다. A4 용지, 세로 방향으로 인쇄하세요.':'PDF를 저장했습니다. A3 용지, 가로 방향으로 인쇄하세요.'))}
  catch(e){pdfToast('PDF를 만들지 못했습니다: '+(e&&e.message||e))}
  finally{if(host)host.remove();_pdfBusy=false;if(btn){btn.disabled=false;btn.textContent=lb}}}
 async function origPdf(o,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn.textContent;btn.disabled=true;btn.textContent='PDF 만드는 중…';
@@ -5492,6 +5497,7 @@ function planCard(){const d=LS.get(ddKey(),''),pl=planToday(),n=pl.n;
 function renderStats(){const v=$('#v-stats');const A=allS();const rows=SUBS.map(u=>{let n=0,c=0;T.filter(t=>t.u===u).forEach(t=>{const r=A.t[t.id];if(r){n+=r[0];c+=r[1]}});return{u,n,c}});
  v.innerHTML=`${planCard()}${statsExtra()}<div class="list">${rows.map(r=>{const p=r.n?Math.round(r.c/r.n*100):0;return `<div class="row"><div class="t"><b>${SUBNAME[r.u]}</b><p>${r.n?`${r.n}문제 풀이 · ${r.c}개 정답`:'아직 풀지 않음'}</p><div class="meter"><i class="${p<60?'lo':''}" style="width:${r.n?p:0}%"></i></div></div><div class="num">${r.n?p+'%':'—'}</div></div>`}).join('')}</div>
  <div class="bar" style="margin-top:12px"><span class="muted">정답률 60% 미만은 붉게 표시됩니다.</span><span class="sp"></span><button class="btn sm" data-act="reset">${confirmReset?`${SJ[CUR].name} 기록을 지울까요? 한 번 더 누르기`:'이 과목 기록 초기화'}</button></div>`}
+$('#v-exam').addEventListener('click',e=>{const b=e.target.closest('button[data-popt]');if(!b)return;e.stopPropagation();const[k,v]=b.dataset.popt.split('|');if(k==='paper'){POPT.paper=v;LS.set('m12-pdfp',v)}else{POPT.gap=+v;LS.set('m12-pdfg',+v)}renderExam()},true);
 $('#v-stats').addEventListener('change',e=>{if(e.target.id==='ddIn'){LS.set(ddKey(),e.target.value||null);ddBadge();renderStats()}});
 $('#v-stats').addEventListener('click',e=>{if(e.target.closest('[data-ddgo]')){sel=new Set(planToday().today.map(x=>x.u));renderScope();weakExam(examN);show('exam');return}const b=e.target.closest('[data-act="reset"]');if(!b)return;if(!confirmReset){confirmReset=true;renderStats();return}S={t:{},w:[]};LS.set('m12-rec-'+SK(),S);onRecord();confirmReset=false;renderStats()});
 
