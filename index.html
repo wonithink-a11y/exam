@@ -5409,7 +5409,7 @@ $('#v-exam').addEventListener('click',e=>{const b=e.target.closest('button');if(
  if(a==='retry'){const wr=E.items.filter(i=>i.d.opts[i.pick]!==i.d.ans).map(i=>i.id);makeExam(Math.floor(1000+Math.random()*9000),wr.length,wr,'오답 유형 시험');return}
  if(a==='copy'){const t=examText();try{navigator.clipboard.writeText(t).then(()=>{b.textContent='복사했습니다'},()=>{E.copy=t;renderExam()})}catch(err){E.copy=t;renderExam()}return}
  if(b.dataset.j!=null&&!E.graded){const it=E.items[+b.dataset.q];it.pick=it.pick===+b.dataset.j?null:+b.dataset.j;
-  document.getElementById('q'+b.dataset.q).querySelectorAll('.opt').forEach((o,j)=>o.classList.toggle('on',it.pick===j));
+  document.querySelector('#v-exam #q'+b.dataset.q).querySelectorAll('.opt').forEach((o,j)=>o.classList.toggle('on',it.pick===j));
   const tl=document.querySelector('#v-exam .tally');if(tl)tl.textContent=`${E.items.filter(i=>i.pick!=null).length}/${E.items.length} 표기`}});
 
 /* ===== 족보 ===== */
