@@ -5286,13 +5286,18 @@ let E=null,examN=LS.get('m12-n',20),examEs=LS.get('m12-esn',0);
 function pickEssays(seed){if(!examEs||typeof essHas!=='function'||!essHas())return[];const pool=SJ[CUR].essay.filter(x=>sel.has(x.u));if(!pool.length)return[];
  return mkR(seed*31+7).shuffle(pool).slice(0,examEs).sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u))}
 const esPts=l=>l.reduce((a,x)=>a+(x.pts||0),0);
+/* 약점 집중: 서술형은 '다시 공부'·'일부 빠졌다'로 표시한 문항 → 아직 안 푼 문항 → 충분히 쓴 문항 순으로 가중 추출 */
+function weakEssays(R,n,all){if(!n||typeof essHas!=='function'||!essHas())return[];const pool=SJ[CUR].essay.filter(x=>all||sel.has(x.u));if(!pool.length)return[];const rec=esRecAll();
+ const w=x=>{const r=rec[x.id];return !r?1:r[1]===0?3:r[1]===1?2:.15};const left=pool.slice(),out=[];
+ while(out.length<n&&left.length){const ws=left.map(w);let t=R.f()*ws.reduce((a,b)=>a+b,0),k=0;while(k<left.length-1&&(t-=ws[k])>0)k++;out.push(left.splice(k,1)[0])}
+ return out.sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u))}
 function pickTypes(R,count,types){const by={};types.forEach(t=>(by[t.u]=by[t.u]||[]).push(t));const keys=SUBS.filter(k=>by[k]);keys.forEach(k=>by[k]=R.shuffle(by[k]));
  const ptr={};const out=[];let ks=R.shuffle(keys);while(out.length<count){for(const k of ks){if(out.length>=count)break;const i=ptr[k]||0;out.push(by[k][i%by[k].length]);ptr[k]=i+1}ks=R.shuffle(keys)}
  return out.sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)||a.lv-b.lv)}
 function makeExam(seed,count,list,label,o){o=o||{};let ids;if(list){ids=list}else{const types=scoped();if(!types.length){E={err:true};renderExam();return}ids=pickTypes(mkR(seed),count,types).map(t=>t.id)}
  const seen=new Set();const items=ids.map((id,i)=>{let s=seed*100+i,d=gen(id,s);for(let k=1;k<10&&seen.has(d.q);k++){s=seed*100+i+k*1000003;d=gen(id,s)}seen.add(d.q);return{id,seed:s,d,pick:null}});
  if(o.srcs)items.forEach((it,i)=>it.src=o.srcs[i]);
- E={seed,label:label||'모의고사',items,graded:false,copy:null,hk:null,es:(list?[]:pickEssays(seed))};
+ E={seed,label:label||'모의고사',items,graded:false,copy:null,hk:null,es:(o.es||(list?[]:pickEssays(seed))),weak:!!o.weakEs,weakAll:!!o.weakAll};
  if(o.save!==false){const H=LS.get('m12-hist-'+SK(),[]);E.hk=Date.now();H.unshift({k:E.hk,seed,label:E.label,ids:items.map(i=>i.id),srcs:o.srcs||null,at:E.hk,score:null});LS.set('m12-hist-'+SK(),H.slice(0,30))}
  renderExam()}
 /* 약점 집중 시험: 틀린 비율·최근 오답·단원 정답률이 낮은 유형과 아직 안 푼 유형을 우선 출제 */
@@ -5307,7 +5312,8 @@ function weakPick(R,count,pool){const A=allS(),un={},recent={};
 function weakExam(count,o){o=o||{};const pool=o.all?T:scoped();if(!pool.length){E={err:true};renderExam();return}
  const picks=weakPick(mkR(Math.floor(Math.random()*1e9)),count,pool).sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)||a.lv-b.lv),A=allS();
  const srcs=picks.map(t=>{const r=A.t[t.id];return r&&r[0]?`${r[0]}번 중 ${r[0]-r[1]}번 틀림`:'아직 안 풀어 봄'});
- makeExam(Math.floor(1000+Math.random()*9000),picks.length,picks.map(t=>t.id),'약점 집중 시험',{srcs})}
+ const sd=Math.floor(1000+Math.random()*9000);
+ makeExam(sd,picks.length,picks.map(t=>t.id),'약점 집중 시험',{srcs,es:weakEssays(mkR(sd*13+5),examEs,!!o.all),weakEs:true,weakAll:!!o.all})}
 function renderExam(){const v=$('#v-exam');
  const cfg=`<div class="cfg"><div class="bar"><span class="muted">문항 수</span>${[10,15,20,25].map(n=>`<button class="chip ${examN===n?'on':''}" data-n="${n}">${n}</button>`).join('')}${(typeof essHas==='function'&&essHas())?`<span class="muted" style="margin-left:10px">서술형</span>${[0,2,3,4].map(n=>`<button class="chip ${examEs===n?'on':''}" data-esn="${n}">${n?n+'문항':'없음'}</button>`).join('')}`:''}</div>
  <div class="bar"><label for="seedIn">시험지 번호 <input id="seedIn" inputmode="numeric" placeholder="자동"></label><span class="sp"></span><button class="btn" data-act="weakmode">약점 집중</button><button class="btn pri" data-act="make">시험지 만들기</button></div>
@@ -5325,8 +5331,8 @@ function renderExam(){const v=$('#v-exam');
  ${E.graded?'':popBar()+`<div class="bar" style="margin-top:12px"><span class="tally">${ans}/${E.items.length} 표기</span><span class="sp"></span><button class="btn" data-act="pdf">시험지 PDF</button><button class="btn" data-act="copy">텍스트 복사</button><button class="btn pri" data-act="grade">채점하기</button></div>${copyBox}`}`}
 
 function esSheet(){if(!E.es||!E.es.length)return'';
- return `<div class="sheet" style="margin-top:12px"><div class="ehead"><b>서술형 ${E.es.length}문항</b><span class="muted">총 ${esPts(E.es)}점 · 답안은 시험지 PDF에 직접 쓰거나 서술형 탭에서 연습</span></div>${E.es.map((x,i)=>`<div class="es" style="border:0;border-top:1px solid var(--rule);border-radius:0;margin:0"><div class="est">서술형 ${i+1} · ${SUBNAME[x.u]} · ${esEsc(x.name)} · ${x.pts}점</div><div class="esq">${esEsc(x.q)}</div><div class="escd"><b>&lt;조건&gt;</b><br>${x.conds.map((c,j)=>`${'ㄱㄴㄷㄹ'[j]}. ${esEsc(c)}`).join('<br>')}</div>${E.graded?`<div class="esm"><b>모범답안</b><br>${esEsc(x.model)}</div>`:''}</div>`).join('')}</div>`}
-$('#v-exam').addEventListener('click',e=>{const b=e.target.closest('button[data-esn]');if(!b)return;e.stopPropagation();examEs=+b.dataset.esn;LS.set('m12-esn',examEs);if(E&&E.items&&!E.graded){E.es=pickEssays(E.seed)}renderExam()},true);
+ return `<div class="sheet" style="margin-top:12px"><div class="ehead"><b>서술형 ${E.es.length}문항</b><span class="muted">총 ${esPts(E.es)}점 · 답안은 시험지 PDF에 직접 쓰거나 서술형 탭에서 연습</span></div>${E.es.map((x,i)=>`<div class="es" style="border:0;border-top:1px solid var(--rule);border-radius:0;margin:0"><div class="est">서술형 ${i+1} · ${SUBNAME[x.u]} · ${esEsc(x.name)} · ${x.pts}점${E.weak?(r=>r?` · 최근 ${['다시 공부','일부 빠졌다','충분히 썼다'][r[1]]}`:' · 아직 안 풀어 봄')(esRecAll()[x.id]):''}</div><div class="esq">${esEsc(x.q)}</div><div class="escd"><b>&lt;조건&gt;</b><br>${x.conds.map((c,j)=>`${'ㄱㄴㄷㄹ'[j]}. ${esEsc(c)}`).join('<br>')}</div>${E.graded?`<div class="esm"><b>모범답안</b><br>${esEsc(x.model)}</div>`:''}</div>`).join('')}</div>`}
+$('#v-exam').addEventListener('click',e=>{const b=e.target.closest('button[data-esn]');if(!b)return;e.stopPropagation();examEs=+b.dataset.esn;LS.set('m12-esn',examEs);if(E&&E.items&&!E.graded){E.es=E.weak?weakEssays(mkR(E.seed*13+5),examEs,E.weakAll):pickEssays(E.seed)}renderExam()},true);
 /* ===== A3 시험지 PDF (가로 2단, 정답·풀이는 뒤쪽 별도 페이지) ===== */
 let _pdfL=null;
 function loadPdfLibs(){return _pdfL||(_pdfL=Promise.all(['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'].map(src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('라이브러리를 불러오지 못했습니다'));document.head.appendChild(s)}))).catch(e=>{_pdfL=null;throw e}))}
