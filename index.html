@@ -5513,8 +5513,9 @@ const ES={ans:{},done:{}};
 const essHas=()=>!!((SJ[CUR]||{}).essay||[]).length;
 const esEsc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const esKey=()=>'m12-es-'+SK();
+let esRecAll=()=>LS.get(esKey(),{});
 const esCheck=(x,t)=>{t=t.replace(/\s+/g,'').toLowerCase();return x.kw.map(g=>g.some(k=>t.includes(k.replace(/\s+/g,'').toLowerCase())))};
-function renderEssay(){const v=$('#v-essay'),items=SJ[CUR].essay.filter(x=>sel.has(x.u)),rec=LS.get(esKey(),{});
+function renderEssay(){const v=$('#v-essay'),items=SJ[CUR].essay.filter(x=>sel.has(x.u)),rec=esRecAll();
  v.innerHTML=(items.length?`<p class="muted" style="margin:0 0 10px;font-size:13px">출제 범위 안의 서술형 ${items.length}문항. 조건을 지켜 쓰고 [채점]을 누르면 필요한 용어가 들어갔는지 확인하고 모범답안을 보여 줍니다.</p>`:'<p class="muted">선택한 출제 범위에 서술형 문항이 없습니다.</p>')+items.map(x=>{const d=ES.done[x.id],a=ES.ans[x.id]||'',r=rec[x.id];let res='';
   if(d){const hit=esCheck(x,a),n=hit.filter(Boolean).length;res=`<div class="esr">필수 용어 <b>${n}/${x.kw.length}</b> · ${x.kw.map((g,i)=>`<span class="${hit[i]?'ok':'no'}">${hit[i]?'✔':'✘'}${esEsc(g[0])}</span>`).join(' ')}<div class="esm"><b>모범답안</b><br>${esEsc(x.model)}</div><div class="bar" style="margin-top:8px"><span class="muted">내 답안과 비교해 스스로 채점</span><span class="sp"></span><button class="btn sm" data-esmk="${x.id}|2">충분히 썼다</button><button class="btn sm" data-esmk="${x.id}|1">일부 빠졌다</button><button class="btn sm" data-esmk="${x.id}|0">다시 공부</button></div></div>`}
   return `<div class="es"><div class="est">${SUBNAME[x.u]} · ${esEsc(x.name)} · ${x.pts}점${r?` · 최근 ${['다시 공부','일부 빠졌다','충분히 썼다'][r[1]]} (${r[0]}회)`:''}</div><div class="esq">${esEsc(x.q)}</div><div class="escd"><b>&lt;조건&gt;</b><br>${x.conds.map((c,i)=>`${'ㄱㄴㄷㄹ'[i]}. ${esEsc(c)}`).join('<br>')}</div><textarea data-esid="${x.id}" placeholder="여기에 답안을 쓰세요">${esEsc(a)}</textarea><div class="bar" style="margin-top:8px"><button class="btn sm" data-esgo="${x.id}">채점</button><button class="btn sm" data-esclr="${x.id}">지우기</button></div>${res}</div>`}).join('')}
@@ -5522,7 +5523,7 @@ $('#v-essay').addEventListener('input',e=>{const t=e.target.closest('textarea[da
 $('#v-essay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.dataset.esgo){ES.done[b.dataset.esgo]=true;renderEssay()}
  else if(b.dataset.esclr){delete ES.ans[b.dataset.esclr];delete ES.done[b.dataset.esclr];renderEssay()}
- else if(b.dataset.esmk){const[id,m]=b.dataset.esmk.split('|'),rec=LS.get(esKey(),{});rec[id]=[((rec[id]||[0])[0])+1,+m];LS.set(esKey(),rec);renderEssay()}});
+ else if(b.dataset.esmk){const[id,m]=b.dataset.esmk.split('|'),rec=LS.get(esKey(),{});rec[id]=[((rec[id]||[0])[0])+1,+m,Date.now()];LS.set(esKey(),rec);onRecord();renderEssay()}});
 
 /* ===== 영단어 (교과서 단원 단어 · 단어장 · 표 형식 학습지 · 인쇄) ===== */
 const W={mode:'list',les:null,hideEn:false,hideKo:false,hideEe:false,kind:'both',n:20,hint:false,audio:false,voice:LS.get('m12-eev','f'),vopen:false,spd:(v=>[0.6,0.7,0.85,1].includes(v)?v:0.85)(LS.get('m12-eesp',0.85)),mix:true,onlyWrong:false,paper:'a4',test:null};
@@ -5779,11 +5780,12 @@ function merged(){const R=REMOTE[SK()]||{},t={},w=[];
  const seen=new Set();const ww=w.sort((a,b)=>b.at-a.at).filter(e=>{const k=e.id+':'+e.seed;if(seen.has(k))return false;seen.add(k);return true}).slice(0,80);
  return{t,w:ww}}
 allS=merged;
-function rerenderShared(){if(!$('#v-stats').hidden)renderStats();if(!$('#v-review').hidden)renderReview()}
+esRecAll=()=>{const mine=LS.get(esKey(),{}),out={},add=r=>{for(const id in r||{}){const x=r[id],o=out[id]||(out[id]=[0,0,0]);o[0]+=x[0];if((x[2]||0)>=o[2]){o[1]=x[1];o[2]=x[2]||0}}};add(mine);Object.values(REMOTE[SK()]||{}).forEach(d=>add(d.E));return out};
+function rerenderShared(){if(!$('#v-stats').hidden)renderStats();if(!$('#v-review').hidden)renderReview();if(!$('#v-essay').hidden)renderEssay()}
 async function pull(subj){if(!fdb)return;try{const doc=await fdb.collection(FB_COL).doc('rec_'+subj).get();const data=doc.exists?doc.data():{};const r={};
  for(const k in data){if(!k.startsWith('d_')||k==='d_'+DEV)continue;try{r[k.slice(2)]=JSON.parse(data[k])}catch(e){}}
  REMOTE[subj]=r;syncState='연결됨';if(subj===SK())rerenderShared()}catch(e){syncState='연결 안 됨 (이 기기 기록만 표시)';rerenderShared()}}
-function push(){if(!fdb)return;clearTimeout(pushTimer);const subj=SK(),payload=JSON.stringify({name:devName(),S,at:Date.now()});
+function push(){if(!fdb)return;clearTimeout(pushTimer);const subj=SK(),payload=JSON.stringify({name:devName(),S,E:LS.get(esKey(),{}),at:Date.now()});
  pushTimer=setTimeout(()=>{fdb.collection(FB_COL).doc('rec_'+subj).set({['d_'+DEV]:payload},{merge:true}).then(()=>{syncState='연결됨'}).catch(()=>{syncState='연결 안 됨 (이 기기 기록만 표시)'})},800)}
 onRecord=push;onSubject=(id)=>pull(SK(id));
 statsExtra=()=>{const R=REMOTE[SK()]||{};const mine=Object.values(S.t).reduce((a,x)=>a+x[0],0);
