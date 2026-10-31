@@ -71,6 +71,7 @@ math{font-size:1.08em}
 .sems button{border:0;background:none;border-radius:999px;padding:4px 13px;font-weight:600;font-size:13px;color:var(--muted);white-space:nowrap}
 .sems button:hover{color:var(--ink)}
 .sems button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.lvl{margin-bottom:2px}.lvl a{border-radius:999px;padding:4px 14px;font-weight:700;font-size:13px;color:var(--muted);text-decoration:none;white-space:nowrap}.lvl a:hover{color:var(--ink)}.lvl a[aria-current="page"]{background:var(--ac);color:#fff}
 .subj{display:flex;flex-wrap:wrap;gap:6px}
 .subj button{--b:var(--ac);border:0;background:var(--sheet);border-radius:999px;padding:6px 14px 6px 11px;font:400 15px/1.2 var(--f-disp);white-space:nowrap;display:inline-flex;align-items:center;gap:7px;color:var(--ink);box-shadow:0 1px 2px rgba(27,31,46,.06)}
 .subj button::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--b);flex:none}
@@ -293,6 +294,7 @@ b.src{color:var(--ac);font-weight:600}
 <body>
 <div class="wrap">
   <header class="head">
+    <nav class="sems lvl" aria-label="학교급"><a href="elem/">초등</a><a href="./" aria-current="page">중등</a></nav>
     <span class="eyebrow" id="eyebrow">2026학년도 2학기 · 기말고사 대비</span>
     <h1 id="htitle">중1 2학기 문제은행</h1>
     <div class="sems" id="sems" role="group" aria-label="학년·학기"></div>
