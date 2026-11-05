@@ -112,7 +112,24 @@ math{font-size:1.08em}
 .nt.hide .f{filter:blur(6px);cursor:pointer;user-select:none}
 .nt.hide .f.on{filter:none}
 .ntnav{margin-bottom:12px;gap:6px}
-@media print{body.ntprint>*:not(.wrap),body.ntprint .wrap>*:not(#v-note),body.ntprint #v-note>.bar,body.ntprint .ntnav,body.ntprint .ntg{display:none!important}body.ntprint #v-note{display:block!important}body.ntprint .nt{border:1px solid #bbb;break-inside:auto}body.ntprint .nt table,body.ntprint .ntw,body.ntprint .ntx,body.ntprint .ntt{break-inside:avoid}body.ntprint .nt .ntb{min-width:0}body.ntprint .tw{overflow:visible}}.tabs.six button{font-size:12.5px;letter-spacing:-.03em;white-space:nowrap;padding:9px 0}
+.nt .ntf{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:0 0 8px;padding:8px 12px;border-left:4px solid var(--ac);background:var(--chip);border-radius:8px}
+.nt .ntfm{font-weight:700;font-size:16px;line-height:1.6}
+.nt .ntfm math{font-size:1.15em}
+.nt .ntfd{font-size:12.5px;color:var(--muted)}
+.nt .ntfigs{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin:4px 0 12px}
+.nt .ntfig{flex-direction:column;align-items:center;gap:6px;border:1px solid var(--rule);border-radius:12px;padding:10px 8px;overflow:visible}
+.nt .ntfig figcaption{font-size:12.5px;color:var(--muted);text-align:center;line-height:1.5}
+.nt .ntfig .tw{width:100%}
+.ntflow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px}
+.ntflow>div{border:1px solid var(--rule);border-radius:8px;padding:6px 10px;background:var(--sheet);font-size:13px;text-align:center;line-height:1.4;max-width:220px}
+.ntflow small{color:var(--muted);font-size:11.5px}
+.ntflow>b{color:var(--ac)}
+.ntflow.v{flex-direction:column}
+.ntsub{margin:6px 0 0;font-size:12.5px;text-align:center}
+.ntbin{font-family:var(--f-num);font-size:14px;line-height:1.7}
+.ntbin span{margin-left:10px;color:var(--ac);font-weight:700}
+.ntbin p{margin:4px 0 0;font-family:var(--f-body);font-size:13px}
+@media print{body.ntprint>*:not(.wrap),body.ntprint .wrap>*:not(#v-note),body.ntprint #v-note>.bar,body.ntprint .ntnav,body.ntprint .ntg{display:none!important}body.ntprint #v-note{display:block!important}body.ntprint .nt{border:1px solid #bbb;break-inside:auto}body.ntprint .nt table,body.ntprint .ntw,body.ntprint .ntx,body.ntprint .ntt,body.ntprint .ntf,body.ntprint .ntfig{break-inside:avoid}body.ntprint .nt .ntb{min-width:0}body.ntprint .tw{overflow:visible}}.tabs.six button{font-size:12.5px;letter-spacing:-.03em;white-space:nowrap;padding:9px 0}
 /* 영단어 */
 .wl-les{display:flex;flex-wrap:wrap;gap:6px}
 .wsec{margin-top:14px}.wsec h3{font:400 17px var(--f-disp);margin:0 0 4px}
@@ -2655,6 +2672,7 @@ function figCourt(bl,ab){const bx=[8,124,240],w=72;let s='';
  CT.forEach((c,i)=>{s+=`<rect x="${bx[i]}" y="54" width="${w}" height="44" rx="8" style="fill:var(--chip);stroke:var(--ink);stroke-width:1.4"/>${txt(bl[i]?`(${LET[i]})`:c,bx[i]+w/2,81,'middle')}${txt(['제1심','제2심','제3심'][i],bx[i]+w/2,44,'middle')}`});
  [0,1].forEach(i=>{const a=bx[i]+w,b=bx[i+1];s+=`<path class="ln" d="M${a+2} 76H${b-2}M${b-9} 71L${b-2} 76L${b-9} 81"/>${txt(ab[i]?`(${LET[i]})`:['항소','상고'][i],(a+b)/2,66,'middle')}`});
  return svg(320,120,s)}
+window.figClim=figClim;window.figCourt=figCourt;window.CLM=CLM;
 G({id:'s11-court',u:'S11',name:'[심화] 3심제 흐름도 해석',lv:3,g:R=>{const mode=R.i(0,2);
  if(mode===0){const i=R.i(0,2),bl=[0,0,0];bl[i]=1;return{q:`그림은 우리나라의 일반적인 3심제를 나타낸 것이다. (${LET[i]})에 들어갈 법원으로 알맞은 것은?`,fig:figCourt(bl,[0,0]),alt:`지방 법원 → 고등 법원 → 대법원 (${LET[i]}가 빈칸)`,...fixed(R.shuffle([...CT,'가정 법원','헌법 재판소']),CT[i]),exp:`제1심은 지방 법원, 제2심은 고등 법원, 제3심은 대법원이다. (가정 법원은 가사 사건을 다루고, 헌법 재판소는 법원이 아니라 헌법 재판을 담당하는 기관이다.) ∴ <b>${CT[i]}</b>`}}
  if(mode===1){const i=R.i(0,1);const ab=[0,0];ab[i]=1;return{q:`그림은 우리나라의 일반적인 3심제를 나타낸 것이다. (${LET[i]})에 들어갈 알맞은 말은?`,fig:figCourt([0,0,0],ab),alt:`제${i+1}심 → 제${i+2}심 불복 절차 (${LET[i]}가 빈칸)`,...fixed(R.shuffle(['항소','상고','항고','기소','재심']),['항소','상고'][i]),exp:`제1심 판결에 불복하여 제2심에 다시 재판을 청구하는 것은 <b>항소</b>, 제2심 판결에 불복하여 제3심에 청구하는 것은 <b>상고</b>이다. (항고는 법원의 결정·명령에 대한 불복 절차이다.) ∴ <b>${['항소','상고'][i]}</b>`}}
@@ -6141,6 +6159,77 @@ N('tech',[
 {id:'N-W4',u:'W4',title:'수송·물류 문제 해결',
  pts:[`스마트 물류: ${F('정보 기술, 자동화, 드론·로봇')}으로 효율을 높임`,`교통 체증·대기 오염 줄이기: ${F('대중교통·자전거 이용 확대')}, 친환경 차량`,`자율 주행 기대 효과: ${F('교통사고 감소, 이동 편의 증대')}`],
  go:['w4-prob']}]);
+/* --- 요점 노트 보강: 공식 상자(fm)와 그림(figs) --- */
+const X=(s,id,o)=>{const n=(SUBJ[s].notes||[]).find(n=>n.id===id);if(n)Object.assign(n,o)};
+const sv=(s,extra)=>s.replace(/<\/svg>$/,extra+'</svg>');
+const FLW=(a)=>`<div class="ntflow">${a.map((t,i)=>(i?'<b>→</b>':'')+`<div>${t}</div>`).join('')}</div>`;
+const nfQuad=()=>{const P=(x,y)=>[150+x*17,140-y*17];return sv(figGrid([[3,2,'A'],[-3,2,'B'],[-3,-2,'C'],[3,-2,'D']],[],6),
+ [['제1사분면','(+, +)',3.5,5],['제2사분면','(−, +)',-3.5,5],['제3사분면','(−, −)',-3.5,-4],['제4사분면','(+, −)',3.5,-4]].map(q=>{const p=P(q[2],q[3]);return `<rect x="${p[0]-34}" y="${p[1]-14}" width="68" height="34" rx="6" style="fill:var(--sheet);opacity:.9"/>`+txt(q[0],p[0],p[1],'middle','v')+txt(q[1],p[0],p[1]+16,'middle')}).join(''))};
+const nfHist=()=>{const F={f:[2,5,8,4,1],s:50,w:10,u:'점'},ox=40,oy=190,W=270,n=5,bw=W/(n+1),ym=10,sy=170/ym;
+ const ps=[[ox,oy],...F.f.map((v,i)=>[ox+bw*(i+1),oy-v*sy]),[ox+bw*(n+1),oy]];
+ return sv(figHist(F,-1),`<path class="arc" style="stroke-width:2" d="M${ps.map(p=>f1(p[0])+' '+f1(p[1])).join('L')}"/>${ps.map(p=>`<circle class="dot" cx="${f1(p[0])}" cy="${f1(p[1])}" r="2.6"/>`).join('')}`)};
+function nfParticles(){let s='';[['고체',10],['액체',120],['기체',230]].forEach(([n,x],k)=>{s+=`<rect x="${x}" y="12" width="90" height="92" rx="6" style="fill:none;stroke:var(--ink);stroke-width:1.4"/>${txt(n,x+45,124,'middle','v')}`;
+ const P=k===0?[...Array(16)].map((_,i)=>[x+18+(i%4)*18,32+Math.floor(i/4)*18]):k===1?[[18,52],[36,48],[56,55],[74,50],[24,70],[44,68],[63,73],[80,68],[16,88],[34,86],[54,90],[72,88]].map(p=>[x+p[0],p[1]]):[[20,30],[66,26],[44,58],[16,84],[74,80]].map(p=>[x+p[0],p[1]]);
+ P.forEach(p=>s+=`<circle cx="${p[0]}" cy="${p[1]}" r="7" style="fill:var(--ac-s);stroke:var(--ink);stroke-width:1"/>`)});return svg(330,132,s)}
+function nfVT(){let s='';[['속력 일정',[0,.5],[1,.5]],['속력 증가',[0,.15],[1,.85]],['속력 감소',[0,.85],[1,.15]]].forEach(([n,a,b],k)=>{const ox=22+k*104,oy=110,W=80,H=86;
+ s+=`<path class="ln" d="M${ox} ${oy-H-4}V${oy}H${ox+W+4}"/><path class="arc" style="stroke-width:2.2" d="M${ox} ${f1(oy-a[1]*H)}L${ox+W} ${f1(oy-b[1]*H)}"/>${txt(n,ox+W/2,oy+34,'middle','v')}${txt('속력',ox+2,14)}${txt('시간',ox+W+4,oy+14,'end')}`});return svg(330,152,s)}
+function nfCharles(){const ox=40,oy=170,W=260;let s=`<path class="ln" d="M${ox} 15V${oy}H${ox+W}"/><path class="arc" style="stroke-width:2.2" d="M${ox} 120L${ox+W-10} 40"/>`;
+ [0,50,100].forEach((t,i)=>s+=txt(t,ox+i*120,oy+15,'middle'));return svg(320,200,s+txt('부피',ox+4,12)+txt('온도(°C)',ox+W,oy+30,'end'))}
+function nfLines(){const R=[['외형선','stroke-width:3'],['숨은선','stroke-width:1.6;stroke-dasharray:8 4'],['중심선','stroke-width:1;stroke-dasharray:16 3 2 3'],['치수선','stroke-width:1'],['치수 보조선','stroke-width:1']];let s='';
+ R.forEach(([n,st],i)=>{const y=22+i*30;s+=txt(n,8,y+4,'','v')+`<path d="M110 ${y}H310" style="fill:none;stroke:var(--ink);${st}"/>`;if(n==='치수선')s+=`<path d="M110 ${y}l8 -4v8zM310 ${y}l-8 -4v8z" style="fill:var(--ink)"/>`});return svg(320,160,s)}
+function nfFlow(){const sh=[['단말','<rect x="-28" y="-14" width="56" height="28" rx="14"/>'],['처리','<rect x="-28" y="-14" width="56" height="28"/>'],['판단','<path d="M0 -18L30 0L0 18L-30 0Z"/>'],['입출력','<path d="M-22 -14H30L22 14H-30Z"/>'],['흐름선','<path d="M-26 0H22M14 -6L24 0L14 6"/>']];
+ return svg(330,80,sh.map(([n,g],i)=>`<g transform="translate(${33+i*66} 28)" style="fill:var(--ac-s);stroke:var(--ink);stroke-width:1.4">${g}</g>${txt(n,33+i*66,68,'middle','v')}`).join(''))}
+function nfPlot(){const P=[['발단',30,150],['전개',100,118],['위기',170,80],['절정',240,28],['결말',305,132]];
+ return svg(330,180,`<path class="ln" d="M14 8V165H322"/>${txt('긴장감',18,12)}<path class="arc" style="stroke-width:2.2" d="M${P.map(p=>p[1]+' '+p[2]).join('L')}"/>${P.map(p=>`<circle class="dot" cx="${p[1]}" cy="${p[2]}" r="3"/>${txt(p[0],p[1],p[0]==='절정'||p[0]==='발단'?p[2]-9:p[2]+20,'middle','v')}`).join('')}`)}
+const nfBin=()=>`<div class="ntbin">${[[41,1],[20,0],[10,0],[5,1],[2,0]].map(([n,r])=>`<div>2 ) ${n}<span>… ${r}</span></div>`).join('')}<div>&nbsp;&nbsp;&nbsp;&nbsp;1</div><p>몫 1부터 나머지를 <b>아래에서 위로</b> 읽으면 <b>101001</b></p></div>`;
+/* 수학 */
+X('math','N-Z1',{figs:[{fig:nfQuad,cap:'사분면과 부호 · A(3, 2)와 대칭인 점: x축 대칭 D, y축 대칭 B, 원점 대칭 C'}]});
+X('math','N-Z2',{fm:[['y = ax','정비례 · x와 y의 비 '+fr('y','x')+'가 a로 일정'],['y = '+fr('a','x'),'반비례 · 곱 xy가 a로 일정']],
+ figs:[{fig:()=>figGrid([[1.5,3,'y = 2x'],[4,-4,'y = −x']],[x=>2*x,x=>-x],6),cap:'정비례: 원점을 지나는 직선 (a > 0 오른쪽 위, a < 0 오른쪽 아래)'},{fig:()=>figGrid([[3,2,'y = 6/x'],[-6,1,'y = −6/x']],[x=>6/x,x=>-6/x],6),cap:'반비례: 좌표축에 가까워지는 한 쌍의 곡선'}]});
+X('math','N-A1',{fm:[[`(직선의 개수) = (선분의 개수) = ${fr('n(n − 1)',2)}`,'어느 세 점도 한 직선 위에 있지 않은 n개의 점'],['(반직선의 개수) = n(n − 1)','']],figs:[{fig:()=>figVert('a','b'),cap:'맞꼭지각: ∠a = ∠b'}]});
+X('math','N-A2',{figs:[{fig:()=>figPar([{t:'a',pos:'ur',pt:1},{t:'b',pos:'ur',pt:2}]),cap:'동위각 (같은 위치) · l ∥ m이면 ∠a = ∠b'},{fig:()=>figPar([{t:'a',pos:'dr',pt:1},{t:'b',pos:'ul',pt:2}]),cap:'엇각 (엇갈린 위치) · l ∥ m이면 ∠a = ∠b'}]});
+X('math','N-A3',{fm:[['|a − b| < x < a + b','두 변이 a, b일 때 나머지 한 변 x의 범위']]});
+X('math','N-B1',{fm:[['(내각의 합) = 180° × (n − 2)','n각형'],[`(대각선의 개수) = ${fr('n(n − 3)',2)}`,'n각형'],[`(정n각형의 한 내각) = ${fr('180° × (n − 2)','n')}`,''],[`(정n각형의 한 외각) = ${fr('360°','n')}`,'외각의 합은 항상 360°']]});
+X('math','N-B2',{fm:[[`l = 2πr × ${fr('x',360)}`,'l: 호의 길이, r: 반지름, x: 중심각'],[`S = πr² × ${fr('x',360)} = ${fr(1,2)}rl`,'S: 부채꼴의 넓이'],['(둘레) = l + 2r','']]});
+X('math','N-C1',{fm:[['n각기둥: 면 n + 2, 모서리 3n, 꼭짓점 2n',''],['n각뿔: 면 n + 1, 모서리 2n, 꼭짓점 n + 1','']]});
+X('math','N-C2a',{fm:[['S = 2πr² + 2πrh','원기둥의 겉넓이'],['V = πr²h','원기둥의 부피']]});
+X('math','N-C2b',{fm:[['S = πr² + πrl','원뿔의 겉넓이 (l: 모선)'],[`V = ${fr(1,3)}πr²h`,'원뿔의 부피 (h: 높이)']]});
+X('math','N-C2c',{fm:[['S = 4πr²','구의 겉넓이'],[`V = ${fr(4,3)}πr³`,'구의 부피']]});
+X('math','N-D1',{fm:[[`(평균) = ${fr('(변량의 총합)','(변량의 개수)')}`,'']],figs:[{fig:()=>stemHTML([52,57,61,63,63,68,70,74,75,79,81,86],'점'),cap:'줄기와 잎 그림 · 12명 → 중앙값은 6번째(68)와 7번째(70)의 평균 69점, 최빈값 63점'}]});
+X('math','N-D2',{fm:[[`(상대도수) = ${fr('(그 계급의 도수)','(도수의 총합)')}`,'합은 항상 1'],['(히스토그램 넓이의 합) = (계급의 크기) × (도수의 총합)','= 도수분포다각형과 가로축 사이의 넓이']],figs:[{fig:nfHist,cap:'히스토그램(막대)과 도수분포다각형(꺾은선) · 양 끝에 도수 0인 계급을 하나씩 더한다'}]});
+/* 과학 */
+X('sci','N-K1',{figs:[{fig:()=>FLW(['문제 인식','가설 설정','탐구 설계·수행','자료 해석','결론 도출']),cap:'연역적 탐구 과정'}]});
+X('sci','N-K5',{fm:[['(고온 물체가 잃은 열) = (저온 물체가 얻은 열)','열평형'],['m₁ × (T₁ − T) = m₂ × (T − T₂)','같은 물질일 때 · T: 열평형 온도']],figs:[{fig:()=>figHeatEq(80,20,50,6),cap:'열평형 그래프 · A는 온도가 내려가고 B는 올라가 6분 뒤 50 °C에서 같아진다'}]});
+X('sci','N-K5b',{fm:[['Q = c × m × Δt','Q: 열량(kcal), c: 비열(kcal/(kg·°C)), m: 질량(kg), Δt: 온도 변화(°C)'],[`Δt = ${fr('Q','c × m')}`,'같은 열량이면 비열이 클수록 온도 변화가 작다']]});
+X('sci','N-K6',{figs:[{fig:nfParticles,cap:'입자 배열 · 고체 → 액체 → 기체로 갈수록 입자 사이 거리가 멀고 운동이 활발'}]});
+X('sci','N-K7b',{figs:[{fig:()=>figCurve(0,100),cap:'가열 곡선 · A 고체, B 녹는 중(고체+액체), C 액체, D 끓는 중(액체+기체), E 기체 / 수평 구간 B·D에서 열은 상태 변화에 쓰인다'}]});
+X('sci','N-K8',{fm:[['(알짜힘) = F₁ + F₂','같은 방향'],['(알짜힘) = F₁ − F₂ (큰 힘 쪽 방향)','반대 방향']]});
+X('sci','N-K9',{fm:[['(무게) = 9.8 × (질량)','무게: N, 질량: kg · 달에서는 무게만 '+fr(1,6)],['(부력) = (공기 중 무게) − (물속 무게)','']],figs:[{fig:()=>figSpring(2,3),cap:'용수철: 매단 무게와 늘어난 길이는 정비례 (원점을 지나는 직선)'}]});
+X('sci','N-K9b',{figs:[{fig:nfVT,cap:'시간–속력 그래프 · 알짜힘 0 / 운동 방향 / 운동 반대 방향'}]});
+X('sci','N-K10',{fm:[[`P = ${fr('F','S')}`,'P: 압력(N/cm²), F: 힘(N), S: 면적(cm²)'],['P₁ × V₁ = P₂ × V₂','보일 법칙 (온도 일정)']],figs:[{fig:()=>figBoyle(1,300),cap:'압력–부피 그래프 · 압력이 2배, 3배가 되면 부피는 '+fr(1,2)+', '+fr(1,3)+' (반비례)'}]});
+X('sci','N-K11',{figs:[{fig:nfCharles,cap:'온도–부피 그래프 · 압력이 일정하면 온도가 높아질수록 부피가 일정하게 증가 (직선)'}]});
+X('sci','N-K13',{fm:[['(일주 운동 각도) = 15° × (시간)','하루 24시간에 360°'],['(연주 운동) ≒ 하루 1°','1년 365일에 360°']],figs:[{fig:figMoonOrbit,cap:'달의 위치와 위상 · A 삭(일식 가능), B 초승달, C 상현달, E 망(월식 가능), G 하현달, H 그믐달'}]});
+/* 사회 */
+X('soc','N-S1',{fm:[[`(시차) = ${fr('(경도 차)','15°')} 시간`,'동경과 서경이면 두 경도를 더한다 · 동쪽이 빠르다'],['(도착 현지 시각) = (출발 시각) + (비행시간) ± (시차)','']]});
+X('soc','N-S3',{figs:[{fig:()=>figClim(CLM.Cs.T,CLM.Cs.P),cap:'지중해성 기후 · 여름에 비가 적고 겨울에 비가 많다'},{fig:()=>figClim(CLM.Cfb.T,CLM.Cfb.P),cap:'서안 해양성 기후 · 비가 연중 고르고 연교차가 작다'}]});
+X('soc','N-S4',{figs:[{fig:()=>figClim(CLM.Af.T,CLM.Af.P),cap:'열대 우림 기후 · 연중 덥고 비가 많다'},{fig:()=>figClim(CLM.Aw.T,CLM.Aw.P),cap:'사바나 기후 · 우기와 건기가 뚜렷'},{fig:()=>figClim(CLM.BW.T,CLM.BW.P),cap:'사막 기후 · 비가 거의 없고 여름이 매우 덥다'}]});
+X('soc','N-S11',{figs:[{fig:()=>figCourt([0,0,0],[0,0]),cap:'3심제 · 1심 불복은 항소, 2심 불복은 상고'}]});
+X('soc','N-S9',{figs:[{fig:()=>FLW(['명예혁명 1688','미국 독립 혁명 1776','프랑스 혁명 1789','차티스트 운동 19세기','여성 참정권 운동']),cap:'민주주의 발전 순서'}]});
+/* 국어·도덕 */
+X('kor','N-KA1',{figs:[{fig:nfPlot,cap:'소설의 구성 단계 · 갈등과 긴장감은 절정에서 가장 높다'}]});
+X('kor','N-KA2',{figs:[{fig:()=>FLW(['문제 확인','원인 분석','해결 방안 탐색','최선의 방안 선택','실천']),cap:'토의 절차'}]});
+X('kor','N-KB2',{figs:[{fig:()=>FLW(['계획하기','내용 생성하기','내용 조직하기','표현하기','고쳐쓰기']),cap:'글쓰기 과정'}]});
+X('eth','N-M12',{figs:[{fig:()=>`<div class="ntflow v"><div>도덕 원리<br><small>남의 물건을 허락 없이 가져가면 안 된다</small></div><b>+</b><div>사실 판단<br><small>친구 펜을 몰래 가져가는 것은 남의 물건을 가져가는 것</small></div><b>→</b><div>도덕 판단<br><small>친구 펜을 몰래 가져가면 안 된다</small></div></div>`,cap:'도덕적 추론의 짜임'}]});
+/* 기술·가정·정보 */
+X('tech','N-Q1',{fm:[['(열량) = 탄수화물 × 4 + 단백질 × 4 + 지방 × 9','단위: g → kcal']]});
+X('tech','N-W2',{fm:[['(전력량, kWh) = (소비 전력, kW) × (사용 시간, h)','1000 W = 1 kW'],['(전기 요금) = (전력량) × (1 kWh당 요금)','']]});
+X('tech','N-V2',{figs:[{fig:nfLines,cap:'제도의 선 · 외형선(굵은 실선), 숨은선(파선), 중심선(가는 일점 쇄선), 치수선·치수 보조선(가는 실선)'}]});
+X('tech','N-T3',{figs:[{fig:()=>FLW(['문제 확인','아이디어 탐색·선정','설계','제작','평가·개선']),cap:'기술적 문제 해결 과정'}]});
+X('tech','N-R2',{figs:[{fig:()=>FLW(['문제 인식','대안 탐색','대안 평가','선택','평가']),cap:'합리적 선택 과정'}]});
+X('tech','N-T1',{figs:[{fig:()=>FLW(['입력','과정(처리)','출력'])+'<p class="ntsub">↺ 되먹임: 출력 결과를 다시 입력·과정에 반영</p>',cap:'기술 시스템'}]});
+X('info','N-C21',{fm:[['(정보의 가짓수) = 2ⁿ','n: 비트 수'],[`(이미지 용량, 바이트) = ${fr('가로 픽셀 × 세로 픽셀 × 한 픽셀의 비트 수',8)}`,'1바이트 = 8비트']],figs:[{fig:nfBin,cap:'10진수 41을 2진수로 바꾸기'}]});
+X('info','N-C31',{figs:[{fig:nfFlow,cap:'순서도 기호'}]});
+X('info','N-C11',{figs:[{fig:()=>FLW(['입력<br><small>센서·키보드</small>','처리<br><small>CPU·프로그램</small>','출력<br><small>LED·모터·스피커</small>']),cap:'피지컬 컴퓨팅 시스템의 흐름'}]});
 })();
 const NO={hide:false};
 const v_open=()=>document.querySelectorAll('#v-note details').forEach(d=>d.open=true);
@@ -6150,6 +6239,8 @@ function renderNote(){const v=$('#v-note');if(!v)return;const items=((SJ[CUR]||{
  (items.length>1?`<nav class="bar ntnav" aria-label="요점 노트 바로가기">${items.map(x=>`<button class="chip" data-ntj="${x.id}">${x.title}</button>`).join('')}</nav>`:'')+
  items.map(x=>`<article class="es nt${NO.hide?' hide':''}" id="nt-${x.id}"><div class="est">${SUBNAME[x.u]||x.u}</div><h3 class="ntt">${x.title}</h3>
  <ul class="ntp">${x.pts.map(p=>`<li>${p}</li>`).join('')}</ul>
+ ${(x.fm||[]).map(f=>`<div class="ntf"><div class="ntfm f">${f[0]}</div>${f[1]?`<div class="ntfd">${f[1]}</div>`:''}</div>`).join('')}
+ ${(x.figs||[]).length?`<div class="ntfigs">${x.figs.map(g=>`<figure class="fig ntfig">${g.fig()}<figcaption>${g.cap}</figcaption></figure>`).join('')}</div>`:''}
  ${x.tbl?`<div class="tw"><table class="ft ntb${x.tbl.h.length>=4?' wide':''}"><thead><tr>${x.tbl.h.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${x.tbl.r.map(r=>`<tr>${r.map((c,i)=>i?`<td><span class="f">${c}</span></td>`:`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
  ${x.warn&&x.warn.length?`<div class="ntw"><b>실수 주의</b><ul>${x.warn.map(w=>`<li>${w}</li>`).join('')}</ul></div>`:''}
  ${(x.ex||[]).map((e,i)=>`<details class="ex ntx"><summary>예제 ${i+1}. ${e.t}</summary>${e.fig?`<figure class="fig">${e.fig()}</figure>`:''}<p>${e.a}</p></details>`).join('')}
