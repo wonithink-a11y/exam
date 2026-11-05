@@ -5343,7 +5343,7 @@ $('#subj').addEventListener('click',e=>{const b=e.target.closest('[data-sub]');i
 
 /* ===== 범위 ===== */
 function renderScope(){$('#units').innerHTML=UNITS.map(U=>{const n=U.subs.filter(x=>sel.has(x[0])).length,st=n===U.subs.length?'all':n?'part':'none';return `<div class="unit"><button class="uh" data-u="${U.id}" data-st="${st}" aria-pressed="${st==='all'}" title="${st==='all'?'단원 전체 해제':'단원 전체 선택'}"><span class="ck">${st==='all'?'✓':st==='part'?'–':''}</span><span class="rn">${U.tag}</span>${U.name}</button><div class="subs">${U.subs.map(([id,nm])=>`<button class="chip ${sel.has(id)?'on':''}" data-s="${id}" aria-pressed="${sel.has(id)}">${nm}<small>${T.filter(t=>t.u===id).length}</small></button>`).join('')}</div></div>`}).join('');
- $('#scopeSum').textContent=`소단원 ${sel.size}/${SUBS.length} · ${scoped().length}개 유형`;LS.set('m12-sel-'+SK(),[...sel]);if(typeof renderNote==='function'&&!$('#v-note').hidden)renderNote()}
+ $('#scopeSum').textContent=`소단원 ${sel.size}/${SUBS.length} · ${scoped().length}개 유형`;LS.set('m12-sel-'+SK(),[...sel])}
 $('#scope').addEventListener('click',e=>{const s=e.target.closest('button[data-s]'),u=e.target.closest('[data-u]'),p=e.target.closest('[data-pre]');
  if(s){sel.has(s.dataset.s)?sel.delete(s.dataset.s):sel.add(s.dataset.s)}
  else if(u){const subs=UNITS.find(x=>x.id===u.dataset.u).subs.map(x=>x[0]);const all=subs.every(x=>sel.has(x));subs.forEach(x=>all?sel.delete(x):sel.add(x))}
@@ -6145,8 +6145,8 @@ N('tech',[
 const NO={hide:false};
 const v_open=()=>document.querySelectorAll('#v-note details').forEach(d=>d.open=true);
 const ntHas=()=>!!((SJ[CUR]||{}).notes||[]).length;
-function renderNote(){const v=$('#v-note');if(!v)return;const items=((SJ[CUR]||{}).notes||[]).filter(x=>sel.has(x.u)).sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u));
- v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${items.length?`출제 범위 안의 요점 노트 ${items.length}개. [공식 가리기]를 누른 뒤 가린 칸을 눌러 하나씩 확인하세요.`:'선택한 출제 범위에 요점 노트가 없습니다.'}</span><span class="sp"></span>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button><button class="btn sm" data-ntp="1">인쇄</button>`:''}</div>`+
+function renderNote(){const v=$('#v-note');if(!v)return;const items=((SJ[CUR]||{}).notes||[]).slice().sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u));
+ v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${items.length?`${SJ[CUR].name} 요점 노트 ${items.length}개. 아래 단원 이름을 누르면 바로 이동합니다. [공식 가리기]를 누르면 핵심이 가려지고, 가린 칸을 누르면 하나씩 보입니다.`:'이 과목은 아직 요점 노트가 없습니다.'}</span><span class="sp"></span>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button><button class="btn sm" data-ntp="1">인쇄</button>`:''}</div>`+
  (items.length>1?`<nav class="bar ntnav" aria-label="요점 노트 바로가기">${items.map(x=>`<button class="chip" data-ntj="${x.id}">${x.title}</button>`).join('')}</nav>`:'')+
  items.map(x=>`<article class="es nt${NO.hide?' hide':''}" id="nt-${x.id}"><div class="est">${SUBNAME[x.u]||x.u}</div><h3 class="ntt">${x.title}</h3>
  <ul class="ntp">${x.pts.map(p=>`<li>${p}</li>`).join('')}</ul>
@@ -6308,7 +6308,7 @@ async function eePdf(kind,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn&&bt
 /* ===== 탭 ===== */
 function show(tab){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));
  if(tab==='words'&&!eeHas())tab='practice';if(tab==='essay'&&!essHas())tab='practice';if(tab==='note'&&!ntHas())tab='practice';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));
- ['practice','exam','jokbo','review','stats','words','essay','note'].forEach(t=>$('#v-'+t).hidden=t!==tab);if(tab==='words')renderWords();if(tab==='essay')renderEssay();if(tab==='note')renderNote();if(tab==='jokbo')renderJokbo();$('#scope').hidden=!(tab==='practice'||tab==='exam'||tab==='essay'||tab==='note');
+ ['practice','exam','jokbo','review','stats','words','essay','note'].forEach(t=>$('#v-'+t).hidden=t!==tab);if(tab==='words')renderWords();if(tab==='essay')renderEssay();if(tab==='note')renderNote();if(tab==='jokbo')renderJokbo();$('#scope').hidden=!(tab==='practice'||tab==='exam'||tab==='essay');
  if(tab==='review')renderReview();if(tab==='stats'){confirmReset=false;renderStats()}LS.set('m12-tab',tab)}
 document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)show(b.dataset.tab)});
 
