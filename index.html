@@ -97,7 +97,8 @@ math{font-size:1.08em}
 .tabs.seven button{font-size:11.5px;letter-spacing:-.06em}
 .nt .ntt{margin:0 0 8px;font-size:17px}
 .nt .ntp{margin:0 0 10px;padding-left:20px;line-height:1.75}
-.nt .ntb{font-size:13.5px;margin:0 0 10px;min-width:500px}
+.nt .ntb{font-size:13.5px;margin:0 0 10px;width:100%}
+.nt .ntb.wide{min-width:500px}
 .nt .ntb td{padding:6px 10px}
 .nt .ntb td:first-child{text-align:left;font-weight:600}
 .nt .ntw{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:var(--chip);font-size:13.5px;line-height:1.65}
@@ -109,7 +110,9 @@ math{font-size:1.08em}
 .nt .ntg{margin-top:8px}
 .nt .f{transition:filter .15s}
 .nt.hide .f{filter:blur(6px);cursor:pointer;user-select:none}
-.nt.hide .f.on{filter:none}.tabs.six button{font-size:12.5px;letter-spacing:-.03em;white-space:nowrap;padding:9px 0}
+.nt.hide .f.on{filter:none}
+.ntnav{margin-bottom:12px;gap:6px}
+@media print{body.ntprint>*:not(.wrap),body.ntprint .wrap>*:not(#v-note),body.ntprint #v-note>.bar,body.ntprint .ntnav,body.ntprint .ntg{display:none!important}body.ntprint #v-note{display:block!important}body.ntprint .nt{border:1px solid #bbb;break-inside:auto}body.ntprint .nt table,body.ntprint .ntw,body.ntprint .ntx,body.ntprint .ntt{break-inside:avoid}body.ntprint .nt .ntb{min-width:0}body.ntprint .tw{overflow:visible}}.tabs.six button{font-size:12.5px;letter-spacing:-.03em;white-space:nowrap;padding:9px 0}
 /* 영단어 */
 .wl-les{display:flex;flex-wrap:wrap;gap:6px}
 .wsec{margin-top:14px}.wsec h3{font:400 17px var(--f-disp);margin:0 0 4px}
@@ -5633,19 +5636,111 @@ N('math',[
  ex:[{t:'두 밑면이 한 변 3 cm, 6 cm인 정사각형, 옆면 사다리꼴의 높이 4 cm인 사각뿔대',fig:()=>figPyrFrus(2,'3cm','6cm','4cm',false),a:`(두 밑넓이) = 9 + 36 = 45<br>(옆넓이) = {${fr(1,2)} × (3 + 6) × 4} × 4 = 72<br>(겉넓이) = <b>117 cm²</b>`},
   {t:'한 변 6 cm, 높이 8 cm인 사각뿔에서 한 변 3 cm, 높이 4 cm인 사각뿔을 떼어 낸 사각뿔대',fig:()=>figPyrFrus(2,'3cm','6cm',null,true),a:`(큰 사각뿔) = ${fr(1,3)} × 36 × 8 = 96, (작은 사각뿔) = ${fr(1,3)} × 9 × 4 = 12<br>(부피) = 96 − 12 = <b>84 cm³</b>`}],
  go:['c2-pfrus','c2-frus','c2-sph','c2-ratio','c2-hole','c2-caps','c2-cut','c2-key']}]);
+N('math',[
+{id:'N-Z1',u:'Z1',title:'순서쌍과 좌표 · 그래프',
+ pts:[`점 P의 좌표 (a, b): a는 ${F('x좌표')}, b는 ${F('y좌표')} → 순서를 바꾸면 다른 점`,`원점 O의 좌표는 ${F('(0, 0)')}, x축 위의 점은 ${F('y좌표가 0')}, y축 위의 점은 ${F('x좌표가 0')}`,
+  `점 (a, b)와 대칭인 점: x축 대칭 ${F('(a, −b)')}, y축 대칭 ${F('(−a, b)')}, 원점 대칭 ${F('(−a, −b)')}`,`그래프 해석: 오른쪽 위로 → ${F('증가')}, 수평 → ${F('변화 없음(일정)')}, 오른쪽 아래로 → ${F('감소')}`],
+ tbl:{h:['사분면','x좌표','y좌표'],r:[['제1사분면','+','+'],['제2사분면','−','+'],['제3사분면','−','−'],['제4사분면','+','−']]},
+ warn:['원점과 좌표축(x축, y축) 위의 점은 <b>어느 사분면에도 속하지 않는다.</b>','(a, b)가 제□사분면일 때 새 점의 위치는 a, b의 부호부터 정하고 하나씩 따진다. 곱 ab, 차 a − b의 부호도 이 방법으로.','좌표평면 위 삼각형의 넓이: 축에 평행한 변을 밑변으로 잡고, 좌표의 차로 길이를 구한다. 안 되면 큰 직사각형에서 빼기.'],
+ ex:[{t:'점 P(a, b)가 제3사분면 위의 점일 때, 점 Q(−a, ab)는 어느 사분면?',a:'a < 0, b < 0 → −a > 0, ab > 0<br>∴ Q(+, +)는 <b>제1사분면</b>'},
+  {t:'세 점 A(−2, 3), B(−2, −1), C(4, −1)을 꼭짓점으로 하는 삼각형의 넓이',a:`AB = 3 − (−1) = 4, BC = 4 − (−2) = 6, ∠B = 90°<br>(넓이) = ${fr(1,2)} × 6 × 4 = <b>12</b>`}],
+ go:['z1-quad','z1-sym','z1-tri','z1-graph']},
+{id:'N-Z2',u:'Z2',title:'정비례와 반비례',
+ pts:[`정비례: ${F('y = ax (a ≠ 0)')} → x가 2배, 3배가 되면 y도 ${F('2배, 3배')} / ${F(fr('y','x')+' = a')}로 일정`,`반비례: ${F('y = '+fr('a','x')+' (a ≠ 0)')} → x가 2배, 3배가 되면 y는 ${F(fr(1,2)+'배, '+fr(1,3)+'배')} / ${F('xy = a')}로 일정`,
+  `그래프가 점 (p, q)를 지나면 식에 대입: 정비례 ${F('a = '+fr('q','p'))}, 반비례 ${F('a = pq')}`],
+ tbl:{h:['','정비례 y = ax','반비례 y = a/x'],r:[['그래프 모양','원점을 지나는 직선','좌표축에 가까워지는 한 쌍의 곡선 (원점을 지나지 않음)'],['a > 0','제1·3사분면, 오른쪽 위로 (증가)','제1·3사분면, 각 사분면에서 x가 커지면 y는 작아짐'],['a < 0','제2·4사분면, 오른쪽 아래로 (감소)','제2·4사분면, 각 사분면에서 x가 커지면 y도 커짐'],['|a|가 클수록','y축에 가까워진다','원점에서 멀어진다']]},
+ warn:['y = ax + b (b ≠ 0)는 정비례가 아니다. 정비례는 원점을 지나야 한다.','반비례 그래프 위에서 x, y좌표가 모두 정수인 점의 개수 = (|a|의 약수의 개수) × 2 (음수 쪽도 센다).','반비례 그래프 위의 점에서 두 좌표축에 수선을 그어 만든 직사각형의 넓이는 항상 |a|.'],
+ ex:[{t:'y = ax의 그래프가 점 (3, −6)을 지날 때, 이 그래프 위의 점 (k, 8)의 k',a:'−6 = 3a → a = −2 → y = −2x<br>8 = −2k → <b>k = −4</b>'},
+  {t:`y = ${fr('a','x')}의 그래프가 점 (2, 6)을 지날 때, x, y좌표가 모두 정수인 점의 개수`,a:'a = 2 × 6 = 12<br>12의 약수 1, 2, 3, 4, 6, 12 → 6개, 음수 쪽 6개 → <b>12개</b>'}],
+ go:['z2-dir','z2-inv','z2-area']},
+{id:'N-A1',u:'A1',title:'점·선·면과 각',
+ pts:[`교점: 선과 선 또는 선과 면이 만나는 점 / 교선: ${F('면과 면이 만나서 생기는 선')}`,`입체도형에서 (교점의 개수) = ${F('꼭짓점의 개수')}, (교선의 개수) = ${F('모서리의 개수')}`,
+  `직선 AB = 직선 BA, 선분 AB = 선분 BA, 반직선 AB ${F('≠')} 반직선 BA (시작점과 방향이 다름)`,`선분 AB의 중점 M: ${F('AM = MB = '+fr(1,2)+'AB')}`,
+  `맞꼭지각의 크기는 ${F('서로 같다')} / 평각 = ${F('180°')}, 직각 = ${F('90°')}`,`점과 직선 사이의 거리 = 점에서 직선에 내린 ${F('수선의 발까지의 거리')} (가장 짧은 거리)`],
+ tbl:{h:['n개의 점 (어느 세 점도 한 직선 위에 있지 않음)','개수'],r:[['직선',fr('n(n − 1)',2)],['선분',fr('n(n − 1)',2)],['반직선','n(n − 1)']]},
+ warn:['한 직선 위에 있는 점들로는 직선이 <b>1개</b>뿐이다. 이때는 공식을 쓰지 말고 직접 센다.','반직선은 시작점과 방향이 모두 같아야 같은 반직선이다.','예각 0° < x < 90°, 둔각 90° < x < 180°. 0°, 90°, 180°는 예각·둔각이 아니다.','점과 직선 사이의 거리는 비스듬한 선분이 아니라 수선의 길이다.'],
+ ex:[{t:'어느 세 점도 한 직선 위에 있지 않은 네 점 A, B, C, D로 만들 수 있는 직선·반직선·선분의 개수',a:`직선 ${fr('4 × 3',2)} = 6, 선분 6, 반직선 4 × 3 = 12<br>∴ <b>직선 6개, 반직선 12개, 선분 6개</b>`},
+  {t:'선분 AB의 중점을 M, 선분 MB의 중점을 N이라 하자. AB = 20 cm일 때 AN의 길이',a:'AM = MB = 10, MN = 5<br>AN = AM + MN = <b>15 cm</b>'},
+  {t:'평각을 세 각 x, 2x, 3x로 나눌 때 x',a:'x + 2x + 3x = 180° → 6x = 180° → <b>x = 30°</b>'}],
+ go:['a1-mid','a1-vert','a1-flat','a1-pv','a1-line','a1-dist']},
+{id:'N-A2',u:'A2',title:'위치 관계와 평행선의 성질',
+ pts:[`평면에서 두 직선: 한 점에서 만난다 / 평행하다 / ${F('일치한다')}`,`공간에서 두 직선: 한 점에서 만난다 / 평행하다 / ${F('꼬인 위치에 있다')} / 일치한다`,
+  `꼬인 위치: ${F('만나지도 않고 평행하지도 않은')} 두 직선 (공간에서만)`,`공간에서 직선과 평면: ${F('포함된다 / 한 점에서 만난다 / 평행하다')}`,
+  `l ∥ m이면 ${F('동위각의 크기가 같고, 엇각의 크기가 같다')}`,`거꾸로 동위각 또는 엇각의 크기가 같으면 ${F('두 직선은 평행')} / 같은 쪽 내각의 합이 ${F('180°')}이면 평행`],
+ tbl:{h:['평행선 문제 유형','푸는 방법'],r:[['꺾인 선 (한 번)','꺾인 점을 지나고 l, m에 평행한 직선을 긋고 엇각 이용 → 꺾인 각 = 두 각의 합'],['꺾인 선 (여러 번)','왼쪽으로 꺾인 각들의 합 = 오른쪽으로 꺾인 각들의 합'],['종이 띠 접기','접은 각의 크기가 같음 + 엇각 → 이등변삼각형이 생김'],['평행 판정','동위각·엇각이 같은지, 같은 쪽 내각의 합이 180°인지 확인']]},
+ warn:['꼬인 위치는 공간에서만 생긴다. 평면 위의 두 직선은 꼬인 위치에 있을 수 없다.','직육면체에서 한 모서리와 꼬인 위치의 모서리 찾기: 그 모서리와 만나는 것, 평행한 것을 지우고 남은 것.','동위각·엇각은 평행하지 않아도 있다. 크기가 같은 것은 평행할 때만.','맞꼭지각이 같다는 것은 평행과 관계없다.'],
+ ex:[{t:'직육면체에서 모서리 AB와 꼬인 위치에 있는 모서리의 개수',a:'모서리 12개 − AB 자신 1개 − 만나는 모서리 4개 − 평행한 모서리 3개 = <b>4개</b>'},
+  {t:'l ∥ m이고, 두 직선 사이에서 꺾인 선이 l과 40°, m과 35°를 이룰 때 꺾인 각 x',a:'꺾인 점을 지나는 평행선을 그으면 엇각이 40°, 35°<br>∴ <b>x = 75°</b>'}],
+ go:['a2-par','a2-pjudge','a2-skew','a2-bend','a2-zig','a2-fold']},
+{id:'N-A3',u:'A3',title:'삼각형의 작도와 합동',
+ pts:[`작도 도구: ${F('눈금 없는 자')}(선 긋기·연장)와 ${F('컴퍼스')}(원 그리기·길이 옮기기)`,`삼각형이 될 조건: ${F('(가장 긴 변) < (나머지 두 변의 합)')}`,
+  `두 변 a, b가 주어질 때 나머지 한 변 x의 범위: ${F('|a − b| < x < a + b')}`,`합동 조건: ${F('SSS (세 변) / SAS (두 변과 끼인각) / ASA (한 변과 양 끝 각)')}`,`△ABC ≡ △DEF: ${F('대응하는 꼭짓점 순서대로')} 쓴다`],
+ tbl:{h:['주어진 조건','삼각형이 하나로 정해질까?'],r:[['세 변의 길이 (가장 긴 변 < 나머지 합)','○'],['두 변의 길이와 그 끼인각','○'],['한 변의 길이와 그 양 끝 각','○'],['한 변과 두 각 (양 끝 각이 아니어도)','○ 나머지 한 각을 구하면 ASA'],['두 변과 끼인각이 아닌 각','× (0개, 1개 또는 2개)'],['세 각의 크기','× (모양은 같고 크기가 다른 것이 무수히 많음)'],['한 변과 양 끝 각의 합이 180° 이상','× (삼각형이 안 됨)']]},
+ warn:['가장 긴 변 = 나머지 두 변의 합이면 삼각형이 <b>안 된다</b>. (등호 없음)','SAS의 각은 반드시 두 변 사이의 <b>끼인각</b>이어야 한다.','세 각이 같으면(AAA) 모양만 같다. 합동 조건이 아니다.','넓이나 둘레가 같다고 합동은 아니다.','작도에서 길이는 자로 재지 않는다. 길이를 옮길 때는 항상 컴퍼스를 쓴다.'],
+ ex:[{t:'두 변의 길이가 4 cm, 9 cm인 삼각형에서 나머지 한 변의 길이가 자연수일 때 가능한 개수',a:'9 − 4 < x < 9 + 4 → 5 < x < 13 → 6, 7, …, 12 → <b>7개</b>'},
+  {t:'길이가 3, 5, 7, 9 cm인 막대 중 3개로 만들 수 있는 삼각형의 개수',a:'(3, 5, 7) ○, (3, 5, 9) × (9 ≥ 8), (3, 7, 9) ○, (5, 7, 9) ○ → <b>3개</b>'}],
+ go:['a3-cons','a3-tri','a3-side','a3-det','a3-cong']},
+{id:'N-B1',u:'B1',title:'다각형의 대각선·내각·외각',
+ pts:[`n각형의 한 꼭짓점에서 그은 대각선: ${F('(n − 3)개')}, 이때 생기는 삼각형: ${F('(n − 2)개')}`,`n각형의 대각선의 총 개수: ${F(fr('n(n − 3)',2))}`,
+  `n각형의 내각의 크기의 합: ${F('180° × (n − 2)')} / 외각의 크기의 합: ${F('항상 360°')}`,`정n각형의 한 내각: ${F(fr('180° × (n − 2)','n'))}, 한 외각: ${F(fr('360°','n'))}`,
+  `(한 내각) + (한 외각) = ${F('180°')}`,`삼각형의 한 외각 = ${F('이웃하지 않는 두 내각의 합')}`],
+ tbl:{h:['다각형','대각선 수','내각의 합','정다각형 한 내각','한 외각'],r:[['삼각형','0','180°','60°','120°'],['사각형','2','360°','90°','90°'],['오각형','5','540°','108°','72°'],['육각형','9','720°','120°','60°'],['팔각형','20','1080°','135°','45°'],['십각형','35','1440°','144°','36°'],['십이각형','54','1800°','150°','30°']]},
+ warn:['외각의 합은 몇 각형이든 360°. 내각의 합과 헷갈리지 않기.','한 내각 : 한 외각 = p : q → 한 외각 = 180° × '+fr('q','p + q')+' → n = 360° ÷ (한 외각)',`정다각형이 아니면 한 내각을 ${fr('180°(n − 2)','n')}로 구할 수 없다.`,'별 모양(오각별)의 다섯 꼭짓점의 각의 합 = 180°.','맞꼭지각을 낀 두 삼각형(나비 모양): 마주 보는 두 각의 합이 같다.'],
+ ex:[{t:'대각선의 총 개수가 27개인 다각형의 내각의 크기의 합',a:`${fr('n(n − 3)',2)} = 27 → n(n − 3) = 54 = 9 × 6 → n = 9<br>180° × 7 = <b>1260°</b>`},
+  {t:'한 내각과 한 외각의 크기의 비가 3 : 1인 정다각형',a:`한 외각 = 180° × ${fr(1,4)} = 45° → n = 360° ÷ 45° = 8 → <b>정팔각형</b>`},
+  {t:'△ABC에서 ∠A = 50°, ∠B = 65°일 때 ∠C의 외각 x',fig:()=>figTri('50°','65°','x'),a:'x = ∠A + ∠B = 50° + 65° = <b>115°</b>'}],
+ go:['b1-diag','b1-diag2','b1-tri','b1-miss','b1-ext','b1-reg','b1-ratio','b1-star','b1-bow']},
+{id:'N-B2',u:'B2',title:'원과 부채꼴',
+ pts:[`호: 원 위의 두 점 사이 원의 일부 / 현: ${F('원 위의 두 점을 이은 선분')} (가장 긴 현은 지름)`,`부채꼴: 두 반지름과 호로 이루어진 도형 / 활꼴: 현과 호로 이루어진 도형 → ${F('반원')}은 부채꼴이면서 활꼴`,
+  `한 원에서 중심각의 크기에 ${F('호의 길이, 부채꼴의 넓이')}는 정비례한다`,`${F('현의 길이')}는 중심각의 크기에 정비례하지 않는다`],
+ tbl:{h:['','원 (반지름 r)','부채꼴 (반지름 r, 중심각 x°)'],r:[['길이','둘레 2πr',`호 l = 2πr × ${fr('x',360)}`],['넓이','πr²',`S = πr² × ${fr('x',360)} = ${fr(1,2)}rl`],['둘레','2πr','l + 2r']]},
+ warn:['부채꼴의 둘레는 호의 길이 + <b>반지름 2개</b>.',`호의 길이를 알면 넓이는 ${fr(1,2)}rl로 바로 구한다 (중심각 몰라도 됨).`,'중심각이 2배 → 호·넓이 2배. 반지름이 2배 → 호 2배, 넓이 4배.','색칠한 부분의 넓이: (큰 도형) − (작은 도형) 또는 잘라서 옮겨 붙여 간단한 모양으로.','현의 길이, 삼각형의 넓이는 중심각에 정비례하지 않는다 (옳지 않은 것 고르기 단골).'],
+ ex:[{t:'반지름 6 cm, 중심각 120°인 부채꼴의 호의 길이·넓이·둘레',fig:()=>figSector(120,'6cm','120°'),a:`(호) = 2π × 6 × ${fr(120,360)} = <b>4π cm</b><br>(넓이) = π × 6² × ${fr(120,360)} = <b>12π cm²</b><br>(둘레) = <b>(4π + 12) cm</b>`},
+  {t:'반지름 8 cm, 호의 길이 6π cm인 부채꼴의 넓이',a:`${fr(1,2)} × 8 × 6π = <b>24π cm²</b>`}],
+ go:['b2-arc','b2-area','b2-rl','b2-peri','b2-circ','b2-prop','b2-con','b2-shade']},
+{id:'N-C1',u:'C1',title:'다면체와 회전체',
+ pts:[`다면체: ${F('다각형인 면')}으로만 둘러싸인 입체 → 면이 n개면 n면체`,`n각기둥: 면 ${F('n + 2')}, 모서리 ${F('3n')}, 꼭짓점 ${F('2n')}`,`n각뿔: 면 ${F('n + 1')}, 모서리 ${F('2n')}, 꼭짓점 ${F('n + 1')}`,`n각뿔대: 면 ${F('n + 2')}, 모서리 ${F('3n')}, 꼭짓점 ${F('2n')} (옆면은 사다리꼴)`,
+  `정다면체 조건: ${F('모든 면이 합동인 정다각형')} + ${F('각 꼭짓점에 모인 면의 개수가 같다')} → 5가지뿐`,
+  `회전체를 회전축에 수직인 평면으로 자른 단면: ${F('항상 원')} / 회전축을 포함하는 평면으로 자른 단면: ${F('선대칭도형')} (원기둥 → 직사각형, 원뿔 → 이등변삼각형, 원뿔대 → 사다리꼴, 구 → 원)`],
+ tbl:{h:['정다면체','면 모양','한 꼭짓점의 면','면','모서리','꼭짓점'],r:[['정사면체','정삼각형','3','4','6','4'],['정육면체','정사각형','3','6','12','8'],['정팔면체','정삼각형','4','8','12','6'],['정십이면체','정오각형','3','12','30','20'],['정이십면체','정삼각형','5','20','30','12']]},
+ warn:['원기둥·원뿔·구처럼 곡면이 있으면 다면체가 아니다.','각뿔대의 두 밑면은 평행하지만 합동이 아니다. 옆면은 직사각형이 아니라 사다리꼴.','정다면체의 면은 정삼각형·정사각형·정오각형뿐 (정육각형 3개를 모으면 360°라 입체가 안 됨).','구는 어느 방향으로 잘라도 단면이 원이다.','회전축을 포함한 단면의 넓이: 원기둥은 2r × h, 원뿔은 '+fr(1,2)+' × 2r × h.'],
+ ex:[{t:'모서리가 18개인 각기둥의 면과 꼭짓점의 개수',a:'3n = 18 → n = 6 → 육각기둥<br>면 6 + 2 = <b>8개</b>, 꼭짓점 2 × 6 = <b>12개</b>'},
+  {t:'밑면의 반지름 4 cm, 높이 6 cm인 원뿔을 회전축을 포함하는 평면으로 자른 단면의 넓이',fig:()=>figCone('4cm','6cm',false),a:`단면은 밑변 8 cm, 높이 6 cm인 이등변삼각형<br>${fr(1,2)} × 8 × 6 = <b>24 cm²</b>`}],
+ go:['c1-cnt','c1-inv','c1-reg','c1-rot','c1-sec']},
+{id:'N-D1',u:'D1',title:'대푯값 · 줄기와 잎 그림',
+ pts:[`평균 = ${F(fr('(변량의 총합)','(변량의 개수)'))}`,`중앙값: 크기순으로 늘어놓고 가운데 값 → n이 홀수면 ${F(fr('n + 1',2)+'번째')}, 짝수면 ${F(fr('n',2)+'번째와 ('+fr('n',2)+' + 1)번째의 평균')}`,
+  `최빈값: ${F('가장 많이 나타나는 값')} (2개 이상일 수도, 숫자가 아닌 자료에도 쓸 수 있음)`,`줄기와 잎 그림: 줄기는 ${F('십의 자리')}, 잎은 ${F('일의 자리')} / 잎은 중복되어도 모두 쓰고, ${F('잎의 총 개수 = 자료의 개수')}`],
+ tbl:{h:['대푯값','이럴 때 알맞다'],r:[['평균','자료에 극단적인 값이 없을 때 (가장 많이 씀)'],['중앙값','매우 크거나 작은 값(극단값)이 있을 때'],['최빈값','가장 많이 팔린 옷 치수, 좋아하는 운동처럼 선호도·문자 자료일 때']]},
+ warn:['중앙값은 반드시 <b>크기순으로 정렬한 다음</b> 구한다.','자료의 개수가 짝수면 중앙값은 가운데 두 값의 평균이다 (자료에 없는 값이 될 수 있음).','평균이 주어지고 x를 구할 때: (총합) = (평균) × (개수).','줄기와 잎 그림은 "2 | 3은 23점" 같은 범례를 꼭 확인한다.'],
+ ex:[{t:'자료 2, 9, 5, 7, 5, 8, 6의 평균·중앙값·최빈값',a:'평균 = 42 ÷ 7 = <b>6</b><br>정렬: 2, 5, 5, 6, 7, 8, 9 → 4번째 값 <b>6</b>이 중앙값<br>5가 2번 → 최빈값 <b>5</b>'},
+  {t:'다섯 개의 변량 5, 8, x, 6, 9의 평균이 7일 때 x',a:'총합 = 7 × 5 = 35 → 5 + 8 + x + 6 + 9 = 35 → <b>x = 7</b>'}],
+ go:['d1-mean','d1-med','d1-mode','d1-x','d1-add','d1-which','d1-stem']},
+{id:'N-D2',u:'D2',title:'도수분포표 · 히스토그램 · 상대도수',
+ pts:[`계급: 변량을 나눈 구간 / 계급의 크기: ${F('구간의 너비')} / 도수: ${F('각 계급에 속하는 자료의 수')}`,`히스토그램의 직사각형 넓이의 합 = ${F('(계급의 크기) × (도수의 총합)')}`,
+  `도수분포다각형: 직사각형 윗변의 ${F('중앙')}을 이은 꺾은선 (양 끝에 도수 0인 계급 추가) → 가로축과 둘러싸인 넓이 = ${F('히스토그램의 넓이')}`,
+  `상대도수 = ${F(fr('(그 계급의 도수)','(도수의 총합)'))} → 상대도수의 합은 ${F('항상 1')}`,`도수의 총합이 다른 두 집단은 ${F('상대도수')}로 비교한다`],
+ tbl:{h:['구하는 것','식'],r:[['상대도수',fr('(그 계급의 도수)','(도수의 총합)')],['그 계급의 도수','(상대도수) × (도수의 총합)'],['도수의 총합',fr('(그 계급의 도수)','(상대도수)')],['백분율(%)','(상대도수) × 100'],['히스토그램 넓이의 합','(계급의 크기) × (도수의 총합)']]},
+ warn:['"이상 ~ 미만": 경계값은 위 계급에 들어간다. 70점은 "70 이상 80 미만" 계급.','"상위 ○번째" 학생의 계급은 큰 계급부터 도수를 차례로 더해서 찾는다.','히스토그램에서 직사각형의 넓이(높이)는 도수에 정비례한다.','상대도수 그래프로는 비율만 비교할 수 있다. 실제 학생 수는 총합을 곱해야 안다.'],
+ ex:[{t:'계급의 크기가 10점, 도수의 총합이 40명인 히스토그램의 넓이의 합',a:'10 × 40 = <b>400</b>'},
+  {t:'도수가 6명인 계급의 상대도수가 0.15일 때 도수의 총합',a:`${fr(6,'0.15')} = <b>40명</b>`},
+  {t:'총 40명 중 상대도수가 0.25인 계급의 학생 수와 비율',a:'0.25 × 40 = <b>10명</b>, 0.25 × 100 = <b>25%</b>'}],
+ go:['d2-blank','d2-top','d2-hist','d2-histg','d2-rel','d2-inv','d2-pct','d2-rel2']}]);
 })();
 const NO={hide:false};
+const v_open=()=>document.querySelectorAll('#v-note details').forEach(d=>d.open=true);
 const ntHas=()=>!!((SJ[CUR]||{}).notes||[]).length;
-function renderNote(){const v=$('#v-note');if(!v)return;const items=((SJ[CUR]||{}).notes||[]).filter(x=>sel.has(x.u));
- v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${items.length?`출제 범위 안의 요점 노트 ${items.length}개. [공식 가리기]를 누른 뒤 가린 칸을 눌러 하나씩 확인하세요.`:'선택한 출제 범위에 요점 노트가 없습니다.'}</span><span class="sp"></span>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button>`:''}</div>`+
- items.map(x=>`<article class="es nt${NO.hide?' hide':''}"><div class="est">${SUBNAME[x.u]||x.u}</div><h3 class="ntt">${x.title}</h3>
+function renderNote(){const v=$('#v-note');if(!v)return;const items=((SJ[CUR]||{}).notes||[]).filter(x=>sel.has(x.u)).sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u));
+ v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${items.length?`출제 범위 안의 요점 노트 ${items.length}개. [공식 가리기]를 누른 뒤 가린 칸을 눌러 하나씩 확인하세요.`:'선택한 출제 범위에 요점 노트가 없습니다.'}</span><span class="sp"></span>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button><button class="btn sm" data-ntp="1">인쇄</button>`:''}</div>`+
+ (items.length>1?`<nav class="bar ntnav" aria-label="요점 노트 바로가기">${items.map(x=>`<button class="chip" data-ntj="${x.id}">${x.title}</button>`).join('')}</nav>`:'')+
+ items.map(x=>`<article class="es nt${NO.hide?' hide':''}" id="nt-${x.id}"><div class="est">${SUBNAME[x.u]||x.u}</div><h3 class="ntt">${x.title}</h3>
  <ul class="ntp">${x.pts.map(p=>`<li>${p}</li>`).join('')}</ul>
- ${x.tbl?`<div class="tw"><table class="ft ntb"><thead><tr>${x.tbl.h.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${x.tbl.r.map(r=>`<tr>${r.map((c,i)=>i?`<td><span class="f">${c}</span></td>`:`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
+ ${x.tbl?`<div class="tw"><table class="ft ntb${x.tbl.h.length>=4?' wide':''}"><thead><tr>${x.tbl.h.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${x.tbl.r.map(r=>`<tr>${r.map((c,i)=>i?`<td><span class="f">${c}</span></td>`:`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
  ${x.warn&&x.warn.length?`<div class="ntw"><b>실수 주의</b><ul>${x.warn.map(w=>`<li>${w}</li>`).join('')}</ul></div>`:''}
  ${(x.ex||[]).map((e,i)=>`<details class="ex ntx"><summary>예제 ${i+1}. ${e.t}</summary>${e.fig?`<figure class="fig">${e.fig()}</figure>`:''}<p>${e.a}</p></details>`).join('')}
  ${(x.go||[]).filter(id=>TYPE[id]).length?`<div class="bar ntg"><span class="muted">관련 유형 풀기</span>${x.go.filter(id=>TYPE[id]).map(id=>`<button class="chip" data-ntgo="${id}">${TYPE[id].name}</button>`).join('')}</div>`:''}</article>`).join('')}
 $('#v-note').addEventListener('click',e=>{const f=e.target.closest('.nt.hide .f');if(f){f.classList.toggle('on');return}const b=e.target.closest('button');if(!b)return;
- if(b.dataset.nth){NO.hide=!NO.hide;renderNote()}else if(b.dataset.ntgo){newPractice(b.dataset.ntgo);show('practice');window.scrollTo({top:0})}});
+ if(b.dataset.nth){NO.hide=!NO.hide;renderNote()}else if(b.dataset.ntj){const el=document.getElementById('nt-'+b.dataset.ntj);if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'})}
+ else if(b.dataset.ntp){NO.hide=false;renderNote();v_open();document.body.classList.add('ntprint');const off=()=>{document.body.classList.remove('ntprint');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);window.print()}else if(b.dataset.ntgo){newPractice(b.dataset.ntgo);show('practice');window.scrollTo({top:0})}});
 
 /* ===== 서술형 (조건형 서술: 용어 포함 확인 + 모범답안 + 스스로 채점) ===== */
 const ES={ans:{},done:{}};
