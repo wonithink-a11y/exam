@@ -152,6 +152,11 @@ math{font-size:1.08em}
 .causes .czl{display:grid;gap:6px;margin-top:8px}.czr{display:grid;grid-template-columns:minmax(9em,auto) 1fr 2em;gap:10px;align-items:center;font-size:13.5px}.czr b{text-align:right;font-family:var(--f-num)}
 .cztip{margin:10px 0 0;font-size:13.5px;line-height:1.65}.cztip b{color:var(--bad)}
 .nt.st{border-left:4px solid var(--ac)}.ntst{margin-right:8px;font:700 11px var(--f-body);padding:2px 8px;border-radius:999px;background:var(--ac);color:var(--on)}
+.sa-note{border:1.5px dashed var(--rule);border-radius:12px;padding:10px 14px;color:var(--muted);font-size:13.5px;margin:8px 0}
+.sachk{margin:10px 0 4px;align-items:center}.sachk .muted{margin-right:4px;font-size:13px}.q.sa .model{font-size:14.5px;margin:8px 0}
+.tx-p{margin:0 0 16px;line-height:1.6;font-size:17px}.tx-who{display:block;font-size:12.5px;color:var(--muted);margin-bottom:2px}
+.tx-s{display:block;cursor:pointer;border-radius:8px;padding:7px 10px;margin:1px 0}.tx-s:hover{background:var(--ac-s)}.tx-s.on{background:var(--ac-s);box-shadow:0 0 0 2px var(--ac) inset}
+.txs .bar{margin:8px 0 14px}.txs .bar.txb{position:sticky;top:calc(env(safe-area-inset-top,0px) + 60px);z-index:4;background:var(--sheet);padding:8px 10px;border-radius:12px;box-shadow:var(--shadow)}
 .ntbs p{margin:0 0 6px;font-size:13px;text-align:center}
 .ntbsr{display:grid;grid-template-columns:2.2em repeat(15,minmax(0,1fr));gap:2px;align-items:center;margin-bottom:3px;font-family:var(--f-num);font-size:11.5px}
 .ntbsr i{font-style:normal;text-align:center;border:1px solid var(--rule);border-radius:4px;padding:3px 0;background:var(--sheet)}
@@ -427,6 +432,8 @@ function mc(R,ans,wrongs,fmt){fmt=fmt||String;const isN=typeof ans==='number';co
 const fixed=(opts,ans)=>({opts,ans});
 /* 문항 은행: [문제, 정답, [오답…], 풀이] 중 하나를 골라 보기 순서를 섞는다 */
 function bank(id,u,name,lv,items){return{id,u,name,lv,bank:true,n:items.length,g:R=>{const it=R.pick(items);return{q:it[0],...mc(R,it[1],it[2]),exp:it[3]}}}}
+/* 서술형 은행: [문제, 모범 답안, 채점 기준·풀이] 중 하나. 보기 없이 직접 쓰고 모범 답안과 비교해 스스로 채점 */
+function sbank(id,u,name,lv,items){return{id,u,name:'[서술형] '+name,lv,sa:true,bank:true,n:items.length,g:R=>{const it=R.pick(items);return{sa:true,q:it[0],model:it[1],exp:it[2]||'',opts:[],ans:''}}}}
 
 /* ===== 그림(SVG) ===== */
 const f1=v=>Math.round(v*10)/10;
@@ -5355,7 +5362,7 @@ const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}
 let SEM=SEMS[LS.get('m12-sem','1-2')]?LS.get('m12-sem','1-2'):'1-2',SJ=SEMS[SEM];const SK=(c=CUR)=>SEM==='1-2'?c:c+'_'+SEM.replace('-','');
 const $=s=>document.querySelector(s);
 const LV=['','하','중','상'];
-function gen(id,seed){for(let k=0;k<6;k++){try{const d=TYPE[id].g(mkR(seed+k*7919));if(d&&d.opts&&d.opts.length===5&&d.opts.includes(d.ans))return d}catch(e){}}
+function gen(id,seed){for(let k=0;k<6;k++){try{const d=TYPE[id].g(mkR(seed+k*7919));if(d&&d.sa&&d.model)return{opts:[],ans:'',...d};if(d&&d.opts&&d.opts.length===5&&d.opts.includes(d.ans))return d}catch(e){}}
  return{q:'문제를 만들지 못했습니다. 다른 문제를 눌러 주세요.',opts:['-','-','-','-','-'],ans:'-',exp:''}}
 function record(id,seed,ok){const t=S.t[id]||(S.t[id]=[0,0]);t[0]++;if(ok)t[1]++;
  S.w=S.w.filter(x=>!(x.id===id&&x.seed===seed));if(!ok){S.w.unshift({id,seed,at:Date.now()});S.w=S.w.slice(0,80)}LS.set('m12-rec-'+SK(),S);onRecord()}
@@ -5429,7 +5436,13 @@ document.addEventListener('click',e=>{
   if(el)setTimeout(()=>window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'}),30);return}
  const z=e.target.closest('[data-cz]');if(z){const box=z.closest('.cause'),w=S.w.find(x=>x.id===box.dataset.cid&&String(x.seed)===box.dataset.cseed);if(!w)return;
   if(w.c===z.dataset.cz)delete w.c;else w.c=z.dataset.cz;LS.set('m12-rec-'+SK(),S);onRecord();box.querySelectorAll('[data-cz]').forEach(b=>b.classList.toggle('on',b.dataset.cz===w.c))}});
-function qHTML(it,idx,o){const t=TYPE[it.id],d=it.d,ai=d.opts.indexOf(d.ans),done=o.graded;
+const okOf=i=>i.d.sa?i.self===1:i.d.opts[i.pick]===i.d.ans;
+function saHTML(it,idx,o){const t=TYPE[it.id],d=it.d,done=o.graded,show=done||it.show;
+ const body=show?`<div class="model"><b>모범 답안</b> ${d.model}</div>${d.exp?`<div class="exp"><b class="h">채점 기준 · 풀이</b>${d.exp}</div>`:''}<div class="selfchk sachk"><span class="muted">스스로 채점</span><button class="chip ${it.self===1?'on':''}" data-sa="${idx}" data-v="1">맞음</button><button class="chip ${it.self===0?'on':''}" data-sa="${idx}" data-v="0">틀림</button></div>`
+  :`${satBox(hsh(d.q),'답을 직접 써 보세요 (종이에 써도 됩니다)')}<div class="sa-note">서술형 — 보기가 없습니다.${o.fold?' 채점하면 모범 답안이 나옵니다.':''}</div>${o.fold?'':`<button class="btn" data-act="sashow">모범 답안 보기</button>`}`;
+ return `<article class="q sa" id="q${idx}" data-aik="${CUR}|${hsh(d.q+'|'+(d.fig||'')+'|'+d.opts.join('|'))}" data-ans="0" data-pick="-1" data-done="${show?1:0}"><template class="aix">${d.model}<br>${d.exp}</template><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name.replace('[서술형] ','')}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lvsa">서술형</span></div>
+ <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${body}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
+function qHTML(it,idx,o){if(it.d.sa)return saHTML(it,idx,o);const t=TYPE[it.id],d=it.d,ai=d.opts.indexOf(d.ans),done=o.graded;
  const short=d.opts.every(x=>x.length<=14);
  const opts=d.opts.map((x,j)=>{let c='',mk='';if(done){if(j===ai){c='ok';mk='정답'}if(it.pick===j&&j!==ai){c='no';mk='내 답'}}else if(it.pick===j)c='on';
   return `<li><button class="opt ${c}" data-q="${idx}" data-j="${j}" ${done&&o.lock?'disabled':''}><span class="bub">${j+1}</span><span>${x}</span>${mk?`<span class="mk">${mk}</span>`:''}</button></li>`}).join('');
@@ -5477,11 +5490,13 @@ function newPractice(id,seed){let pool=scoped().filter(t=>!P.lv||t.lv===P.lv).ma
 function renderPractice(){const v=$('#v-practice');
  const lvBar=`<div class="bar"><span class="muted">난이도</span>${[0,1,2,3].map(l=>`<button class="chip ${P.lv===l?'on':''}" data-lv="${l}">${l?LV[l]:'전체'}</button>`).join('')}<span class="sp"></span><span class="tally">이번에 ${P.n}문제 · 정답 ${P.ok}</span></div>`;
  if(!P.it){v.innerHTML=lvBar+`<div class="empty" style="margin-top:12px">선택한 범위와 난이도에 맞는 유형이 없습니다. 위에서 출제 범위를 넓혀 주세요.</div>`;return}
- const done=P.it.pick!=null,bk=TYPE[P.it.id].bank;
+ const done=P.it.d.sa?P.it.self!=null:P.it.pick!=null,bk=TYPE[P.it.id].bank;
  v.innerHTML=lvBar+`<div class="sheet" style="margin-top:12px">${qHTML(P.it,0,{graded:done,lock:true,num:P.n+(done?0:1),hint:true,cause:true})}</div>
  <div class="bar" style="margin-top:12px"><button class="btn pri" data-act="next">다음 문제</button><button class="btn" data-act="again">${bk?'같은 유형 다른 문제':'같은 유형, 숫자만 바꿔서'}</button></div>`}
 $('#v-practice').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.dataset.lv!=null){P.lv=+b.dataset.lv;newPractice();return}
+ if(b.dataset.act==='sashow'&&P.it){P.it.show=true;renderPractice();return}
+ if(b.dataset.sa!=null&&P.it&&P.it.d.sa&&P.it.self==null){P.it.self=+b.dataset.v;P.n++;if(P.it.self===1)P.ok++;record(P.it.id,P.it.seed,P.it.self===1);renderPractice();return}
  if(b.dataset.act==='next'){newPractice();return}
  if(b.dataset.act==='again'&&P.it){newPractice(P.it.id);return}
  if(b.dataset.j!=null&&P.it&&P.it.pick==null){P.it.pick=+b.dataset.j;const ok=P.it.d.opts[P.it.pick]===P.it.d.ans;P.n++;if(ok)P.ok++;record(P.it.id,P.it.seed,ok);renderPractice()}});
@@ -5496,10 +5511,15 @@ function weakEssays(R,n,all){if(!n||typeof essHas!=='function'||!essHas())return
  const w=x=>{const r=rec[x.id];return !r?1:r[1]===0?3:r[1]===1?2:.15};const left=pool.slice(),out=[];
  while(out.length<n&&left.length){const ws=left.map(w);let t=R.f()*ws.reduce((a,b)=>a+b,0),k=0;while(k<left.length-1&&(t-=ws[k])>0)k++;out.push(left.splice(k,1)[0])}
  return out.sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u))}
-function pickTypes(R,count,types){const by={};types.forEach(t=>(by[t.u]=by[t.u]||[]).push(t));const keys=SUBS.filter(k=>by[k]);keys.forEach(k=>by[k]=R.shuffle(by[k]));
+function pickTypes(R,count,types){types=types.filter(t=>!t.sa);if(!types.length)return[];const by={};types.forEach(t=>(by[t.u]=by[t.u]||[]).push(t));const keys=SUBS.filter(k=>by[k]);keys.forEach(k=>by[k]=R.shuffle(by[k]));
  const ptr={};const out=[];let ks=R.shuffle(keys);while(out.length<count){for(const k of ks){if(out.length>=count)break;const i=ptr[k]||0;out.push(by[k][i%by[k].length]);ptr[k]=i+1}ks=R.shuffle(keys)}
  return out.sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)||a.lv-b.lv)}
-function makeExam(seed,count,list,label,o){o=o||{};let ids;if(list){ids=list}else{const types=scoped();if(!types.length){E={err:true};renderExam();return}ids=pickTypes(mkR(seed),count,types).map(t=>t.id)}
+/* 서술형이 있는 과목은 모의고사를 객관식 (count-3) + 서술형 3문항으로 구성(맨 뒤). 교과서 본문 서술형(tsa-)이 범위에 있으면 그것만 출제 */
+const SA_N=3;
+function pickSa(R,types,n){const by={};const sa=types.filter(t=>t.sa),tb=sa.filter(t=>t.id.startsWith('tsa-'));(tb.length?tb:sa).forEach(t=>(by[t.u]=by[t.u]||[]).push(t));const keys=SUBS.filter(k=>by[k]);if(!keys.length)return[];keys.forEach(k=>by[k]=R.shuffle(by[k]));
+ const out=[],ptr={};let ks=R.shuffle(keys);while(out.length<n){for(const k of ks){if(out.length>=n)break;const i=ptr[k]||0;out.push(by[k][i%by[k].length]);ptr[k]=i+1}ks=R.shuffle(keys)}
+ return out.sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u))}
+function makeExam(seed,count,list,label,o){o=o||{};let ids;if(list){ids=list}else{const types=scoped();if(!types.length){E={err:true};renderExam();return}const R=mkR(seed),sa=pickSa(R,types,SA_N);ids=[...pickTypes(R,count-sa.length,types).map(t=>t.id),...sa.map(t=>t.id)]}
  const seen=new Set();const items=ids.map((id,i)=>{let s=seed*100+i,d=gen(id,s);for(let k=1;k<10&&seen.has(d.q);k++){s=seed*100+i+k*1000003;d=gen(id,s)}seen.add(d.q);return{id,seed:s,d,pick:null}});
  if(o.srcs)items.forEach((it,i)=>it.src=o.srcs[i]);
  E={seed,label:label||'모의고사',items,graded:false,copy:null,hk:null,es:(o.es||(list?[]:pickEssays(seed))),weak:!!o.weakEs,weakAll:!!o.weakAll};
@@ -5514,26 +5534,29 @@ function weakPick(R,count,pool){const A=allS(),un={},recent={};
   const ws=c.map(t=>W.get(t.id)/(1+(used[t.id]||0)));let x=R.f()*ws.reduce((a,b)=>a+b,0),k=0;while(k<c.length-1&&(x-=ws[k])>0)k++;
   out.push(c[k]);used[c[k].id]=(used[c[k].id]||0)+1}
  return out}
-function weakExam(count,o){o=o||{};const pool=o.all?T:scoped();if(!pool.length){E={err:true};renderExam();return}
- const picks=weakPick(mkR(Math.floor(Math.random()*1e9)),count,pool).sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)||a.lv-b.lv),A=allS();
+function weakExam(count,o){o=o||{};const all=o.all?T:scoped(),pool=all.filter(t=>!t.sa);if(!pool.length){E={err:true};renderExam();return}
+ const R0=mkR(Math.floor(Math.random()*1e9)),sa=o.all?[]:pickSa(R0,all,SA_N);
+ const picks=[...weakPick(R0,count-sa.length,pool).sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)||a.lv-b.lv),...sa],A=allS();
  const srcs=picks.map(t=>{const r=A.t[t.id];return r&&r[0]?`${r[0]}번 중 ${r[0]-r[1]}번 틀림`:'아직 안 풀어 봄'});
  const sd=Math.floor(1000+Math.random()*9000);
  makeExam(sd,picks.length,picks.map(t=>t.id),'약점 집중 시험',{srcs,es:weakEssays(mkR(sd*13+5),examEs,!!o.all),weakEs:true,weakAll:!!o.all})}
+const hasSa=()=>scoped().some(t=>t.sa);
 function renderExam(){const v=$('#v-exam');
- const cfg=`<div class="cfg"><div class="bar"><span class="muted">문항 수</span>${[10,15,20,25].map(n=>`<button class="chip ${examN===n?'on':''}" data-n="${n}">${n}</button>`).join('')}${(typeof essHas==='function'&&essHas())?`<span class="muted" style="margin-left:10px">서술형</span>${[0,2,3,4].map(n=>`<button class="chip ${examEs===n?'on':''}" data-esn="${n}">${n?n+'문항':'없음'}</button>`).join('')}`:''}</div>
+ const cfg=`<div class="cfg"><div class="bar"><span class="muted">문항 수</span>${[10,15,20,25].map(n=>`<button class="chip ${examN===n?'on':''}" data-n="${n}">${n}</button>`).join('')}${hasSa()?`<span class="muted">객관식 ${examN-SA_N} + 서술형 ${SA_N}</span>`:''}${(typeof essHas==='function'&&essHas())?`<span class="muted" style="margin-left:10px">서술형</span>${[0,2,3,4].map(n=>`<button class="chip ${examEs===n?'on':''}" data-esn="${n}">${n?n+'문항':'없음'}</button>`).join('')}`:''}</div>
  <div class="bar"><label for="seedIn">시험지 번호 <input id="seedIn" inputmode="numeric" placeholder="자동"></label><span class="sp"></span><button class="btn" data-act="weakmode">약점 집중</button><button class="btn pri" data-act="make">시험지 만들기</button></div>
  <p class="muted" style="margin:0">같은 과목에서 같은 번호를 넣으면 같은 시험지가 다시 나옵니다. <b>약점 집중</b>은 출제 범위 안에서 많이 틀린 유형·정답률이 낮은 단원·아직 안 풀어 본 유형을 우선 출제합니다.</p></div>`;
  if(!E||E.err){v.innerHTML=cfg+(E&&E.err?`<div class="empty" style="margin-top:12px">출제 범위를 하나 이상 선택해 주세요.</div>`:'');return}
- const ans=E.items.filter(i=>i.pick!=null).length;let score='';const okOf=i=>i.d.opts[i.pick]===i.d.ans;
+ const ans=E.items.filter(i=>!i.d.sa&&i.pick!=null).length,nObj=E.items.filter(i=>!i.d.sa).length;let score='';
  const copyBox=E.copy!=null?`<textarea class="copybox" id="copybox" readonly>${E.copy.replace(/</g,'&lt;')}</textarea><p class="muted" style="margin:0">자동 복사가 막혀 있어 위 글을 직접 선택해 복사해 주세요.</p>`:'';
  if(E.graded){const ok=E.items.filter(okOf).length;const by={};E.items.forEach(i=>{const u=TYPE[i.id].u;by[u]=by[u]||[0,0];by[u][0]++;if(okOf(i))by[u][1]++});
-  score=`<div class="score"><div class="big">${Math.round(ok/E.items.length*100)}<small>점 · ${E.items.length}문항 중 ${ok}개 정답</small></div>
-  <div class="omrrow">${E.items.map((i,k)=>`<span class="${okOf(i)?'o':'x'}">${k+1} ${okOf(i)?'○':'×'}</span>`).join('')}</div>
+  const nSa=E.items.length-nObj,saOk=E.items.filter(i=>i.d.sa&&i.self===1).length,saUn=E.items.filter(i=>i.d.sa&&i.self==null).length;
+  score=`<div class="score"><div class="big">${Math.round(ok/E.items.length*100)}<small>점 · ${E.items.length}문항 중 ${ok}개 정답${nSa?` (객관식 ${ok-saOk}/${nObj} · 서술형 ${saOk}/${nSa}${saUn?` · 서술형 ${saUn}문항은 아래에서 스스로 채점`:''})`:''}</small></div>
+  <div class="omrrow">${E.items.map((i,k)=>`<span class="${okOf(i)?'o':'x'}">${k+1}${i.d.sa?'서':''} ${okOf(i)?'○':i.d.sa&&i.self==null?'?':'×'}</span>`).join('')}</div>
   <div class="muted">${Object.entries(by).map(([u,[n,c]])=>`${SUBNAME[u]} ${c}/${n}`).join(' · ')}</div>
   <div class="bar">${ok<E.items.length?`<button class="btn pri sm" data-act="retry">틀린 유형 다시 풀기</button>`:''}<button class="btn sm" data-act="copy">시험지·정답 텍스트 복사</button><button class="btn sm" data-act="pdf">시험지 PDF</button></div>${copyBox}</div>`}
  v.innerHTML=cfg+`<div style="height:12px"></div>${score}<div class="sheet" style="margin-top:12px"><div class="ehead"><b>${SJ[CUR].name} ${E.label}</b><span class="muted">시험지 번호 ${E.seed} · ${E.items.length}문항</span></div>
  ${E.items.map((it,i)=>qHTML(it,i,{graded:E.graded,lock:true,fold:true,cause:true})).join('')}</div>${esSheet()}
- ${E.graded?'':popBar()+`<div class="bar" style="margin-top:12px"><span class="tally">${ans}/${E.items.length} 표기</span><span class="sp"></span><button class="btn" data-act="pdf">시험지 PDF</button><button class="btn" data-act="copy">텍스트 복사</button><button class="btn pri" data-act="grade">채점하기</button></div>${copyBox}`}`}
+ ${E.graded?'':popBar()+`<div class="bar" style="margin-top:12px"><span class="tally">${ans}/${nObj} 표기</span><span class="sp"></span><button class="btn" data-act="pdf">시험지 PDF</button><button class="btn" data-act="copy">텍스트 복사</button><button class="btn pri" data-act="grade">채점하기</button></div>${copyBox}`}`}
 
 function esSheet(){if(!E.es||!E.es.length)return'';
  return `<div class="sheet" style="margin-top:12px"><div class="ehead"><b>서술형 ${E.es.length}문항</b><span class="muted">총 ${esPts(E.es)}점 · 아래 칸에 직접 쓰거나 시험지 PDF에 쓰세요</span></div>${E.es.map((x,i)=>`<div class="es" style="border:0;border-top:1px solid var(--rule);border-radius:0;margin:0"><div class="est">서술형 ${i+1} · ${SUBNAME[x.u]} · ${esEsc(x.name)} · ${x.pts}점${E.weak?(r=>r?` · 최근 ${['다시 공부','일부 빠졌다','충분히 썼다'][r[1]]}`:' · 아직 안 풀어 봄')(esRecAll()[x.id]):''}</div><div class="esq">${esEsc(x.q)}</div><div class="escd"><b>&lt;조건&gt;</b><br>${x.conds.map((c,j)=>`${'ㄱㄴㄷㄹ'[j]}. ${esEsc(c)}`).join('<br>')}</div><textarea data-esid="${x.id}" rows="6" placeholder="여기에 답안을 쓰세요">${esEsc(ES.ans[x.id]||'')}</textarea>${E.graded?`<div class="esm"><b>모범답안</b><br>${esEsc(x.model)}</div>`:''}</div>`).join('')}</div>`}
@@ -5555,8 +5578,11 @@ const PDF_CSS=`.pp{--ink:#111;--muted:#555;--rule:#888;--chip:#f3f3f3;--ac:#333;
 .pp.a4{width:794px;height:1123px;font-size:13px;padding:34px 34px 38px}.pp.a4 .ph h1{font-size:20px}.pp.a4 .ph .m{font-size:12px}.pp.a4 .ph .nm{font-size:12px;gap:5px}.pp.a4 .ph .nm span{min-width:70px;padding:4px 6px}.pp.a4 .cols{gap:24px}.pp.a4 .cols .col+.col{padding-left:24px}.pp.a4 .pqt{font-size:13.5px}.pp.a4 .pqt b.n{font-size:14.5px}.pp.a4 .psg,.pp.a4 .ex{font-size:12.5px}.pp.a4 .fig svg{max-width:190px;width:190px}.pp.a4 .ak{grid-template-columns:repeat(8,1fr)}
 .pp .pg{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:13px;color:#555}
 .pp .ak{display:grid;grid-template-columns:repeat(10,1fr);border:1.5px solid #111;margin-bottom:14px}.pp .ak div{border:1px solid #bbb;text-align:center;padding:4px 0;font-size:15px}.pp .ak b{display:block;font-size:12px;color:#555}
-.pp .ex{font-size:13.5px;line-height:1.55;padding:4px 0 10px}.pp .ex .tw,.pp .pq .tw{overflow:visible}`;
-function pqHTML(it,i,ans){const d=it.d,t=TYPE[it.id],C='①②③④⑤';const short=d.opts.every(x=>x.replace(/<[^>]+>/g,'').length<=12);
+.pp .sal{height:30px;border-bottom:1px solid #888}.pp .ex{font-size:13.5px;line-height:1.55;padding:4px 0 10px}.pp .ex .tw,.pp .pq .tw{overflow:visible}`;
+function saveScore(){if(!E.hk)return;const H=LS.get('m12-hist-'+SK(),[]),h=H.find(x=>x.k===E.hk);if(h){h.score=Math.round(E.items.filter(okOf).length/E.items.length*100);LS.set('m12-hist-'+SK(),H)}}
+function pqHTML(it,i,ans){const d=it.d,t=TYPE[it.id],C='①②③④⑤';if(d.sa){if(ans)return `<div class="ex"><b>${i+1}. 서술형 모범 답안</b> ${pFrac(d.model)}${d.exp?`<br>${pFrac(d.exp)}`:''}</div>`;
+  return `<div class="pq"><span class="tag">서술형 · ${SUBNAME[t.u]}</span><div class="pqt"><b class="n">${i+1}.</b>${pFrac(d.q)}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}<div class="sal"></div><div class="sal"></div><div class="sal"></div></div>`}
+ const short=d.opts.every(x=>x.replace(/<[^>]+>/g,'').length<=12);
  if(ans){const ai=d.opts.indexOf(d.ans);return `<div class="ex"><b>${i+1}. 정답 ${C[ai]}</b> ${pFrac(d.exp)}</div>`}
  return `<div class="pq"><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?' · '+it.src:''}</span><div class="pqt"><b class="n">${i+1}.</b>${pFrac(d.q)}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}<ol class="po${short?' s':''}">${d.opts.map((x,j)=>`<li><span>${C[j]}</span><span>${pFrac(x)}</span></li>`).join('')}</ol></div>`}
 function svgInline(root){root.querySelectorAll('svg').forEach(sv=>{const r=sv.getBoundingClientRect();sv.setAttribute('width',Math.round(r.width));sv.setAttribute('height',Math.round(r.height));
@@ -5579,7 +5605,7 @@ async function examPdf(btn){if(_pdfBusy)return;if(!E||!E.items){pdfToast('먼저
  let host;try{await loadPdfLibs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
   const [g,t,ey]=SEMNAME[SEM],nm=SJ[CUR].name;const head=`<div class="ph"><div><div class="m">${ey}</div><h1>${g} ${nm} ${E.label}</h1><div class="m">${SJ[CUR].book||''} · 시험지 번호 ${E.seed} · ${E.items.length}문항${E.es&&E.es.length?` + 서술형 ${E.es.length}문항`:''}</div></div><div class="nm"><span>반·번호</span><span>이름</span><span>점수</span></div></div>`;
   const aHead=`<div class="ph"><div><div class="m">${ey}</div><h1>정답과 풀이 — ${g} ${nm} ${E.label}</h1><div class="m">시험지 번호 ${E.seed}</div></div></div>`;
-  const key=`<div class="ak">${E.items.map((it,i)=>`<div><b>${i+1}</b>${'①②③④⑤'[it.d.opts.indexOf(it.d.ans)]}</div>`).join('')}</div>`;
+  const key=`<div class="ak">${E.items.map((it,i)=>`<div><b>${i+1}</b>${it.d.sa?'서술':'①②③④⑤'[it.d.opts.indexOf(it.d.ans)]}</div>`).join('')}</div>`;
   const A4=POPT.paper==='a4',gapPx=[18,A4?56:80,A4?110:150][popGap()];const esB=(E.es||[]).map((x,i)=>`<div class="pq"><span class="tag">서술형 ${i+1} · ${SUBNAME[x.u]} · ${x.name}</span><div class="pqt"><b class="n">서술형 ${i+1}.</b>${esEsc(x.q)} <b>[${x.pts}점]</b></div><div class="psg" style="margin:6px 0;border:1px solid #888;padding:6px 10px"><b>&lt;조건&gt;</b><br>${x.conds.map((c,j)=>`${'ㄱㄴㄷㄹ'[j]}. ${esEsc(c)}`).join('<br>')}</div><div class="esl">${Array.from({length:Math.max(4,Math.ceil(x.pts*1.2))},()=>`<div style="height:${A4?17:21}px;border-bottom:1px solid #aaa"></div>`).join('')}</div></div>`),esA=(E.es||[]).map((x,i)=>`<div class="ex"><b>서술형 ${i+1}. 모범답안</b> ${esEsc(x.model)} <span style="color:#555">(필수 용어: ${x.kw.map(g=>esEsc(g[0])).join(', ')})</span></div>`);
   const r=await buildPages(head,[...E.items.map((it,i)=>pqHTML(it,i)),...esB],[key,...E.items.map((it,i)=>pqHTML(it,i,true)),...esA],{a4:A4,gap:gapPx});host=r.host;
   // 정답 페이지 머리말 교체
@@ -5599,16 +5625,17 @@ async function origPdf(o,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn.text
   const st=await savePdf(doc.output('blob'),`${o.title}.pdf`.replace(/[\\/:*?"<>|\s]+/g,'_'));pdfToast(st==='declined'?'저장을 취소했습니다.':'PDF를 저장했습니다. A3 가로로 인쇄하면 원본 2쪽이 한 장에 들어갑니다.')}
  catch(e){pdfToast('PDF를 만들지 못했습니다: '+(e&&e.message||e))}finally{_pdfBusy=false;btn.disabled=false;btn.textContent=lb}}
 function examText(){let s=`${SEMNAME[SEM][0]} ${SJ[CUR].name} ${SEMNAME[SEM][1]} ${E.label} (시험지 번호 ${E.seed})\n이름: ${$('#nm').value||''}\n\n`;
- E.items.forEach((it,i)=>{s+=`${i+1}. ${plain(it.d.q)}\n`;if(it.d.alt)s+=`   [그림] ${it.d.alt}\n`;s+=it.d.opts.map((o,j)=>`   ${CIRC[j]} ${plain(o)}`).join('\n')+'\n\n'});
- s+='[정답]\n'+E.items.map((it,i)=>`${i+1}.${CIRC[it.d.opts.indexOf(it.d.ans)]}`).join('  ')+'\n\n[풀이]\n'+E.items.map((it,i)=>`${i+1}. ${plain(it.d.exp)}`).join('\n');return s}
+ E.items.forEach((it,i)=>{s+=`${i+1}. ${it.d.sa?'[서술형] ':''}${plain(it.d.q)}\n`;if(it.d.alt)s+=`   [그림] ${it.d.alt}\n`;s+=it.d.sa?'   답: ____________________________\n\n':it.d.opts.map((o,j)=>`   ${CIRC[j]} ${plain(o)}`).join('\n')+'\n\n'});
+ s+='[정답]\n'+E.items.map((it,i)=>`${i+1}.${it.d.sa?'서술형':CIRC[it.d.opts.indexOf(it.d.ans)]}`).join('  ')+'\n\n[풀이·모범 답안]\n'+E.items.map((it,i)=>`${i+1}. ${it.d.sa?'모범 답안: '+plain(it.d.model)+' / ':''}${plain(it.d.exp)}`).join('\n');return s}
 $('#v-exam').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.dataset.n){examN=+b.dataset.n;LS.set('m12-n',examN);renderExam();return}
  const a=b.dataset.act;
  if(a==='make'){const sv=parseInt($('#seedIn').value,10);makeExam(sv>0?sv:Math.floor(1000+Math.random()*9000),examN);return}
  if(a==='weakmode'){weakExam(examN);return}
- if(a==='grade'){E.graded=true;E.copy=null;E.items.forEach(i=>record(i.id,i.seed,i.d.opts[i.pick]===i.d.ans));if(E.hk){const H=LS.get('m12-hist-'+SK(),[]),h=H.find(x=>x.k===E.hk);if(h){h.score=Math.round(E.items.filter(i=>i.d.opts[i.pick]===i.d.ans).length/E.items.length*100);LS.set('m12-hist-'+SK(),H)}}renderExam();window.scrollTo({top:$('#v-exam').offsetTop-60});return}
+ if(a==='grade'){E.graded=true;E.copy=null;E.items.forEach(i=>{if(!i.d.sa)record(i.id,i.seed,okOf(i))});saveScore();renderExam();window.scrollTo({top:$('#v-exam').offsetTop-60});return}
  if(a==='pdf'){examPdf(b);return}
- if(a==='retry'){const wr=E.items.filter(i=>i.d.opts[i.pick]!==i.d.ans).map(i=>i.id);makeExam(Math.floor(1000+Math.random()*9000),wr.length,wr,'오답 유형 시험');return}
+ if(b.dataset.sa!=null&&E.graded){const it=E.items[+b.dataset.sa];const first=it.self==null;it.self=+b.dataset.v;if(first)record(it.id,it.seed,it.self===1);saveScore();renderExam();return}
+ if(a==='retry'){const wr=E.items.filter(i=>!okOf(i)).map(i=>i.id);makeExam(Math.floor(1000+Math.random()*9000),wr.length,wr,'오답 유형 시험');return}
  if(a==='copy'){const t=examText();try{navigator.clipboard.writeText(t).then(()=>{b.textContent='복사했습니다'},()=>{E.copy=t;renderExam()})}catch(err){E.copy=t;renderExam()}return}
  if(b.dataset.j!=null&&!E.graded){const it=E.items[+b.dataset.q];it.pick=it.pick===+b.dataset.j?null:+b.dataset.j;
   document.querySelector('#v-exam #q'+b.dataset.q).querySelectorAll('.opt').forEach((o,j)=>o.classList.toggle('on',it.pick===j));
@@ -6721,12 +6748,31 @@ function eeCell(it,print){const x=it.x,k=it.kind;const eg=`<div class="eg">e.g. 
  if(k==='ee')return `<div class="df">${x.ee}</div>`;if(k==='sent')return `<div class="df">${eeBlank(x.s)}</div>`;if(k==='ko')return `<div class="df">${x.ko}</div>`;
  return `<div class="df">${x.ee}</div>${eg}`}
 const EE_KH={both:'영영 풀이 + 예문',ee:'영영 풀이만',sent:'예문 빈칸만',ko:'우리말 뜻',mix:'섞어서'};
-function renderWords(){const v=$('#v-words');if(!eeHas()){v.innerHTML='';return}const L=eeBook(),all=eeWords(false),wr=new Set(LS.get(eeWK(),[]));
- const les=`<div class="cfg"><div class="wl-les"><span class="muted" style="align-self:center">단원</span>${L.map(c=>{const n=eeLesName(c);return `<button class="chip ${W.les.has(c)?'on':''}" data-les="${c}" title="${n.name}">${n.tag}<small>${WB[c].length}</small></button>`}).join('')}<button class="chip" data-les="*">전체</button></div>
- <div class="bar"><button class="chip ${W.mode==='list'?'on':''}" data-wm="list">단어장</button><button class="chip ${W.mode==='test'?'on':''}" data-wm="test">단어 테스트 (학습지)</button><span class="sp"></span><span class="muted">${all.length}단어${wr.size?` · 틀린 단어 ${all.filter(x=>wr.has(x.w)).length}`:''}</span></div>
- <div class="vset"><button class="chip ${W.vopen?'on':''}" data-wvt="1" aria-expanded="${W.vopen?'true':'false'}">🔊 발음 설정 <small>${W.voice==='f'?'여성':W.voice==='m'?'남성':'섞어서'} · ${W.spd===1?'1.0':W.spd}×</small> ${W.vopen?'▴':'▾'}</button>
+const wVset=()=>`<div class="vset"><button class="chip ${W.vopen?'on':''}" data-wvt="1" aria-expanded="${W.vopen?'true':'false'}">🔊 발음 설정 <small>${W.voice==='f'?'여성':W.voice==='m'?'남성':'섞어서'} · ${W.spd===1?'1.0':W.spd}×</small> ${W.vopen?'▴':'▾'}</button>
  ${W.vopen?`<div class="vrow"><span class="muted">목소리</span><button class="chip ${W.voice==='f'?'on':''}" data-wv="f">여성</button><button class="chip ${W.voice==='m'?'on':''}" data-wv="m">남성</button><button class="chip ${W.voice==='mix'?'on':''}" data-wv="mix">섞어서</button></div>
- <div class="vrow"><span class="muted">속도</span>${[0.6,0.7,0.85,1].map(n=>`<button class="chip ${W.spd===n?'on':''}" data-wsp="${n}">${n===1?'1.0':n}×</button>`).join('')}</div>`:''}</div>
+ <div class="vrow"><span class="muted">속도</span>${[0.6,0.7,0.85,1].map(n=>`<button class="chip ${W.spd===n?'on':''}" data-wsp="${n}">${n===1?'1.0':n}×</button>`).join('')}</div>`:''}</div>`;
+/* ===== 본문 읽기: 교과서 본문(비공개 아티팩트 전용, data-eng-text.js) 문장별 듣기·전체 듣기 ===== */
+const txHas=()=>typeof TX_BOOK!=='undefined'&&!!(TX_BOOK[SEM]||[]).length;
+let _txTok=0,_txEnd=null,_txOn=false,_wl=null,_nv=null;
+/* 읽는 동안 화면이 꺼지지 않게: Wake Lock API, 안 되면 소리 없는 1초 영상을 반복 재생(NoSleep 방식) */
+async function wlOn(){try{if(navigator.wakeLock&&!_wl){_wl=await navigator.wakeLock.request('screen');_wl.addEventListener('release',()=>{_wl=null});return}}catch(e){_wl=null}
+ if(_wl)return;try{if(!_nv){_nv=document.createElement('video');_nv.setAttribute('playsinline','');_nv.muted=true;_nv.loop=true;_nv.style.cssText='position:fixed;left:0;top:0;width:2px;height:2px;opacity:.02;pointer-events:none';_nv.src='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAN1bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAp90cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAABAAAAAQAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAQAAABAAAAAAIXbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAKABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABwm1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAYJzdGJsAAAAvnN0c2QAAAAAAAAAAQAAAK5hdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAABAAEABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAANGF2Y0MBZAAK/+EAF2dkAAqs2V7ARAAAAwAEAAADACg8SJZYAQAGaOvjyyLA/fj4AAAAABBwYXNwAAAAAQAAAAEAAAAUYnRydAAAAAAAABegAAAXoAAAABhzdHRzAAAAAAAAAAEAAAAFAAAIAAAAABRzdHNzAAAAAAAAAAEAAAABAAAAOGN0dHMAAAAAAAAABQAAAAEAABAAAAAAAQAAKAAAAAABAAAQAAAAAAEAAAAAAAAAAQAACAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAUAAAABAAAAKHN0c3oAAAAAAAAAAAAAAAUAAALEAAAADAAAAAwAAAAMAAAADAAAABRzdGNvAAAAAAAAAAEAAAOlAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY2MC4xNi4xMDAAAAAIZnJlZQAAAvxtZGF0AAACrQYF//+p3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE2NCByMzEwOCAzMWUxOWY5IC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAyMyAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTMgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4eDhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTEgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhPTAgYmZyYW1lcz0zIGJfcHlyYW1pZD0yIGJfYWRhcHQ9MSBiX2JpYXM9MCBkaXJlY3Q9MSB3ZWlnaHRiPTEgb3Blbl9nb3A9MCB3ZWlnaHRwPTIga2V5aW50PTI1MCBrZXlpbnRfbWluPTUgc2NlbmVjdXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD00MCByYz1jcmYgbWJ0cmVlPTEgY3JmPTIzLjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjAwAIAAAAAPZYiEABL//vet34FNwys9AAAACEGaJGxD//7gAAAACEGeQniCH6uBAAAACAGeYXRD/7OAAAAACAGeY2pD/7OB';document.body.appendChild(_nv)}const p=_nv.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
+function wlOff(){try{_wl&&_wl.release()}catch(e){}_wl=null;try{_nv&&_nv.pause()}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(_txOn&&document.visibilityState==='visible')wlOn()});
+function txStop(){_txOn=false;wlOff();_txTok++;try{_A&&_A.pause()}catch(e){}if('speechSynthesis' in window)speechSynthesis.cancel();if(_txEnd){const f=_txEnd;_txEnd=null;f()}document.querySelectorAll('.tx-s.on').forEach(x=>x.classList.remove('on'))}
+function txClip(t,code,tok){return new Promise(async res=>{_txEnd=res;const v=audVoice(t);let P=_PK[v+code];if(!P)P=await audLoad(code,v);if(tok!==_txTok){res();return}const b=P&&P[eeKey(t)];
+ if(!b){if(!('speechSynthesis' in window)){res();return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=W.spd;u.onend=u.onerror=()=>res();speechSynthesis.speak(u);return}
+ if(!_A)_A=new Audio();_A.onended=_A.onerror=()=>res();_A.src='data:audio/mpeg;base64,'+b;_A.defaultPlaybackRate=W.spd;_A.playbackRate=W.spd;_A.preservesPitch=true;const p=_A.play();if(p&&p.catch)p.catch(()=>res())})}
+async function txPlay(code,els,from,title){txStop();_tok++;const tok=_txTok;_txOn=true;wlOn();try{if(navigator.mediaSession){navigator.mediaSession.metadata=new MediaMetadata({title:title||'본문 읽기',artist:'영어 교과서'});navigator.mediaSession.setActionHandler('pause',txStop)}}catch(e){}if(!_A)_A=new Audio();try{_A.src=_SIL;const p=_A.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}
+ for(let i=from;i<els.length;i++){if(tok!==_txTok)return;const el=els[i];el.classList.add('on');if(i>from)el.scrollIntoView({block:'center',behavior:'smooth'});await txClip(el.dataset.tx,code,tok);if(tok!==_txTok)return;el.classList.remove('on')}if(tok===_txTok){_txOn=false;wlOff()}}
+function txView(){const modes=`<div class="bar"><button class="chip" data-wm="list">단어장</button><button class="chip" data-wm="test">단어 테스트 (학습지)</button><button class="chip on" data-wm="text">본문 읽기</button></div>`;
+ return `<div class="cfg">${modes}${wVset()}<p class="muted" style="margin:0"><b>읽고 싶은 문장을 누르면 그 문장부터 끝까지</b> 이어서 읽고, <b>전체 듣기</b>는 처음부터 읽습니다. 읽는 문장은 색으로 표시되고, <b>■ 멈춤</b>으로 멈춥니다. 읽는 동안에는 화면이 꺼지지 않게 합니다. 교과서 본문이므로 이 화면은 비공개 버전에서만 보입니다.</p></div>`+
+ TX_BOOK[SEM].map(l=>`<div class="wsec txs"><h3>${l.tag} ${l.title}</h3><div class="muted">${l.lesson} · ${l.pages}</div><div class="bar txb"><button class="btn sm pri" data-txall="${l.code}">▶ 전체 듣기</button><button class="btn sm" data-txstop="1">■ 멈춤</button></div>`+
+  l.ps.map(p=>`<div class="tx-p">${p.who?`<b class="tx-who">${p.who}</b>`:''}${p.s.map(t=>`<span class="tx-s" data-tx="${eeAtt(t)}" data-txc="${l.code}">${t}</span>`).join(' ')}</div>`).join('')+`</div>`).join('')}
+function renderWords(){const v=$('#v-words');if(!eeHas()){v.innerHTML='';return}if(W.mode==='text'&&txHas()){txStop();v.innerHTML=txView();return}const L=eeBook(),all=eeWords(false),wr=new Set(LS.get(eeWK(),[]));
+ const les=`<div class="cfg"><div class="wl-les"><span class="muted" style="align-self:center">단원</span>${L.map(c=>{const n=eeLesName(c);return `<button class="chip ${W.les.has(c)?'on':''}" data-les="${c}" title="${n.name}">${n.tag}<small>${WB[c].length}</small></button>`}).join('')}<button class="chip" data-les="*">전체</button></div>
+ <div class="bar"><button class="chip ${W.mode==='list'?'on':''}" data-wm="list">단어장</button><button class="chip ${W.mode==='test'?'on':''}" data-wm="test">단어 테스트 (학습지)</button>${txHas()?`<button class="chip ${W.mode==='text'?'on':''}" data-wm="text">본문 읽기</button>`:''}<span class="sp"></span><span class="muted">${all.length}단어${wr.size?` · 틀린 단어 ${all.filter(x=>wr.has(x.w)).length}`:''}</span></div>
+ ${wVset()}
  <p class="muted" style="margin:0">단어는 교과서(2022 개정 동아 윤정미) 각 Lesson의 단어장과 대화문·본문에서 뽑았고, 영영 풀이와 예문은 새로 쓴 것입니다.</p></div>`;
  const paper=`<span class="muted" style="display:inline-flex;gap:6px;align-items:center">용지 <button class="chip ${W.paper==='a4'?'on':''}" data-pp="a4">A4 세로</button><button class="chip ${W.paper==='a3'?'on':''}" data-pp="a3">A3 가로</button></span>`;
  if(W.mode==='list'){const groups=L.filter(c=>W.les.has(c)).map(c=>[c,all.filter(x=>x.code===c)]);
@@ -6748,9 +6794,9 @@ function eeGrade(){const T0=W.test;if(!T0)return;const wr=new Set(LS.get(eeWK(),
 const eeNew=()=>{W.test=eeMakeTest(Math.floor(1000+Math.random()*9000))};
 $('#v-words').addEventListener('input',e=>{const t=e.target;if(t.matches('input.win')&&W.test)W.test.items[+t.dataset.wi].val=t.value});
 $('#v-words').addEventListener('keydown',e=>{const t=e.target;if(e.key!=='Enter'||e.isComposing||!t.matches('input.win'))return;e.preventDefault();const ins=[...document.querySelectorAll('#v-words input.win')],k=ins.indexOf(t);if(ins[k+1])ins[k+1].focus();else t.blur()});
-$('#v-words').addEventListener('click',e=>{const sp=e.target.closest('button.spk');if(sp){say(sp.dataset.say,sp.dataset.ac);return}const cv=e.target.closest('.cv');if(cv){cv.classList.toggle('hid');return}const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+$('#v-words').addEventListener('click',e=>{const ts=e.target.closest('.tx-s');if(ts){const sec=ts.closest('.txs'),all=[...sec.querySelectorAll('.tx-s')];txPlay(ts.dataset.txc,all,all.indexOf(ts),sec.querySelector('h3').textContent);return}const ta=e.target.closest('button[data-txall],button[data-txstop]');if(ta){if(ta.dataset.txstop){txStop();return}const sec=ta.closest('.txs');txPlay(ta.dataset.txall,[...sec.querySelectorAll('.tx-s')],0,sec.querySelector('h3').textContent);return}const sp=e.target.closest('button.spk');if(sp){say(sp.dataset.say,sp.dataset.ac);return}const cv=e.target.closest('.cv');if(cv){cv.classList.toggle('hid');return}const b=e.target.closest('button');if(!b)return;const d=b.dataset;
  if(d.les){if(d.les==='*')W.les=new Set(eeBook());else{if(W.les.has(d.les)){if(W.les.size>1)W.les.delete(d.les)}else W.les.add(d.les)}LS.set('m12-eel-'+SEM,[...W.les]);W.test=null;if(W.mode==='test')eeNew();renderWords();return}
- if(d.wm){W.mode=d.wm;if(W.mode==='test'&&!W.test)eeNew();renderWords();return}
+ if(d.wm){txStop();W.mode=d.wm;if(W.mode==='test'&&!W.test)eeNew();renderWords();return}
  if(d.hide){W['hide'+d.hide]=!W['hide'+d.hide];renderWords();return}
  if(d.pp){W.paper=d.pp;renderWords();return}
  if(d.wvt){W.vopen=!W.vopen;renderWords();return}
@@ -6810,7 +6856,7 @@ async function eePdf(kind,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn&&bt
 /* ===== 탭 ===== */
 function show(tab){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));
  if(tab==='words'&&!eeHas())tab='practice';if(tab==='essay'&&!essHas())tab='practice';if(tab==='note'&&!ntHas())tab='practice';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));
- ['practice','exam','jokbo','review','stats','words','essay','note'].forEach(t=>$('#v-'+t).hidden=t!==tab);if(tab==='words')renderWords();if(tab==='essay')renderEssay();if(tab==='note')renderNote();if(tab==='jokbo')renderJokbo();{const sc=$('#scope');if(tab==='note'&&!NO.inNote){NO.scOpen=sc.open;sc.open=false}if(tab!=='note'&&NO.inNote)sc.open=NO.scOpen!==false;NO.inNote=tab==='note';sc.hidden=!(tab==='practice'||tab==='exam'||tab==='essay'||tab==='note')}
+ if(tab!=='words'&&typeof txStop==='function')txStop();['practice','exam','jokbo','review','stats','words','essay','note'].forEach(t=>$('#v-'+t).hidden=t!==tab);if(tab==='words')renderWords();if(tab==='essay')renderEssay();if(tab==='note')renderNote();if(tab==='jokbo')renderJokbo();{const sc=$('#scope');if(tab==='note'&&!NO.inNote){NO.scOpen=sc.open;sc.open=false}if(tab!=='note'&&NO.inNote)sc.open=NO.scOpen!==false;NO.inNote=tab==='note';sc.hidden=!(tab==='practice'||tab==='exam'||tab==='essay'||tab==='note')}
  if(tab==='review')renderReview();if(tab==='stats'){confirmReset=false;renderStats()}LS.set('m12-tab',tab)}
 document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)show(b.dataset.tab)});
 
