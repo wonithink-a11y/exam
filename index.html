@@ -145,6 +145,13 @@ math{font-size:1.08em}
 .ntsr.g .ntsn{justify-content:center}.ntsr.g .ntsn svg{max-width:130px}
 @media (max-width:800px){.ntsr.g.w{grid-template-columns:1fr 1fr}.ntsr.g.w .ntsc{border-left:1px dashed var(--rule);border-top:1px dashed var(--rule)}.ntsr.g.w .ntsc:nth-child(odd){border-left:0}.ntsr.g.w .ntsc:nth-child(-n+2){border-top:0}}
 @media (max-width:560px){.ntsr.g{grid-template-columns:1fr 1fr}.ntsr.g .ntsc{border-left:1px dashed var(--rule);border-top:1px dashed var(--rule)}.ntsr.g .ntsc:nth-child(odd){border-left:0}.ntsr.g .ntsc:nth-child(-n+2){border-top:0}}
+.hintbox{margin-top:10px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.hint{margin:0;padding:8px 12px;border-radius:10px;background:var(--ac-s);font-size:14px;line-height:1.7;width:100%;box-sizing:border-box}
+.hint .hl{color:var(--ac);font-weight:700;margin-right:8px}
+.cause{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.cause .muted{font-size:13px;margin-right:2px}
+.causes .czl{display:grid;gap:6px;margin-top:8px}.czr{display:grid;grid-template-columns:minmax(9em,auto) 1fr 2em;gap:10px;align-items:center;font-size:13.5px}.czr b{text-align:right;font-family:var(--f-num)}
+.cztip{margin:10px 0 0;font-size:13.5px;line-height:1.65}.cztip b{color:var(--bad)}
+.nt.st{border-left:4px solid var(--ac)}.ntst{margin-right:8px;font:700 11px var(--f-body);padding:2px 8px;border-radius:999px;background:var(--ac);color:var(--on)}
 .ntbs p{margin:0 0 6px;font-size:13px;text-align:center}
 .ntbsr{display:grid;grid-template-columns:2.2em repeat(15,minmax(0,1fr));gap:2px;align-items:center;margin-bottom:3px;font-family:var(--f-num);font-size:11.5px}
 .ntbsr i{font-style:normal;text-align:center;border:1px solid var(--rule);border-radius:4px;padding:3px 0;background:var(--sheet)}
@@ -5356,14 +5363,52 @@ function plain(h){return h.replace(/<math>[\s\S]*?<\/math>/g,m=>{const p=m.match
  .replace(/<span class="sg">(.*?)<\/span>/g,'$1').replace(/<br\s*\/?>/g,'\n').replace(/<div class="psg">/g,'\n').replace(/<\/(div|p|tr)>/g,'\n').replace(/<\/t[dh]>/g,'\t').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\n{2,}/g,'\n').trim()}
 const SAT={};const satBox=(k,ph)=>`<textarea class="satx" data-sat="${k}" rows="5" placeholder="${ph}">${String(SAT[k]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>`;
 document.addEventListener('input',e=>{const t=e.target.closest&&e.target.closest('textarea[data-sat]');if(t)SAT[t.dataset.sat]=t.value});
+/* ===== 심화 힌트 · 틀린 까닭 (연습: 힌트 단계별 공개, 연습·모의고사 채점 뒤: 틀린 까닭 고르기) =====
+   HINT[유형 id] = [1단계(어떤 개념), 2단계(첫 식·보조선)] — 숫자와 무관하게 유형 전체에 맞도록 쓴다. */
+const HINT={
+ 'b1-ratio':['한 내각 + 한 외각 = 180°. 비를 이용해 <b>한 외각</b>을 먼저 구한다.',`한 외각 = 180° × ${fr('(외각 쪽 비)','(비의 합)')} → n = 360° ÷ (한 외각) → 대각선 ${fr('n(n − 3)',2)}`],
+ 'c2-ratio':['구가 원기둥에 꼭 맞으면 원기둥의 높이 = 구의 <b>지름</b>(2r).','(원뿔) : (구) : (원기둥) = 1 : 2 : 3 → 원기둥 부피 ÷ 3이 한 칸'],
+ 'd1-add':['평균 문제는 <b>총합</b>으로 바꿔 생각한다: (총합) = (평균) × (사람 수).','(늘어난 뒤 총합) − (처음 총합) = 새로 들어온 값'],
+ 'a2-bend':['꺾인 점을 지나고 l, m에 <b>평행한 보조선</b>을 하나 그어 본다.','보조선 위아래에 엇각이 생긴다 → ∠x = (위쪽 엇각) + (아래쪽 엇각)'],
+ 'a2-zig':['꺾인 점마다 l에 <b>평행한 보조선</b>을 긋는다.','오른쪽으로 꺾인 각의 합 = 왼쪽으로 꺾인 각의 합 → 식을 세운다'],
+ 'b1-star':['삼각형의 외각 = 이웃하지 않는 두 내각의 합. 별의 꼭짓점 각을 <b>한 삼각형</b>으로 모아 본다.','별 모양 다섯 꼭짓점 각의 합 = 180° → x = 180° − (나머지 네 각의 합)'],
+ 'b1-bow':['점 O에서 마주 보는 두 각은 <b>맞꼭지각</b>이라 크기가 같다.','두 삼각형에서 (맞꼭지각이 아닌 두 각의 합)이 서로 같다 → 식을 세운다'],
+ 'b2-shade':['색칠한 부분 = (전체 도형) − (색칠 안 된 부분). 둘레는 <b>곡선과 직선을 따로</b> 센다.',`반원 2개 = 원 1개, 사분원 = 원 × ${fr(1,4)}. 둘레에 직선 부분을 빠뜨리지 않는다`],
+ 'c2-net':['원뿔 전개도: 부채꼴의 반지름 = <b>모선</b>, 부채꼴의 호 = <b>밑면 원의 둘레</b>.',`2π × (모선) × ${fr('(중심각)',360)} = 2π × (밑면 반지름). 겉넓이는 πr² + πrl`],
+ 'c2-frus':['원뿔대 = (큰 원뿔) − (잘라 낸 작은 원뿔).','두 반지름의 비 = 높이의 비(닮음비) → 큰 원뿔의 높이부터 구한다'],
+ 'c2-hole':['부피는 (큰 원기둥) − (뚫린 원기둥).','겉넓이는 밑면(고리 모양) 2개 + 바깥 옆면 + <b>안쪽 옆면</b>을 모두 더한다'],
+ 'c2-caps':['입체를 <b>원기둥</b>과 <b>반구</b>로 나눠 각각 구해 더한다.',`반구의 부피 = ${fr(4,3)}πr³ × ${fr(1,2)}`],
+ 'c2-cut':['남은 부피 = (정육면체) − (잘라 낸 삼각뿔).',`삼각뿔의 밑면은 직각삼각형: ${fr(1,3)} × (${fr(1,2)} × a × b) × c`],
+ 'c2-pfrus':['부피: 각뿔대 = (큰 각뿔) − (작은 각뿔). 겉넓이: 두 밑면 + 옆면 사다리꼴 4개.',`각뿔 = ${fr(1,3)} × (밑넓이) × (높이), 사다리꼴 = ${fr(1,2)} × (윗변 + 아랫변) × (높이)`],
+ 'd1-stem':['줄기와 잎 그림은 이미 <b>작은 값부터 정렬</b>되어 있다. 잎 하나가 한 명.','20명이면 중앙값은 10번째와 11번째의 평균. 위에서부터 차례로 센다'],
+ 'd2-histg':['막대의 높이 = 도수. 먼저 계급별 도수를 <b>표로 옮겨</b> 적는다.','넓이의 합 = (계급의 크기) × (도수의 총합), 비율 = (해당 도수) ÷ (전체) × 100'],
+ 'd2-rel2':['두 반의 전체 학생 수가 다르면 상대도수끼리 바로 비교할 수 <b>없다</b>.','(도수) = (상대도수) × (전체 학생 수)로 반마다 학생 수를 구해 비교한다'],
+ 'z1-quad':['P의 사분면으로 a, b의 <b>부호</b>부터 정한다 (예: 제3사분면 → a < 0, b < 0).','Q의 x좌표, y좌표의 부호를 각각 계산한다 (음수 × 음수 = 양수, −a는 a와 부호가 반대)'],
+ 'z1-tri':['세 점을 모두 둘러싸는 <b>직사각형</b>(변이 축에 평행)을 그린다.','△ = (직사각형) − (바깥 직각삼각형 3개의 넓이)'],
+ 'z2-inv':[`반비례 y = ${fr('a','x')}에서 <b>xy = a</b>로 일정하다. 지나는 점을 대입해 a부터 구한다.`,'정수 좌표의 개수 = a의 약수 개수 × 2 (양수와 음수)'],
+ 'z2-area':[`그래프 위의 점을 P(p, ${fr('a','p')})로 놓는다.`,`직사각형 넓이 = p × ${fr('a','p')} = a, 삼각형은 그 절반 → 점의 위치와 관계없이 일정`],
+ 'a2-fold':['접는 선 양쪽의 <b>접힌 두 각은 크기가 같다</b>.','종이 띠의 위·아래 변은 평행 → 엇각으로 ∠x와 연결한다 (일직선 = 180°)']};
+const CAUSE=[['k','개념을 몰랐다'],['s','풀이 방법이 안 떠올랐다'],['c','계산 실수'],['r','문제를 잘못 읽었다']];
+const CAUSE_TIP={k:'요점 탭에서 그 단원 노트의 개념부터 다시 보세요.',s:'연습에서 [힌트]를 1단계씩 열어 보고, 요점 탭의 <b>풀이 전략</b> 카드를 읽어 보세요.',c:'답을 고르기 전에 한 번 더: 부호·단위·π 확인, 구한 답을 식에 다시 넣어 검산하세요.',r:'문제의 조건에 밑줄, 묻는 것(무엇을 구하나)에 동그라미를 치고 푸세요.'};
+function causeHTML(it){const w=S.w.find(x=>x.id===it.id&&x.seed===it.seed);if(!w)return'';
+ return `<div class="cause" data-cid="${it.id}" data-cseed="${it.seed}"><span class="muted">틀린 까닭은?</span>${CAUSE.map(([k,n])=>`<button class="chip${w.c===k?' on':''}" data-cz="${k}">${n}</button>`).join('')}</div>`}
+const stCard=id=>((SJ[CUR]||{}).notes||[]).find(n=>n.st&&(n.go||[]).includes(id));
+document.addEventListener('click',e=>{
+ const h=e.target.closest('[data-hint]');if(h){const box=h.closest('.hintbox'),H=HINT[box.dataset.hid],k=+h.dataset.hint;
+  h.insertAdjacentHTML('beforebegin',`<p class="hint"><span class="hl">힌트 ${k+1}</span>${H[k]}</p>`);
+  if(k+1<H.length){h.dataset.hint=k+1;h.textContent=`힌트 ${k+2} 보기`}else{const c=stCard(box.dataset.hid);if(c)h.outerHTML=`<button class="btn sm" data-stgo="${c.id}">풀이 전략 카드 보기: ${c.title.replace('풀이 전략: ','')}</button>`;else h.remove()}return}
+ const g=e.target.closest('[data-stgo]');if(g){show('note');let el=document.getElementById('nt-'+g.dataset.stgo);if(!el){NO.all=true;renderNote();el=document.getElementById('nt-'+g.dataset.stgo)}
+  if(el)setTimeout(()=>window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'}),30);return}
+ const z=e.target.closest('[data-cz]');if(z){const box=z.closest('.cause'),w=S.w.find(x=>x.id===box.dataset.cid&&String(x.seed)===box.dataset.cseed);if(!w)return;
+  if(w.c===z.dataset.cz)delete w.c;else w.c=z.dataset.cz;LS.set('m12-rec-'+SK(),S);onRecord();box.querySelectorAll('[data-cz]').forEach(b=>b.classList.toggle('on',b.dataset.cz===w.c))}});
 function qHTML(it,idx,o){const t=TYPE[it.id],d=it.d,ai=d.opts.indexOf(d.ans),done=o.graded;
  const short=d.opts.every(x=>x.length<=14);
  const opts=d.opts.map((x,j)=>{let c='',mk='';if(done){if(j===ai){c='ok';mk='정답'}if(it.pick===j&&j!==ai){c='no';mk='내 답'}}else if(it.pick===j)c='on';
   return `<li><button class="opt ${c}" data-q="${idx}" data-j="${j}" ${done&&o.lock?'disabled':''}><span class="bub">${j+1}</span><span>${x}</span>${mk?`<span class="mk">${mk}</span>`:''}</button></li>`}).join('');
  const exp=`<div class="exp"><b class="h">정답 ${CIRC[ai]} · 풀이</b>${d.exp}</div>`;
  return `<article class="q" id="q${idx}" data-aik="${CUR}|${hsh(d.q)}" data-ans="${ai+1}" data-pick="${it.pick??-1}" data-done="${done?1:0}"><template class="aix">${d.exp}</template><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lv${t.lv}">${LV[t.lv]}</span></div>
- <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}<ol class="opts${short?' short':''}">${opts}</ol>
- ${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
+ <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}
+ ${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
 const scoped=()=>T.filter(t=>sel.has(t.u));
 const qCount=t=>t.bank?t.n:'∞';
 
@@ -5405,7 +5450,7 @@ function renderPractice(){const v=$('#v-practice');
  const lvBar=`<div class="bar"><span class="muted">난이도</span>${[0,1,2,3].map(l=>`<button class="chip ${P.lv===l?'on':''}" data-lv="${l}">${l?LV[l]:'전체'}</button>`).join('')}<span class="sp"></span><span class="tally">이번에 ${P.n}문제 · 정답 ${P.ok}</span></div>`;
  if(!P.it){v.innerHTML=lvBar+`<div class="empty" style="margin-top:12px">선택한 범위와 난이도에 맞는 유형이 없습니다. 위에서 출제 범위를 넓혀 주세요.</div>`;return}
  const done=P.it.pick!=null,bk=TYPE[P.it.id].bank;
- v.innerHTML=lvBar+`<div class="sheet" style="margin-top:12px">${qHTML(P.it,0,{graded:done,lock:true,num:P.n+(done?0:1)})}</div>
+ v.innerHTML=lvBar+`<div class="sheet" style="margin-top:12px">${qHTML(P.it,0,{graded:done,lock:true,num:P.n+(done?0:1),hint:true,cause:true})}</div>
  <div class="bar" style="margin-top:12px"><button class="btn pri" data-act="next">다음 문제</button><button class="btn" data-act="again">${bk?'같은 유형 다른 문제':'같은 유형, 숫자만 바꿔서'}</button></div>`}
 $('#v-practice').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.dataset.lv!=null){P.lv=+b.dataset.lv;newPractice();return}
@@ -5459,7 +5504,7 @@ function renderExam(){const v=$('#v-exam');
   <div class="muted">${Object.entries(by).map(([u,[n,c]])=>`${SUBNAME[u]} ${c}/${n}`).join(' · ')}</div>
   <div class="bar">${ok<E.items.length?`<button class="btn pri sm" data-act="retry">틀린 유형 다시 풀기</button>`:''}<button class="btn sm" data-act="copy">시험지·정답 텍스트 복사</button><button class="btn sm" data-act="pdf">시험지 PDF</button></div>${copyBox}</div>`}
  v.innerHTML=cfg+`<div style="height:12px"></div>${score}<div class="sheet" style="margin-top:12px"><div class="ehead"><b>${SJ[CUR].name} ${E.label}</b><span class="muted">시험지 번호 ${E.seed} · ${E.items.length}문항</span></div>
- ${E.items.map((it,i)=>qHTML(it,i,{graded:E.graded,lock:true,fold:true})).join('')}</div>${esSheet()}
+ ${E.items.map((it,i)=>qHTML(it,i,{graded:E.graded,lock:true,fold:true,cause:true})).join('')}</div>${esSheet()}
  ${E.graded?'':popBar()+`<div class="bar" style="margin-top:12px"><span class="tally">${ans}/${E.items.length} 표기</span><span class="sp"></span><button class="btn" data-act="pdf">시험지 PDF</button><button class="btn" data-act="copy">텍스트 복사</button><button class="btn pri" data-act="grade">채점하기</button></div>${copyBox}`}`}
 
 function esSheet(){if(!E.es||!E.es.length)return'';
@@ -5615,10 +5660,12 @@ function origList(){if(!HAS_ORIG)return'';const L=ORIG.filter(o=>o.subj===CUR&&(
 function weakTypes(){return Object.entries(allS().t).map(([id,[n,c]])=>({id,n,c,w:n-c})).filter(x=>x.w>0&&TYPE[x.id]).sort((a,b)=>b.w-a.w||a.c/a.n-b.c/b.n)}
 function renderReview(){const v=$('#v-review');const wk=weakTypes(),A=allS();
  if(!A.w.length){v.innerHTML=`<div class="empty">${SJ[CUR].name}에서 아직 틀린 문제가 없습니다. 연습이나 모의고사에서 틀린 문제가 여기에 모입니다.</div>`;return}
- v.innerHTML=`<div class="bar"><h2 class="sec">자주 틀리는 유형</h2><span class="sp"></span><button class="btn pri sm" data-act="weak">약한 유형으로 10문항 시험</button></div>
+ const cz={};A.w.forEach(x=>{if(x.c)cz[x.c]=(cz[x.c]||0)+1});const czN=Object.values(cz).reduce((a,b)=>a+b,0),czM=Math.max(1,...Object.values(cz)),top=CAUSE.filter(([k])=>cz[k]===czM&&czN)[0];
+ v.innerHTML=`<div class="scope causes"><div class="bar"><b>틀린 까닭</b><span class="muted">${czN?`고른 문제 ${czN}개 · 안 고른 문제 ${A.w.length-czN}개`:'틀린 문제 아래에서 까닭을 고르면 여기에 모입니다.'}</span></div>${czN?`<div class="czl">${CAUSE.map(([k,n])=>`<div class="czr"><span>${n}</span><div class="meter"><i class="${top&&top[0]===k?'lo':''}" style="width:${(cz[k]||0)/czM*100}%"></i></div><b>${cz[k]||0}</b></div>`).join('')}</div><p class="cztip"><b>${top[1]}</b>가 가장 많습니다. ${CAUSE_TIP[top[0]]}</p>`:''}</div>
+ <div class="bar" style="margin-top:14px"><h2 class="sec">자주 틀리는 유형</h2><span class="sp"></span><button class="btn pri sm" data-act="weak">약한 유형으로 10문항 시험</button></div>
  <div class="list" style="margin-top:8px">${wk.slice(0,6).map(x=>`<div class="row"><div class="t"><b>${TYPE[x.id].name}</b><p>${SUBNAME[TYPE[x.id].u]} · ${x.n}번 중 ${x.w}번 틀림</p></div><div class="acts"><button class="btn sm" data-new="${x.id}">연습</button></div></div>`).join('')}</div>
  <h2 class="sec" style="margin-top:16px">최근 틀린 문제</h2>
- <div class="list" style="margin-top:8px">${A.w.slice(0,30).map(x=>{if(!TYPE[x.id])return'';const d=gen(x.id,x.seed);return `<div class="row"><div class="t"><b>${TYPE[x.id].name}</b><p>${plain(d.q).split('\n')[0]}</p></div><div class="acts"><button class="btn sm" data-same="${x.id}" data-seed="${x.seed}">그 문제</button><button class="btn sm" data-new="${x.id}">비슷한 문제</button></div></div>`}).join('')}</div>`}
+ <div class="list" style="margin-top:8px">${A.w.slice(0,30).map(x=>{if(!TYPE[x.id])return'';const d=gen(x.id,x.seed);return `<div class="row"><div class="t"><b>${TYPE[x.id].name}</b><p>${x.c?`<span class="ntacc lo" style="margin:0 6px 0 0">${(CAUSE.find(c=>c[0]===x.c)||[,''])[1]}</span>`:''}${plain(d.q).split('\n')[0]}</p></div><div class="acts"><button class="btn sm" data-same="${x.id}" data-seed="${x.seed}">그 문제</button><button class="btn sm" data-new="${x.id}">비슷한 문제</button></div></div>`}).join('')}</div>`}
 $('#v-review').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.dataset.act==='weak'){weakExam(10,{all:true});show('exam');return}
  if(b.dataset.same){newPractice(b.dataset.same,+b.dataset.seed);show('practice');return}
@@ -6436,6 +6483,63 @@ G2('tech','N-W2s','W2','한 장 정리: 전력량·전기 요금',[
  ['전기 요금','1 kWh당 120원','(전력량) × (1 kWh당 요금)','12 × 120 = 1440원'],
  ['절약량 비교','60 W 전구 → 10 W LED, 하루 5시간, 30일','(전력 차) × (시간)','(0.06 − 0.01) × 5 × 30 = 7.5 kWh']],
  ['W → kW는 ÷ 1000, 분 → 시간은 ÷ 60 (30분 = 0.5시간).'],['w-kwh','w2-sol']);
+/* --- 풀이 전략 카드 (수학 심화 유형별 접근법, st:true, go = 관련 심화 유형) --- */
+const ST=(s,list)=>{SUBJ[s].notes=(SUBJ[s].notes||[]).concat(list.map(n=>Object.assign({st:true},n)))};
+const nsTriArea=()=>{const P=(x,y)=>[150+x*17,140-y*17],A=[-2,1],B=[3,-1],C=[1,4],r=[P(-2,-1),P(3,-1),P(3,4),P(-2,4)];
+ return sv(figGrid([[...A,'A'],[...B,'B'],[...C,'C']]),`<path class="arc" style="stroke-dasharray:4 3" d="M${r.map(p=>p.join(' ')).join('L')}Z"/>${poly([A,B,C].map(p=>P(...p)),'ln',true)}`)};
+ST('math',[
+{id:'N-ST-A2a',u:'A2',title:'풀이 전략: 꺾인 선에는 평행한 보조선',
+ pts:['<b>언제</b>: 평행선 l, m 사이에서 선이 꺾여 있고, 꺾인 곳의 각을 물을 때','<b>순서</b>: ① 꺾인 점마다 l에 평행한 보조선 → ② 보조선 위아래에 엇각 표시 → ③ 엇각을 더해 식 세우기',`꺾인 점이 여러 개면 ${F('오른쪽으로 꺾인 각의 합 = 왼쪽으로 꺾인 각의 합')}`],
+ ex:[{t:'꺾인 점이 1개일 때 ∠x (l ∥ m)',fig:()=>figBend(40,35),a:'꺾인 점을 지나고 l에 평행한 보조선 → ∠x는 위쪽 엇각 40°와 아래쪽 엇각 35°로 나뉜다.<br>∴ ∠x = 40° + 35° = <b>75°</b>'},
+  {t:'꺾인 점이 2개일 때 ∠x',fig:()=>figZig(30,25,40,['30°','55°','x','40°']),a:'오른쪽으로 꺾인 각: 30°, x / 왼쪽으로 꺾인 각: 55°, 40°<br>30° + x = 55° + 40° ∴ x = <b>65°</b>'}],
+ warn:['보조선은 반드시 l, m과 <b>평행</b>하게 긋는다. 그래야 엇각이 생긴다.'],go:['a2-bend','a2-zig']},
+{id:'N-ST-A2b',u:'A2',title:'풀이 전략: 종이 접기는 "접은 각은 같다"',
+ pts:['<b>언제</b>: 폭이 일정한 종이 띠를 접은 그림','<b>순서</b>: ① 접는 선 양쪽의 두 각이 같다고 표시 → ② 띠의 위·아래 변은 평행 → 엇각으로 옮기기 → ③ 일직선 180° 또는 삼각형 내각의 합',`접힌 부분에 생기는 삼각형은 ${F('이등변삼각형')}인 경우가 많다`],
+ ex:[{t:'∠a = 50°로 접었을 때 ∠x',fig:()=>figFold(50),a:'접은 각은 같으므로 50° + 50° = 100°<br>평행선의 엇각으로 옮기면 ∠x = 180° − 100° = <b>80°</b>'}],
+ go:['a2-fold']},
+{id:'N-ST-B1a',u:'B1',title:'풀이 전략: 외각으로 각을 한곳에 모으기',
+ pts:[`삼각형의 한 외각 = ${F('이웃하지 않는 두 내각의 합')}`,'<b>별 모양</b>: 작은 삼각형의 외각을 두 번 쓰면 다섯 꼭짓점 각이 한 삼각형 안에 모인다 → 합 180°','<b>나비 모양</b>(맞꼭지각을 낀 두 삼각형): 맞꼭지각이 같으므로 나머지 두 각의 합도 같다'],
+ ex:[{t:'별 모양에서 ∠x',fig:()=>figStar(['30°','x','40°','35°','25°']),a:'다섯 꼭짓점 각의 합 = 180°<br>x = 180° − (30° + 40° + 35° + 25°) = <b>50°</b>'},
+  {t:'나비 모양에서 ∠x',fig:()=>figBow('60°','45°','50°','x'),a:'∠AOB = ∠COD (맞꼭지각) → 60° + 45° = 50° + x ∴ x = <b>55°</b>'}],
+ go:['b1-star','b1-bow']},
+{id:'N-ST-B1b',u:'B1',title:'풀이 전략: 정다각형은 외각부터',
+ pts:[`정n각형의 한 외각 = ${F('360° ÷ n')} → 거꾸로 n = ${F('360° ÷ (한 외각)')}`,`한 내각이 주어지면 한 외각 = ${F('180° − (한 내각)')}`,`(한 내각) : (한 외각) = a : b → 한 외각 = ${F('180° × '+fr('b','a + b'))}`],
+ ex:[{t:'한 내각과 한 외각의 비가 3 : 1인 정다각형의 대각선 개수',a:`한 외각 = 180° × ${fr(1,4)} = 45° → n = 360° ÷ 45° = 8<br>대각선 = ${fr('8 × 5',2)} = <b>20개</b>`},
+  {t:'한 내각이 156°인 정다각형',a:'한 외각 = 180° − 156° = 24° → n = 360° ÷ 24° = <b>15 (정십오각형)</b>'}],
+ warn:['내각의 합 식 180° × (n − 2) = (한 내각) × n으로 풀어도 되지만, 외각으로 풀면 계산이 훨씬 짧다.'],go:['b1-ratio','b1-reg','b1-ext']},
+{id:'N-ST-B2',u:'B2',title:'풀이 전략: 색칠한 부분은 "전체 − 빈 부분"',
+ pts:['<b>넓이</b>: 큰 도형에서 색칠 안 된 부분을 뺀다. 모양이 복잡하면 잘라서 옮겨 붙여 간단한 모양으로 만든다','<b>둘레</b>: 곡선(호)과 직선을 따로 세고 더한다',`반원 2개 = ${F('원 1개')}, 사분원 = ${F('원 × '+fr(1,4))}`],
+ ex:[{t:'한 변 6 cm인 정사각형에서 사분원을 뺀 부분',fig:()=>figCorner('6 cm'),a:`6² − π × 6² × ${fr(1,4)} = <b>(36 − 9π) cm²</b>`},
+  {t:'직선 10 cm, 양 끝이 지름 4 cm인 반원인 운동장 모양의 둘레',fig:()=>figTrack('10 cm','4 cm'),a:'반원 2개 = 지름 4 cm인 원 1개 → 4π<br>직선 2개 → 20 &nbsp;∴ <b>(4π + 20) cm</b>'}],
+ go:['b2-shade']},
+{id:'N-ST-C2a',u:'C2',title:'풀이 전략: 복합 입체는 나누고, 빼고, 새 면 챙기기',
+ pts:['<b>부피</b>: 붙인 입체는 더하고(원기둥 + 반구), 파낸 입체는 뺀다(큰 원기둥 − 구멍)','<b>겉넓이</b>: 빼서 구하지 않는다. 바깥 면 + 새로 생긴 면(구멍 안쪽, 잘린 면)을 하나씩 더한다',`잘라 낸 꼭짓점 삼각뿔 = ${fr(1,3)} × (${fr(1,2)} × a × b) × c = ${F(fr('abc',6))}`],
+ ex:[{t:'바깥 반지름 5, 구멍 반지름 2, 높이 6인 원기둥의 겉넓이',fig:()=>figHole('5cm','2cm','6cm'),a:'밑면(고리) 2개: π(25 − 4) × 2 = 42π<br>바깥 옆면 2π × 5 × 6 = 60π, 안쪽 옆면 2π × 2 × 6 = 24π<br>∴ <b>126π cm²</b>'},
+  {t:'반지름 3, 높이 5인 원기둥 위에 반구를 붙인 입체의 부피',fig:()=>figCapsule('3cm','5cm'),a:`원기둥 π × 3² × 5 = 45π, 반구 ${fr(4,3)}π × 3³ × ${fr(1,2)} = 18π<br>∴ <b>63π cm³</b>`}],
+ go:['c2-hole','c2-caps','c2-cut']},
+{id:'N-ST-C2b',u:'C2',title:'풀이 전략: 뿔대는 "큰 뿔 − 작은 뿔", 전개도는 "호 = 둘레"',
+ pts:['<b>뿔대 부피</b>: 잘리기 전의 큰 뿔을 되살린다. 두 밑면의 반지름(한 변)의 비 = 높이의 비',`<b>원뿔 전개도</b>: 부채꼴 반지름 = 모선 l, 부채꼴의 호 = 밑면 둘레 → 2πl × ${fr('x',360)} = 2πr`,`중심각 x = ${F('360° × '+fr('r','l'))}`],
+ ex:[{t:'두 밑면의 반지름 3, 6, 높이 4인 원뿔대의 부피',fig:()=>figFrustum('3cm','6cm','4cm'),a:`비 1 : 2 → 큰 원뿔 높이 8, 작은 원뿔 높이 4<br>${fr(1,3)}π × 6² × 8 − ${fr(1,3)}π × 3² × 4 = 96π − 12π = <b>84π cm³</b>`},
+  {t:'모선 9, 밑면 반지름 3인 원뿔 전개도의 중심각',fig:()=>figNet(120,'9cm','x'),a:`x = 360° × ${fr(3,9)} = <b>120°</b>`}],
+ go:['c2-frus','c2-pfrus','c2-net','c2-ratio']},
+{id:'N-ST-Z1',u:'Z1',title:'풀이 전략: 좌표평면은 "부호표"와 "둘러싼 직사각형"',
+ pts:['<b>사분면</b>: a, b의 부호를 먼저 적고 → 새 점의 x, y 부호를 계산 (음 × 음 = 양, −a는 부호가 반대)','<b>세 점 삼각형의 넓이</b>: 세 점을 둘러싸는 직사각형 − 바깥 직각삼각형 3개'],
+ ex:[{t:'P(a, b)가 제2사분면 위의 점일 때 Q(ab, −b)',a:'a < 0, b > 0 → ab < 0, −b < 0 → <b>제3사분면</b>'},
+  {t:'A(−2, 1), B(3, −1), C(1, 4)인 삼각형 ABC의 넓이',fig:nsTriArea,a:`둘러싼 직사각형 5 × 5 = 25<br>바깥 삼각형: ${fr(1,2)} × 5 × 2 = 5, ${fr(1,2)} × 2 × 5 = 5, ${fr(1,2)} × 3 × 3 = 4.5<br>∴ 25 − 14.5 = <b>10.5</b>`}],
+ go:['z1-quad','z1-tri']},
+{id:'N-ST-Z2',u:'Z2',title:'풀이 전략: 반비례는 "xy = a가 일정"',
+ pts:['지나는 점 하나만 알면 a = xy로 식이 바로 나온다',`그래프 위의 점 P(p, ${fr('a','p')})에서 만든 직사각형 넓이 = ${F('a')}, 삼각형 = ${F(fr('a',2))} (점의 위치와 무관)`,`x, y가 모두 정수인 점의 개수 = ${F('|a|의 약수 개수 × 2')}`],
+ ex:[{t:`y = ${fr(12,'x')} 위에서 x, y가 모두 정수인 점의 개수`,a:'12의 약수 1, 2, 3, 4, 6, 12 → 6개 × 2(음수 포함) = <b>12개</b>'},
+  {t:`y = ${fr('a','x')}가 점 (−2, 5)를 지날 때, x = 5에서 y의 값`,a:'a = (−2) × 5 = −10 → y = −10 ÷ 5 = <b>−2</b>'}],
+ go:['z2-inv','z2-area']},
+{id:'N-ST-D1',u:'D1',title:'풀이 전략: 평균은 "총합"으로 바꾸기',
+ pts:[`평균 문제는 ${F('(총합) = (평균) × (개수)')}로 바꾸면 더하기·빼기 문제가 된다`,'줄기와 잎 그림은 이미 정렬되어 있다 → 위에서부터 순서대로 센다 (짝수 개면 가운데 두 값의 평균)'],
+ ex:[{t:'4명의 평균이 70점, 1명이 더 와서 5명의 평균이 72점일 때 새로 온 학생의 점수',a:'72 × 5 − 70 × 4 = 360 − 280 = <b>80점</b>'}],
+ go:['d1-add','d1-x','d1-stem']},
+{id:'N-ST-D2',u:'D2',title:'풀이 전략: 상대도수 비교는 "도수"로 바꿔서',
+ pts:[`전체 수가 다른 두 집단은 상대도수만 보고 "몇 명 더 많다"를 말할 수 없다 → ${F('(도수) = (상대도수) × (전체)')}`,'히스토그램은 막대 높이(도수)를 표로 옮겨 적고 시작한다. 넓이의 합 = (계급의 크기) × (도수의 총합)'],
+ ex:[{t:'A반 20명 중 상대도수 0.3, B반 40명 중 상대도수 0.2인 계급의 학생 수',a:'A반 0.3 × 20 = 6명, B반 0.2 × 40 = 8명<br>상대도수는 A반이 크지만 학생 수는 <b>B반이 2명 더 많다</b>'}],
+ go:['d2-rel2','d2-histg','d2-inv']}]);
 })();
 const NO={hide:false,weak:LS.get('m12-ntweak',false)};
 /* 소단원별 정답률 (단원 현황과 같은 기록 allS) → {u:[푼 수, 맞힌 수]} */
@@ -6445,7 +6549,7 @@ const ntHas=()=>!!((SJ[CUR]||{}).notes||[]).length;
 function renderNote(){const v=$('#v-note');if(!v)return;const all=((SJ[CUR]||{}).notes||[]).slice().sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)),acc=ntAcc(),pc=u=>acc[u]&&acc[u][0]?acc[u][1]/acc[u][0]:null,rk=u=>{const q=pc(u);return q===null?.595:q<.6?q-1:q};let items=NO.all?all:all.filter(x=>sel.has(x.u));if(NO.weak)items=items.slice().sort((a,b)=>rk(a.u)-rk(b.u)||SUBS.indexOf(a.u)-SUBS.indexOf(b.u));const us=[...new Set(items.map(x=>x.u))],weakU=us.filter(u=>pc(u)!==null&&pc(u)<.6),badge=u=>{const q=pc(u);return q===null?'<span class="ntacc">미학습</span>':`<span class="ntacc${q<.6?' lo':''}">정답률 ${Math.round(q*100)}% · ${acc[u][0]}문제</span>`};
  v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${!all.length?'이 과목은 아직 요점 노트가 없습니다.':items.length?`${SJ[CUR].name} 요점 노트 ${items.length}개${NO.all?' (전체)':` (출제 범위 · 전체 ${all.length}개 중)`}. 소단원 이름을 누르면 바로 이동합니다. [공식 가리기]를 누르면 핵심이 가려지고, 가린 칸을 누르면 하나씩 보입니다.`:`선택한 출제 범위에 요점 노트가 없습니다. 위 [출제 범위]에서 소단원을 고르거나 전체 노트를 보세요.`}</span>${all.length?`<button class="btn sm" data-ntw="1" aria-pressed="${!!NO.weak}">${NO.weak?'교과서 순서로':'약한 단원 먼저'}</button>`:''}${all.length?`<button class="btn sm" data-nta="1" aria-pressed="${!!NO.all}">${NO.all?'출제 범위만 보기':`전체 노트 보기 (${all.length})`}</button>`:''}<span class="sp"></span>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button><button class="btn sm" data-ntp="1">인쇄</button>`:''}</div>`+
  (NO.weak&&items.length?`<div class="ntweak">${weakU.length?`<b>정답률 60% 미만 소단원 ${weakU.length}개</b>를 맨 앞에 놓았습니다. 그다음 아직 안 푼 단원, 잘하는 단원 순서입니다.`:Object.keys(acc).length?'<b>정답률 60% 미만인 소단원이 없습니다.</b> 아직 안 푼 단원과 정답률이 낮은 단원부터 보여 줍니다.':'<b>아직 푼 문제가 없습니다.</b> 연습·모의고사를 풀면 정답률이 낮은 단원의 노트부터 보여 줍니다.'}</div>`:'')+(us.length>1?`<nav class="bar ntnav" aria-label="소단원 바로가기">${us.map(u=>`<button class="chip${NO.weak&&weakU.includes(u)?' lo':''}" data-ntj="${items.find(x=>x.u===u).id}">${SUBNAME[u]||u}<small>${NO.weak?(pc(u)!==null?Math.round(pc(u)*100)+'%':'미학습'):items.filter(x=>x.u===u).length}</small></button>`).join('')}</nav>`:'')+
- items.map(x=>`<article class="es nt${NO.hide?' hide':''}" id="nt-${x.id}"><div class="est">${SUBNAME[x.u]||x.u}${badge(x.u)}</div><h3 class="ntt">${x.title}</h3>
+ items.map(x=>`<article class="es nt${x.st?' st':''}${NO.hide?' hide':''}" id="nt-${x.id}"><div class="est">${x.st?'<span class="ntst">풀이 전략</span>':''}${SUBNAME[x.u]||x.u}${badge(x.u)}</div><h3 class="ntt">${x.title}</h3>
  <ul class="ntp">${(x.pts||[]).map(p=>`<li>${p}</li>`).join('')}</ul>
  ${(x.fm||[]).map(f=>`<div class="ntf"><div class="ntfm f">${f[0]}</div>${f[1]?`<div class="ntfd">${f[1]}</div>`:''}</div>`).join('')}
  ${(x.figs||[]).length?`<div class="ntfigs">${x.figs.map(g=>`<figure class="fig ntfig">${g.fig()}<figcaption>${g.cap}</figcaption></figure>`).join('')}</div>`:''}
@@ -6456,7 +6560,7 @@ function renderNote(){const v=$('#v-note');if(!v)return;const all=((SJ[CUR]||{})
  ${x.grid?`<div class="nts">${x.grid.rows.map(r=>`<div class="ntsr g${x.grid.h.length>=4?' w':''}" style="--k:${x.grid.h.length}"><div class="ntsc ntsn"><b>${r.n}</b>${r.d?`<small>${r.d}</small>`:''}${r.fig?`<div class="fig">${r.fig()}</div>`:''}</div>${r.c.map((c,i)=>`<div class="ntsc ntsa"><div><i>${x.grid.h[i]}</i>${c[0]?`<em>${c[0]}</em>`:''}<span class="f">${c[1]}</span></div></div>`).join('')}</div>`).join('')}</div>`:''}
  ${x.tbl?`<div class="tw"><table class="ft ntb${x.tbl.h.length>=4?' wide':''}"><thead><tr>${x.tbl.h.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${x.tbl.r.map(r=>`<tr>${r.map((c,i)=>i?`<td><span class="f">${c}</span></td>`:`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
  ${x.warn&&x.warn.length?`<div class="ntw"><b>실수 주의</b><ul>${x.warn.map(w=>`<li>${w}</li>`).join('')}</ul></div>`:''}
- ${(x.ex||[]).map((e,i)=>`<details class="ex ntx"><summary>예제 ${i+1}. ${e.t}</summary>${e.fig?`<figure class="fig">${e.fig()}</figure>`:''}<p>${e.a}</p></details>`).join('')}
+ ${(x.ex||[]).map((e,i)=>`<details class="ex ntx"${x.st&&!i?' open':''}><summary>예제 ${i+1}. ${e.t}</summary>${e.fig?`<figure class="fig">${e.fig()}</figure>`:''}<p>${e.a}</p></details>`).join('')}
  ${(x.go||[]).filter(id=>TYPE[id]).length?`<div class="bar ntg"><span class="muted">관련 유형 풀기</span>${x.go.filter(id=>TYPE[id]).map(id=>`<button class="chip" data-ntgo="${id}">${TYPE[id].name}</button>`).join('')}</div>`:''}</article>`).join('')}
 $('#v-note').addEventListener('click',e=>{const f=e.target.closest('.nt.hide .f');if(f){f.classList.toggle('on');return}const b=e.target.closest('button');if(!b)return;
  if(b.dataset.ntw){NO.weak=!NO.weak;LS.set('m12-ntweak',NO.weak);renderNote()}else if(b.dataset.nta){NO.all=!NO.all;renderNote()}else if(b.dataset.nth){NO.hide=!NO.hide;renderNote()}else if(b.dataset.ntj){const el=document.getElementById('nt-'+b.dataset.ntj);if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'})}
