@@ -136,6 +136,8 @@ math{font-size:1.08em}
 .ntsa{align-items:stretch;justify-content:center;gap:10px}.ntsa>div{display:flex;flex-direction:column;gap:2px;text-align:left}
 .ntsa em{font-style:normal;font-size:12px;color:var(--muted)}.ntsc .f{font-variant-numeric:tabular-nums}.ntsc small{font-size:11px}
 @media (max-width:560px){.ntsr{grid-template-columns:1fr 1fr}.ntsc:nth-child(3){border-left:0}.ntsc:nth-child(n+3){border-top:1px dashed var(--rule)}}
+@media screen and (min-width:1000px){body.ntwide .wrap{max-width:1120px}body.ntwide .ntsc{font-size:15px;padding:12px 10px}body.ntwide .ntsc>i,body.ntwide .ntsa i,body.ntwide .ntsa em{font-size:13.5px}body.ntwide .ntsn b{font-size:16px}body.ntwide .ntsn small{font-size:13px}
+body.ntwide .ntsc .fig svg{max-width:220px}body.ntwide .ntsn .fig svg{max-width:250px}body.ntwide .ntsn svg text{font-size:20px}body.ntwide .nt .ntfig svg{max-width:440px}body.ntwide .nt .ntfigs{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}body.ntwide .ntbsr{font-size:13.5px}}
 .ntbs p{margin:0 0 6px;font-size:13px;text-align:center}
 .ntbsr{display:grid;grid-template-columns:2.2em repeat(15,minmax(0,1fr));gap:2px;align-items:center;margin-bottom:3px;font-family:var(--f-num);font-size:11.5px}
 .ntbsr i{font-style:normal;text-align:center;border:1px solid var(--rule);border-radius:4px;padding:3px 0;background:var(--sheet)}
@@ -6296,7 +6298,7 @@ function nfSun(){const c=[92,120];let s=`<circle cx="${c[0]}" cy="${c[1]}" r="10
  [[74,108,6],[82,116,4],[110,138,5]].forEach(p=>s+=`<circle cx="${p[0]}" cy="${p[1]}" r="${p[2]}" style="fill:#5a3a10"/>`);
  const L=(x1,y1,x2,y2,t,sub)=>`<path class="ln" style="stroke-width:1" d="M${x1} ${y1}L${x2} ${y2}H324"/>${txt(t,x2+4,y2-4,'','v')}<text x="${x2+4}" y="${y2+14}" class="v" style="font-size:11.5px;font-weight:400">${sub}</text>`;
  s+=L(140,48,206,26,'홍염','광구 밖으로 솟는 불꽃')+L(154,120,206,84,'채층','광구 바로 위 붉은 층')+L(182,166,206,146,'코로나','가장 바깥의 대기')+L(110,140,206,196,'광구 · 흑점','표면 · 흑점은 더 낮은 온도');
- return svg(330,232,s)}
+ return svg(342,232,`<g transform="translate(12 0)">${s}</g>`)}
 function nfGlobe(){const c=[150,112],r=90,P=(la,lo)=>[f1(c[0]+r*Math.cos(la*R2D)*Math.sin(lo*R2D)),f1(c[1]-r*Math.sin(la*R2D))];let s=`<circle cx="${c[0]}" cy="${c[1]}" r="${r}" style="fill:var(--ac-s);stroke:var(--ink);stroke-width:1.6"/>`;
  [-60,-30,30,60].forEach(la=>{const y=f1(c[1]-r*Math.sin(la*R2D)),x=f1(r*Math.cos(la*R2D));s+=`<path class="ln" style="stroke-width:.8;opacity:.6" d="M${c[0]-x} ${y}H${c[0]+x}"/>`;s+=txt((la>0?'북위 ':'남위 ')+Math.abs(la)+'°',c[0]-x-4,y+4,'end')});
  [-60,-30,30,60].forEach(lo=>{const rx=f1(r*Math.abs(Math.sin(lo*R2D)));s+=`<path class="ln" style="stroke-width:.8;opacity:.6" d="M${c[0]} ${c[1]-r}A${rx} ${r} 0 0 ${lo>0?1:0} ${c[0]} ${c[1]+r}"/>`});
@@ -6483,7 +6485,7 @@ async function eePdf(kind,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn&&bt
 function show(tab){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));
  if(tab==='words'&&!eeHas())tab='practice';if(tab==='essay'&&!essHas())tab='practice';if(tab==='note'&&!ntHas())tab='practice';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));
  ['practice','exam','jokbo','review','stats','words','essay','note'].forEach(t=>$('#v-'+t).hidden=t!==tab);if(tab==='words')renderWords();if(tab==='essay')renderEssay();if(tab==='note')renderNote();if(tab==='jokbo')renderJokbo();$('#scope').hidden=!(tab==='practice'||tab==='exam'||tab==='essay');
- if(tab==='review')renderReview();if(tab==='stats'){confirmReset=false;renderStats()}LS.set('m12-tab',tab)}
+ if(tab==='review')renderReview();if(tab==='stats'){confirmReset=false;renderStats()}document.body.classList.toggle('ntwide',tab==='note');LS.set('m12-tab',tab)}
 document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)show(b.dataset.tab)});
 
 /* ===== 시작 ===== */
