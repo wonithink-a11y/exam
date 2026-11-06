@@ -132,7 +132,7 @@ math{font-size:1.08em}
 .ntsc>i,.ntsa i{font-style:normal;font-size:12px;font-weight:700;color:var(--ac);align-self:flex-start}
 .ntsn{background:var(--chip)}.ntsn b{font-size:14px}.ntsn small{font-size:11.5px;color:var(--muted);line-height:1.4}
 .ntsc .fig{width:100%}.ntsc .fig svg{max-width:150px}
-.ntsn svg text{font-size:24px}.ntsn svg .ln,.ntsn svg .sh,.ntsn svg .arc{vector-effect:non-scaling-stroke}
+.ntsr:not(.g) .ntsn svg text{font-size:24px}.ntsn svg .ln,.ntsn svg .sh,.ntsn svg .arc{vector-effect:non-scaling-stroke}
 .ntsa{align-items:stretch;justify-content:center;gap:10px}.ntsa>div{display:flex;flex-direction:column;gap:2px;text-align:left}
 .ntsa em{font-style:normal;font-size:12px;color:var(--muted)}.ntsc .f{font-variant-numeric:tabular-nums}.ntsc small{font-size:11px}
 @media (max-width:560px){.ntsr{grid-template-columns:1fr 1fr}.ntsc:nth-child(3){border-left:0}.ntsc:nth-child(n+3){border-top:1px dashed var(--rule)}}
@@ -141,6 +141,10 @@ math{font-size:1.08em}
 .ntweak{margin:0 0 10px;padding:9px 12px;border-radius:10px;background:var(--bad-soft);font-size:13.5px;line-height:1.6}
 .ntweak b{color:var(--bad)}
 .ntnav .chip.lo{border-color:var(--bad);color:var(--bad)}
+.ntsr.g{grid-template-columns:minmax(0,1.05fr) repeat(var(--k),minmax(0,1fr))}
+.ntsr.g .ntsn{justify-content:center}.ntsr.g .ntsn svg{max-width:130px}
+@media (max-width:800px){.ntsr.g.w{grid-template-columns:1fr 1fr}.ntsr.g.w .ntsc{border-left:1px dashed var(--rule);border-top:1px dashed var(--rule)}.ntsr.g.w .ntsc:nth-child(odd){border-left:0}.ntsr.g.w .ntsc:nth-child(-n+2){border-top:0}}
+@media (max-width:560px){.ntsr.g{grid-template-columns:1fr 1fr}.ntsr.g .ntsc{border-left:1px dashed var(--rule);border-top:1px dashed var(--rule)}.ntsr.g .ntsc:nth-child(odd){border-left:0}.ntsr.g .ntsc:nth-child(-n+2){border-top:0}}
 .ntbs p{margin:0 0 6px;font-size:13px;text-align:center}
 .ntbsr{display:grid;grid-template-columns:2.2em repeat(15,minmax(0,1fr));gap:2px;align-items:center;margin-bottom:3px;font-family:var(--f-num);font-size:11.5px}
 .ntbsr i{font-style:normal;text-align:center;border:1px solid var(--rule);border-radius:4px;padding:3px 0;background:var(--sheet)}
@@ -345,7 +349,7 @@ b.src{color:var(--ac);font-weight:600}
 
 @media (prefers-reduced-motion:no-preference){.opt,.btn,.chip,.subj button,.tabs button{transition:background-color .15s,color .15s,border-color .15s,box-shadow .15s}}
 @media screen and (min-width:1000px){.wrap{max-width:1120px}.qt,.exp,.cond,.data{max-width:760px}.fig svg{max-width:420px}.ntsc{font-size:15px;padding:12px 10px}.ntsc>i,.ntsa i,.ntsa em{font-size:13.5px}.ntsn b{font-size:16px}.ntsn small{font-size:13px}
-.ntsc .fig svg{max-width:220px}.ntsn .fig svg{max-width:250px}.ntsn svg text{font-size:20px}.nt .ntfig svg{max-width:440px}.nt .ntfigs{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}.ntbsr{font-size:13.5px}}
+.ntsc .fig svg{max-width:220px}.ntsn .fig svg{max-width:250px}.ntsr:not(.g) .ntsn svg text{font-size:20px}.nt .ntfig svg{max-width:440px}.nt .ntfigs{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}.ntbsr{font-size:13.5px}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
 </head>
@@ -6256,7 +6260,7 @@ X('info','N-C11',{figs:[{fig:()=>FLW(['입력<br><small>센서·키보드</small
 const nsC=rl=>svg(160,100,`<circle class="sh" cx="80" cy="50" r="40"/><path class="ln" d="M80 50H120"/><circle class="dot" cx="80" cy="50" r="2.2"/>${txt(rl,100,44,'middle')}`);
 function nsSec(th,rl){const big=th>180,semi=th===180,r=big?40:semi?62:66,c=[80,big?52:semi?84:90],p=a=>[f1(c[0]+r*Math.cos(a*R2D)),f1(c[1]-r*Math.sin(a*R2D))],P1=p(90-th/2),P2=p(90+th/2);
  const m=[(c[0]+P2[0])/2,(c[1]+P2[1])/2],lab=semi?txt(rl,f1(m[0]),c[1]+15,'middle'):txt(rl,f1(m[0]-5),f1(m[1]+(big?12:0)),'end');
- return svg(160,100,`<path class="sh" d="M${c[0]} ${c[1]}L${P1[0]} ${P1[1]}A${r} ${r} 0 ${big?1:0} 0 ${P2[0]} ${P2[1]}Z"/>${semi?'':arcAt(c,P1,P2,10)}<circle class="dot" cx="${c[0]}" cy="${c[1]}" r="2.2"/>${lab}${semi?'':txt(th+'°',c[0],big?c[1]-13:c[1]-30,'middle')}`)}
+ return svg(160,100,`<path class="sh" d="M${c[0]} ${c[1]}L${P1[0]} ${P1[1]}A${r} ${r} 0 ${big?1:0} 0 ${P2[0]} ${P2[1]}Z"/>${semi?'':arcAt(c,P1,P2,10)}<circle class="dot" cx="${c[0]}" cy="${c[1]}" r="2.2"/>${lab}${semi?'':txt(th+'°',c[0],big?c[1]-13:th<=50?c[1]-r-6:c[1]-30,'middle')}`)}
 function nsRect(parts,hl){const W=118,H=46,x0=12,y0=24,tot=parts.reduce((s,q)=>s+q[1],0);let x=x0,s=`<rect class="sh" x="${x0}" y="${y0}" width="${W}" height="${H}"/>`;
  parts.forEach((q,i)=>{const w=W*q[1]/tot;if(i)s+=`<path class="ln dash" d="M${f1(x)} ${y0}V${y0+H}"/>`;s+=txt(q[0],f1(x+w/2),y0-7,'middle');x+=w});return svg(160,80,s+txt(hl,x0+W+6,y0+H/2+5))}
 function nsConeNet(th,ll){const c=[80,26],R=42,p=a=>[f1(c[0]+R*Math.cos(a*R2D)),f1(c[1]-R*Math.sin(a*R2D))],P1=p(270-th/2),P2=p(270+th/2),rr=R*th/360,cy=c[1]+R+rr;
@@ -6316,6 +6320,122 @@ X('sci','N-K8',{figs:[{fig:nfForce,cap:'힘의 표현 · 화살표의 시작점�
 X('sci','N-K12',{figs:[{fig:nfSun,cap:'태양의 구조 · 광구(표면, 흑점·쌀알 무늬) 위로 채층, 가장 바깥에 코로나 / 채층·코로나·홍염은 개기 일식 때 잘 보인다'}]});
 X('soc','N-S1',{figs:[{fig:nfGlobe,cap:'위도·경도 · 적도 기준 남북 0°~90°(북위·남위), 본초 자오선 기준 동서 0°~180°(동경·서경) / 점 P는 북위 30°, 동경 45°'}]});
 {const n=(SUBJ.info.notes||[]).find(n=>n.id==='N-C31');if(n)n.figs=(n.figs||[]).concat([{fig:nfBsearch,cap:'이진 탐색 · 15개(2⁴ − 1개) 자료는 최대 4번 비교하면 찾는다. 순차 탐색이면 11번'}])}
+/* --- 한 장 정리표(일반형 grid): 열 제목 h[], 행 {n:이름, d:주어진 값, fig?, c:[[규칙, 계산(가리기 대상), 그림?], …]} — 수치는 자체 설정 --- */
+function nsPoly(n){const c=[80,54],r=44,P=[...Array(n)].map((_,i)=>{const a=(90+360*i/n)*R2D;return[f1(c[0]+r*Math.cos(a)),f1(c[1]-r*Math.sin(a))]});
+ let s=`<path class="sh" d="M${P.map(p=>p.join(' ')).join('L')}Z"/>`;for(let j=2;j<=n-2;j++)s+=`<path class="arc" style="stroke-dasharray:3 3" d="M${P[0].join(' ')}L${P[j].join(' ')}"/>`;
+ return svg(160,104,s+`<circle class="dot" cx="${P[0][0]}" cy="${P[0][1]}" r="2.6"/>`)}
+function nsGr(f){const O=[80,56],u=5.5,X=x=>f1(O[0]+x*u),Y=y=>f1(O[1]-y*u);let s=`<path class="ln" style="stroke-width:1" d="M8 ${O[1]}H152M${O[0]} 6V106"/>${txt('x',150,O[1]-4,'end','v')}${txt('y',O[0]+5,14,'','v')}${txt('O',O[0]-4,O[1]+13,'end','v')}`,d='',pen=false;
+ for(let x=-13;x<=13.001;x+=.125){if(Math.abs(x)<1e-9){pen=false;continue}const y=f(x);if(!isFinite(y)||Math.abs(y)>8.8){pen=false;continue}d+=(pen?'L':'M')+X(x)+' '+Y(y);pen=true}
+ return svg(160,112,s+`<path class="arc" style="stroke-width:2.2" d="${d}"/>`)}
+const G=(s,list)=>{SUBJ[s].notes=(SUBJ[s].notes||[]).concat(list)};
+G('math',[
+{id:'N-B1s',u:'B1',title:'한 장 정리 ③ 다각형 (대각선·내각·외각)',
+ pts:[`n각형: 대각선 ${F(fr('n(n − 3)',2)+'개')}, 내각의 합 ${F('180° × (n − 2)')}, 정n각형의 한 외각 ${F('360° ÷ n')}`,`그림의 점선 = 한 꼭짓점에서 그은 대각선 ${F('(n − 3)개')} → 삼각형 ${F('(n − 2)개')}로 나뉜다`,`[공식 가리기]를 누르면 계산 칸이 가려져 연습지가 된다.`],
+ grid:{h:['대각선의 개수','내각의 합','정다각형의 한 내각','정다각형의 한 외각'],rows:[
+ {n:'사각형',d:'n = 4',fig:()=>nsPoly(4),c:[[fr('n(n − 3)',2),`${fr('4 × 1',2)} = 2`],['180° × (n − 2)','180° × 2 = 360°'],['(내각의 합) ÷ n','360° ÷ 4 = 90°'],['360° ÷ n','360° ÷ 4 = 90°']]},
+ {n:'오각형',d:'n = 5',fig:()=>nsPoly(5),c:[['',`${fr('5 × 2',2)} = 5`],['','180° × 3 = 540°'],['','540° ÷ 5 = 108°'],['','360° ÷ 5 = 72°']]},
+ {n:'육각형',d:'n = 6',fig:()=>nsPoly(6),c:[['',`${fr('6 × 3',2)} = 9`],['','180° × 4 = 720°'],['','720° ÷ 6 = 120°'],['','360° ÷ 6 = 60°']]},
+ {n:'팔각형',d:'n = 8',fig:()=>nsPoly(8),c:[['',`${fr('8 × 5',2)} = 20`],['','180° × 6 = 1080°'],['','1080° ÷ 8 = 135°'],['','360° ÷ 8 = 45°']]},
+ {n:'십이각형',d:'n = 12',fig:()=>nsPoly(12),c:[['',`${fr('12 × 9',2)} = 54`],['','180° × 10 = 1800°'],['','1800° ÷ 12 = 150°'],['','360° ÷ 12 = 30°']]},
+ {n:'정□각형 찾기',d:'한 외각이 40°',c:[['먼저 n 구하기',`n = 360° ÷ 40° = 9 (정구각형)<br>${fr('9 × 6',2)} = 27`],['','180° × 7 = 1260°'],['(한 내각) = 180° − (한 외각)','180° − 40° = 140°'],['','40° (주어짐)']]},
+ {n:'□각형 찾기',d:'대각선이 35개',c:[['n(n − 3) = 70인 n','10 × 7 = 70 → n = 10 (십각형)'],['','180° × 8 = 1440°'],['','1440° ÷ 10 = 144°'],['','360° ÷ 10 = 36°']]}]},
+ warn:['한 내각만 주어지면 <b>한 외각 = 180° − 한 내각</b>을 먼저 구하고 360° ÷ (한 외각)으로 n을 찾는 것이 빠르다.','외각의 합은 n에 관계없이 항상 360°.'],
+ go:['b1-diag','b1-diag2','b1-reg','b1-ext']},
+{id:'N-B2s',u:'B2',title:'한 장 정리 ④ 원과 부채꼴',
+ pts:[`호 ${F('l = 2πr × '+fr('x',360))}, 넓이 ${F('S = πr² × '+fr('x',360)+' = '+fr(1,2)+'rl')}, 둘레 ${F('l + 2r')}`,`중심각을 모르고 호를 알면 ${F('S = '+fr(1,2)+'rl')}로 바로 넓이를 구한다.`],
+ grid:{h:['호의 길이 l','넓이 S','둘레 (l + 2r)'],rows:[
+ {n:'원',d:'반지름 5',fig:()=>nsC('5'),c:[['원의 둘레 2πr','2π × 5 = 10π'],['πr²','π × 5² = 25π'],['원은 l 그대로','10π']]},
+ {n:'반원',d:'반지름 6',fig:()=>nsSec(180,'6'),c:[[`2πr × ${fr(1,2)}`,`2π × 6 × ${fr(1,2)} = 6π`],[`πr² × ${fr(1,2)}`,`π × 6² × ${fr(1,2)} = 18π`],['l + 2r (지름)','6π + 12']]},
+ {n:'부채꼴',d:'반지름 6, 중심각 120°',fig:()=>nsSec(120,'6'),c:[[`2πr × ${fr('x',360)}`,`2π × 6 × ${fr(120,360)} = 4π`],[`πr² × ${fr('x',360)}`,`π × 6² × ${fr(120,360)} = 12π`],['l + 2r','4π + 12']]},
+ {n:'부채꼴',d:'반지름 8, 중심각 45°',fig:()=>nsSec(45,'8'),c:[['',`2π × 8 × ${fr(45,360)} = 2π`],['',`π × 8² × ${fr(45,360)} = 8π`],['','2π + 16']]},
+ {n:'부채꼴 (중심각 모름)',d:'반지름 10, 호 4π',fig:()=>nsSec(72,'10'),c:[['호로 중심각 구하기',`2π × 10 × ${fr('x',360)} = 4π<br>→ x = 72°`],[`${fr(1,2)}rl`,`${fr(1,2)} × 10 × 4π = 20π`],['l + 2r','4π + 20']]}]},
+ warn:['부채꼴의 둘레에는 <b>반지름 2개</b>를 꼭 더한다.','중심각이 2배 → 호와 넓이 2배 / 반지름이 2배 → 호 2배, 넓이 4배.'],
+ go:['b2-arc','b2-area','b2-rl','b2-peri']},
+{id:'N-Z2s',u:'Z2',title:'한 장 정리 ⑤ 정비례·반비례 그래프',
+ pts:[`y = ax: ${F('원점을 지나는 직선')} / y = ${fr('a','x')}: ${F('좌표축에 가까워지는 한 쌍의 곡선')}`,`a > 0이면 ${F('제1·3사분면')}, a < 0이면 ${F('제2·4사분면')}`,`식 구하기: 지나는 점을 대입 → 정비례 ${F('a = '+fr('y','x'))}, 반비례 ${F('a = xy')}`],
+ grid:{h:['그래프 모양','지나는 사분면','x가 커지면 y는','x = 2일 때 y'],rows:[
+ {n:'y = 3x',fig:()=>nsGr(x=>3*x),c:[['정비례','원점을 지나는 직선'],['a > 0','제1·3사분면'],['','증가'],['','3 × 2 = 6']]},
+ {n:`y = −${fr(1,2)}x`,fig:()=>nsGr(x=>-x/2),c:[['정비례','원점을 지나는 직선'],['a < 0','제2·4사분면'],['','감소'],['',`−${fr(1,2)} × 2 = −1`]]},
+ {n:`y = ${fr(8,'x')}`,fig:()=>nsGr(x=>8/x),c:[['반비례','한 쌍의 곡선'],['a > 0','제1·3사분면'],['','각 사분면에서 감소'],['',`${fr(8,2)} = 4`]]},
+ {n:`y = −${fr(8,'x')}`,fig:()=>nsGr(x=>-8/x),c:[['반비례','한 쌍의 곡선'],['a < 0','제2·4사분면'],['','각 사분면에서 증가'],['',`−${fr(8,2)} = −4`]]},
+ {n:'정비례 식 구하기',d:'점 (3, −6)을 지남',fig:()=>nsGr(x=>-2*x),c:[['y = ax에 대입','−6 = 3a → a = −2<br>y = −2x'],['','제2·4사분면'],['','감소'],['','−2 × 2 = −4']]},
+ {n:'반비례 식 구하기',d:'점 (−3, 4)를 지남',fig:()=>nsGr(x=>-12/x),c:[['a = xy',`a = (−3) × 4 = −12<br>y = −${fr(12,'x')}`],['','제2·4사분면'],['','각 사분면에서 증가'],['',`−${fr(12,2)} = −6`]]}]},
+ warn:['반비례 그래프는 좌표축과 만나지 않는다 (x = 0일 수 없다).','|a|가 클수록 정비례 직선은 y축에, 반비례 곡선은 원점에서 멀어진다.'],
+ go:['z2-dir','z2-inv','z2-area']},
+{id:'N-D1s',u:'D1',title:'한 장 정리 ⑥ 대푯값 (평균·중앙값·최빈값)',
+ pts:[`평균 = ${F(fr('(변량의 총합)','(변량의 개수)'))}`,`중앙값: 작은 값부터 늘어놓고 ${F('가운데 값')} (개수가 짝수면 ${F('가운데 두 값의 평균')})`,`최빈값: ${F('가장 많이 나온 값')} (여러 개일 수도, 없을 수도 있다)`],
+ grid:{h:['평균','중앙값','최빈값'],rows:[
+ {n:'자료 5개 (홀수)',d:'3, 5, 5, 7, 10',c:[['(총합) ÷ (개수)',`${fr(30,5)} = 6`],['가운데 (3번째)','5'],['','5']]},
+ {n:'자료 6개 (짝수)',d:'2, 4, 6, 8, 9, 13',c:[['',`${fr(42,6)} = 7`],['가운데 두 값의 평균',`${fr('6 + 8',2)} = 7`],['','없음 (모두 1번씩)']]},
+ {n:'극단값이 있을 때',d:'4, 5, 6, 6, 7, 32',c:[['32 때문에 커진다',`${fr(60,6)} = 10`],['대푯값으로 적절',`${fr('6 + 6',2)} = 6`],['','6']]},
+ {n:'최빈값이 2개',d:'1, 2, 2, 3, 3, 4, 6',c:[['',`${fr(21,7)} = 3`],['4번째 값','3'],['','2, 3']]},
+ {n:'평균으로 x 구하기',d:'7, 9, x, 10, 8의 평균이 8',c:[['(총합) = (평균) × (개수)','8 × 5 = 40 → x = 6'],['정렬: 6, 7, 8, 9, 10','8'],['','없음']]}]},
+ warn:['중앙값은 반드시 <b>작은 값부터 정렬</b>한 뒤 찾는다.','극단값(너무 크거나 작은 값)이 있으면 평균보다 중앙값이 자료를 잘 대표한다.'],
+ go:['d1-mean','d1-med','d1-mode','d1-x']},
+{id:'N-D2s',u:'D2',title:'한 장 정리 ⑦ 도수분포표·상대도수',
+ pts:[`학생 20명의 점수 도수분포표를 한 줄씩 채운다.`,`계급값 = ${F('계급의 양 끝 값의 평균')}, 상대도수 = ${F(fr('(그 계급의 도수)','(도수의 총합)'))}`,`히스토그램 넓이의 합 = ${F('(계급의 크기) × (도수의 총합)')}`],
+ grid:{h:['계급값','상대도수','히스토그램 직사각형 넓이'],rows:[
+ {n:'50 이상 60 미만',d:'도수 2명',c:[['양 끝의 평균',`${fr('50 + 60',2)} = 55`],['(도수) ÷ (총합)',`${fr(2,20)} = 0.1`],['(계급의 크기) × (도수)','10 × 2 = 20']]},
+ {n:'60 이상 70 미만',d:'도수 5명',c:[['','65'],['',`${fr(5,20)} = 0.25`],['','10 × 5 = 50']]},
+ {n:'70 이상 80 미만',d:'도수 8명',c:[['','75'],['',`${fr(8,20)} = 0.4`],['','10 × 8 = 80']]},
+ {n:'80 이상 90 미만',d:'도수 4명',c:[['','85'],['',`${fr(4,20)} = 0.2`],['','10 × 4 = 40']]},
+ {n:'90 이상 100 미만',d:'도수 1명',c:[['','95'],['',`${fr(1,20)} = 0.05`],['','10 × 1 = 10']]},
+ {n:'합계',d:'20명',c:[['','—'],['상대도수의 합','1'],['넓이의 합','10 × 20 = 200']]}]},
+ warn:['상대도수에서 도수 구하기: (도수) = (상대도수) × (도수의 총합). 예) 40명 중 상대도수 0.15 → 6명','도수분포다각형과 가로축 사이의 넓이 = 히스토그램 넓이의 합.'],
+ go:['d2-rel','d2-blank','d2-hist','d2-inv']}]);
+const G2=(s,id,u,title,rows,warn,go)=>G(s,[{id,u,title,pts:['[공식 가리기]를 누르면 식과 답이 가려져 연습지가 된다. 가린 칸을 누르면 하나씩 보인다.'],grid:{h:['쓰는 식','대입과 답'],rows:rows.map(([n,d,a,b])=>({n,d,c:[['',a],['',b]]}))},warn,go}]);
+G2('sci','N-K5bs','K5b','한 장 정리: 열량·비열 계산',[
+ ['열량 구하기','물 2 kg (비열 1), 10 °C → 30 °C','Q = c × m × Δt','1 × 2 × 20 = 40 kcal'],
+ ['비열 구하기','0.5 kg에 3 kcal → 20 °C 상승',`c = ${fr('Q','m × Δt')}`,`${fr(3,'0.5 × 20')} = 0.3 kcal/(kg·°C)`],
+ ['온도 변화 구하기','물 4 kg에 20 kcal',`Δt = ${fr('Q','c × m')}`,`${fr(20,'1 × 4')} = 5 °C`],
+ ['질량 구하기','비열 0.2인 물질에 6 kcal → 10 °C 상승',`m = ${fr('Q','c × Δt')}`,`${fr(6,'0.2 × 10')} = 3 kg`],
+ ['열평형 온도','80 °C 물 1 kg + 20 °C 물 2 kg','(잃은 열) = (얻은 열)','1 × (80 − T) = 2 × (T − 20)<br>→ T = 40 °C'],
+ ['비열 비교','같은 질량에 같은 열량 · 비열 A 1, B 0.2','온도 변화는 비열에 반비례','A : B = 1 : 5 (B가 5배 더 오른다)']],
+ ['온도 변화(Δt)는 나중 온도 − 처음 온도. 처음·나중 온도를 그대로 넣지 않는다.','열평형 온도는 항상 두 처음 온도 사이에 있다 (질량이 큰 쪽에 가깝다).'],['k15-q','k15-c','k5-mix','k15-cmp']);
+G2('sci','N-K9s','K9','한 장 정리: 힘 계산 (무게·탄성력·부력·알짜힘)',[
+ ['무게','질량 3 kg','(무게) = 9.8 × (질량)','9.8 × 3 = 29.4 N'],
+ ['달에서의 무게','지구에서 29.4 N',`(지구 무게) × ${fr(1,6)}`,`29.4 × ${fr(1,6)} = 4.9 N<br>(질량 3 kg은 그대로)`],
+ ['용수철이 늘어난 길이','2 N에 3 cm 늘어남 → 8 N','늘어난 길이는 힘에 비례','2 : 3 = 8 : x → x = 12 cm'],
+ ['부력','공기 중 10 N, 물속 7 N','(공기 중 무게) − (물속 무게)','10 − 7 = 3 N'],
+ ['알짜힘','오른쪽 5 N, 왼쪽 3 N','반대 방향이면 큰 힘 − 작은 힘','5 − 3 = 2 N, 오른쪽']],
+ ['질량(kg)은 장소에 따라 변하지 않고, 무게(N)만 달에서 '+fr(1,6)+'로 줄어든다.','용수철은 <b>늘어난 길이</b>가 힘에 비례한다 (전체 길이가 아님).'],['k8-wt','k8-spr','k8-buoy','k9-net']);
+G2('sci','N-K10s','K10','한 장 정리: 압력·보일 법칙 계산',[
+ ['압력','무게 60 N, 닿는 면적 20 cm²',`P = ${fr('F','S')}`,`${fr(60,20)} = 3 N/cm²`],
+ ['면적이 넓어지면','같은 60 N, 면적 30 cm²',`P = ${fr('F','S')}`,`${fr(60,30)} = 2 N/cm² (면적이 넓을수록 압력이 작다)`],
+ ['보일 법칙: 부피','1기압 300 mL → 3기압','P₁V₁ = P₂V₂','1 × 300 = 3 × V → V = 100 mL'],
+ ['보일 법칙: 압력','2기압 60 mL → 120 mL','P₁V₁ = P₂V₂','2 × 60 = P × 120 → P = 1기압']],
+ ['보일 법칙은 <b>온도가 일정</b>할 때만 쓴다. 압력이 2배 → 부피 '+fr(1,2)+'.','압력 단위를 맞춘다 (N/cm²는 힘 ÷ 면적).'],['k10-p','k10-calc','k11-boyle']);
+G2('sci','N-K13s','K13','한 장 정리: 일주·연주 운동 각도',[
+ ['일주 운동 각도','3시간 동안 별이 도는 각도','15° × (시간)','15° × 3 = 45°'],
+ ['걸린 시간','별이 60° 돌았을 때','(각도) ÷ 15°','60° ÷ 15° = 4시간'],
+ ['연주 운동','30일 뒤 같은 시각의 별자리','하루 약 1°씩 서쪽으로','1° × 30 = 약 30°'],
+ ['같은 위치에 오는 시각','한 달 뒤','하루 약 4분씩 빨라짐','4분 × 30 = 약 2시간 빨리']],
+ ['일주 운동은 지구의 <b>자전</b>(1시간 15°), 연주 운동은 <b>공전</b>(하루 약 1°) 때문이다.'],['k13-rot','k13-orbit']);
+G('soc',[{id:'N-S1s',u:'S1',title:'한 장 정리: 시차 계산',pts:['우리나라 표준 경선은 동경 135°. [공식 가리기]로 연습지처럼 풀어 본다.',`시차 = ${F('(경도 차) ÷ 15°')} 시간, ${F('동쪽')}이 시각이 빠르다`],
+ grid:{h:['경도 차','시차','현지 시각'],rows:[
+ {n:'서울 → 런던',d:'동경 135° / 경도 0° · 서울 오전 10시',c:[['같은 쪽이면 빼기','135° − 0° = 135°'],['(경도 차) ÷ 15°','135° ÷ 15° = 9시간'],['서쪽은 느림 → 빼기','10시 − 9시간 = 오전 1시']]},
+ {n:'서울 → 뉴욕',d:'동경 135° / 서경 75° · 서울 오후 3시',c:[['동경·서경이면 더하기','135° + 75° = 210°'],['','210° ÷ 15° = 14시간'],['','15시 − 14시간 = 오전 1시']]},
+ {n:'서울 → 동경 165° 도시',d:'서울 정오',c:[['','165° − 135° = 30°'],['','30° ÷ 15° = 2시간'],['동쪽은 빠름 → 더하기','12시 + 2시간 = 오후 2시']]},
+ {n:'비행기 도착 시각',d:'서울 오전 10시 출발 → 런던, 12시간 비행',c:[['','135°'],['','9시간'],['(출발) + (비행) − (시차)','10시 + 12시간 − 9시간<br>= 오후 1시 (런던)']]}]},
+ warn:['도착 시각은 <b>출발지 시각 + 비행시간</b>을 먼저 구한 뒤 도착지 시각으로 바꾼다.','날짜 변경에 주의: 계산한 시각이 0시보다 작거나 24시를 넘으면 날짜가 바뀐다.'],go:['s1-time','s1-fly']}]);
+G2('info','N-C21s','C21','한 장 정리: 데이터 표현 계산',[
+ ['표현할 수 있는 가짓수','3비트','2ⁿ','2³ = 8가지'],
+ ['필요한 비트 수','알파벳 26자를 구분','2ⁿ ≥ (가짓수)인 가장 작은 n','2⁴ = 16 < 26 ≤ 2⁵ = 32 → 5비트'],
+ ['10진수 → 2진수','13','2로 나눈 나머지를 아래부터','13 = 8 + 4 + 1 → 1101<sub>(2)</sub>'],
+ ['2진수 → 10진수','10110<sub>(2)</sub>','자리값 16 · 8 · 4 · 2 · 1','16 + 4 + 2 = 22'],
+ ['이미지 용량','가로 100 × 세로 80 픽셀, 픽셀당 24비트',fr('가로 × 세로 × (픽셀당 비트)',8)+' 바이트',`${fr('100 × 80 × 24',8)} = 24000 바이트`],
+ ['흑백 이미지 용량','가로 10 × 세로 8 픽셀, 흑백 1비트','',`${fr('10 × 8 × 1',8)} = 10 바이트`]],
+ ['비트 → 바이트는 ÷ 8. 1 KB = 1024 바이트.','2진수는 오른쪽 끝 자리부터 1, 2, 4, 8, 16 …'],['i2-bit','i2-bin','i12-img']);
+G2('tech','N-Q1s','Q1','한 장 정리: 열량 계산',[
+ ['밥 한 공기','탄수화물 60 g, 단백질 5 g, 지방 1 g','탄 × 4 + 단 × 4 + 지 × 9','240 + 20 + 9 = 269 kcal'],
+ ['우유 한 컵','탄수화물 10 g, 단백질 6 g, 지방 7 g','','40 + 24 + 63 = 127 kcal'],
+ ['지방만','지방 10 g','지방 1 g = 9 kcal','10 × 9 = 90 kcal']],
+ ['단백질도 1 g당 4 kcal. 무기질·비타민·물은 열량을 내지 않는다.'],['h2-kcal','h2-nut']);
+G2('tech','N-W2s','W2','한 장 정리: 전력량·전기 요금',[
+ ['전력량','800 W 전자레인지, 하루 30분, 30일','(kW) × (시간)','0.8 × 0.5 × 30 = 12 kWh'],
+ ['전기 요금','1 kWh당 120원','(전력량) × (1 kWh당 요금)','12 × 120 = 1440원'],
+ ['절약량 비교','60 W 전구 → 10 W LED, 하루 5시간, 30일','(전력 차) × (시간)','(0.06 − 0.01) × 5 × 30 = 7.5 kWh']],
+ ['W → kW는 ÷ 1000, 분 → 시간은 ÷ 60 (30분 = 0.5시간).'],['w-kwh','w2-sol']);
 })();
 const NO={hide:false,weak:LS.get('m12-ntweak',false)};
 /* 소단원별 정답률 (단원 현황과 같은 기록 allS) → {u:[푼 수, 맞힌 수]} */
@@ -6333,6 +6453,7 @@ function renderNote(){const v=$('#v-note');if(!v)return;const all=((SJ[CUR]||{})
  <div class="ntsc"><i>밑넓이</i><div class="fig">${r.b[0]()}</div><span class="f">${r.b[1]}</span></div>
  <div class="ntsc"><i>옆넓이</i>${r.l?`<div class="fig">${r.l[0]()}</div><span class="f">${r.l[1]}</span>`:'<span class="muted">—</span>'}</div>
  <div class="ntsc ntsa">${r.S?`<div><i>겉넓이</i><em>${r.S[0]}</em><span class="f">${r.S[1]}</span></div>`:''}<div><i>부피</i><em>${r.V[0]}</em><span class="f">${r.V[1]}</span></div></div></div>`).join('')}</div>`:''}
+ ${x.grid?`<div class="nts">${x.grid.rows.map(r=>`<div class="ntsr g${x.grid.h.length>=4?' w':''}" style="--k:${x.grid.h.length}"><div class="ntsc ntsn"><b>${r.n}</b>${r.d?`<small>${r.d}</small>`:''}${r.fig?`<div class="fig">${r.fig()}</div>`:''}</div>${r.c.map((c,i)=>`<div class="ntsc ntsa"><div><i>${x.grid.h[i]}</i>${c[0]?`<em>${c[0]}</em>`:''}<span class="f">${c[1]}</span></div></div>`).join('')}</div>`).join('')}</div>`:''}
  ${x.tbl?`<div class="tw"><table class="ft ntb${x.tbl.h.length>=4?' wide':''}"><thead><tr>${x.tbl.h.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${x.tbl.r.map(r=>`<tr>${r.map((c,i)=>i?`<td><span class="f">${c}</span></td>`:`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
  ${x.warn&&x.warn.length?`<div class="ntw"><b>실수 주의</b><ul>${x.warn.map(w=>`<li>${w}</li>`).join('')}</ul></div>`:''}
  ${(x.ex||[]).map((e,i)=>`<details class="ex ntx"><summary>예제 ${i+1}. ${e.t}</summary>${e.fig?`<figure class="fig">${e.fig()}</figure>`:''}<p>${e.a}</p></details>`).join('')}
