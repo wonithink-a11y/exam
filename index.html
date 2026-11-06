@@ -126,10 +126,25 @@ math{font-size:1.08em}
 .ntflow>b{color:var(--ac)}
 .ntflow.v{flex-direction:column}
 .ntsub{margin:6px 0 0;font-size:12.5px;text-align:center}
+.nts{display:grid;gap:8px;margin:4px 0 12px}
+.ntsr{display:grid;grid-template-columns:1.05fr 1fr 1.15fr 1.2fr;border:1px solid var(--rule);border-radius:12px;overflow:hidden;break-inside:avoid}
+.ntsc{padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-size:13px;line-height:1.55;border-left:1px dashed var(--rule);min-width:0}
+.ntsc>i,.ntsa i{font-style:normal;font-size:12px;font-weight:700;color:var(--ac);align-self:flex-start}
+.ntsn{background:var(--chip)}.ntsn b{font-size:14px}.ntsn small{font-size:11.5px;color:var(--muted);line-height:1.4}
+.ntsc .fig{width:100%}.ntsc .fig svg{max-width:150px}
+.ntsn svg text{font-size:24px}.ntsn svg .ln,.ntsn svg .sh,.ntsn svg .arc{vector-effect:non-scaling-stroke}
+.ntsa{align-items:stretch;justify-content:center;gap:10px}.ntsa>div{display:flex;flex-direction:column;gap:2px;text-align:left}
+.ntsa em{font-style:normal;font-size:12px;color:var(--muted)}.ntsc .f{font-variant-numeric:tabular-nums}.ntsc small{font-size:11px}
+@media (max-width:560px){.ntsr{grid-template-columns:1fr 1fr}.ntsc:nth-child(3){border-left:0}.ntsc:nth-child(n+3){border-top:1px dashed var(--rule)}}
+.ntbs p{margin:0 0 6px;font-size:13px;text-align:center}
+.ntbsr{display:grid;grid-template-columns:2.2em repeat(15,minmax(0,1fr));gap:2px;align-items:center;margin-bottom:3px;font-family:var(--f-num);font-size:11.5px}
+.ntbsr i{font-style:normal;text-align:center;border:1px solid var(--rule);border-radius:4px;padding:3px 0;background:var(--sheet)}
+.ntbsr i.x{opacity:.25}.ntbsr i.m{background:var(--ac);color:var(--on);border-color:var(--ac);font-weight:700}
+.ntbsr span{font-size:11.5px;color:var(--muted)}.ntbsr em{grid-column:2/-1;font-style:normal;font-size:12px;color:var(--ac);text-align:right;margin-bottom:4px}
 .ntbin{font-family:var(--f-num);font-size:14px;line-height:1.7}
 .ntbin span{margin-left:10px;color:var(--ac);font-weight:700}
 .ntbin p{margin:4px 0 0;font-family:var(--f-body);font-size:13px}
-@media print{body.ntprint>*:not(.wrap),body.ntprint .wrap>*:not(#v-note),body.ntprint #v-note>.bar,body.ntprint .ntnav,body.ntprint .ntg{display:none!important}body.ntprint #v-note{display:block!important}body.ntprint .nt{border:1px solid #bbb;break-inside:auto}body.ntprint .nt table,body.ntprint .ntw,body.ntprint .ntx,body.ntprint .ntt,body.ntprint .ntf,body.ntprint .ntfig{break-inside:avoid}body.ntprint .nt .ntb{min-width:0}body.ntprint .tw{overflow:visible}}.tabs.six button{font-size:12.5px;letter-spacing:-.03em;white-space:nowrap;padding:9px 0}
+@media print{body.ntprint>*:not(.wrap),body.ntprint .wrap>*:not(#v-note),body.ntprint #v-note>.bar,body.ntprint .ntnav,body.ntprint .ntg{display:none!important}body.ntprint #v-note{display:block!important}body.ntprint .nt{border:1px solid #bbb;break-inside:auto}body.ntprint .nt table,body.ntprint .ntw,body.ntprint .ntx,body.ntprint .ntt,body.ntprint .ntf,body.ntprint .ntfig,body.ntprint .ntsr{break-inside:avoid}body.ntprint .nt .ntb{min-width:0}body.ntprint .tw{overflow:visible}}.tabs.six button{font-size:12.5px;letter-spacing:-.03em;white-space:nowrap;padding:9px 0}
 /* 영단어 */
 .wl-les{display:flex;flex-wrap:wrap;gap:6px}
 .wsec{margin-top:14px}.wsec h3{font:400 17px var(--f-disp);margin:0 0 4px}
@@ -6230,6 +6245,70 @@ X('tech','N-T1',{figs:[{fig:()=>FLW(['입력','과정(처리)','출력'])+'<p cl
 X('info','N-C21',{fm:[['(정보의 가짓수) = 2ⁿ','n: 비트 수'],[`(이미지 용량, 바이트) = ${fr('가로 픽셀 × 세로 픽셀 × 한 픽셀의 비트 수',8)}`,'1바이트 = 8비트']],figs:[{fig:nfBin,cap:'10진수 41을 2진수로 바꾸기'}]});
 X('info','N-C31',{figs:[{fig:nfFlow,cap:'순서도 기호'}]});
 X('info','N-C11',{figs:[{fig:()=>FLW(['입력<br><small>센서·키보드</small>','처리<br><small>CPU·프로그램</small>','출력<br><small>LED·모터·스피커</small>']),cap:'피지컬 컴퓨팅 시스템의 흐름'}]});
+/* --- 한 장 정리표 (입체도형 | 밑넓이 | 옆넓이 | 겉넓이·부피) — 수치는 자체 설정 --- */
+const nsC=rl=>svg(160,100,`<circle class="sh" cx="80" cy="50" r="40"/><path class="ln" d="M80 50H120"/><circle class="dot" cx="80" cy="50" r="2.2"/>${txt(rl,100,44,'middle')}`);
+function nsSec(th,rl){const big=th>180,semi=th===180,r=big?40:semi?62:66,c=[80,big?52:semi?84:90],p=a=>[f1(c[0]+r*Math.cos(a*R2D)),f1(c[1]-r*Math.sin(a*R2D))],P1=p(90-th/2),P2=p(90+th/2);
+ const m=[(c[0]+P2[0])/2,(c[1]+P2[1])/2],lab=semi?txt(rl,f1(m[0]),c[1]+15,'middle'):txt(rl,f1(m[0]-5),f1(m[1]+(big?12:0)),'end');
+ return svg(160,100,`<path class="sh" d="M${c[0]} ${c[1]}L${P1[0]} ${P1[1]}A${r} ${r} 0 ${big?1:0} 0 ${P2[0]} ${P2[1]}Z"/>${semi?'':arcAt(c,P1,P2,10)}<circle class="dot" cx="${c[0]}" cy="${c[1]}" r="2.2"/>${lab}${semi?'':txt(th+'°',c[0],big?c[1]-13:c[1]-30,'middle')}`)}
+function nsRect(parts,hl){const W=118,H=46,x0=12,y0=24,tot=parts.reduce((s,q)=>s+q[1],0);let x=x0,s=`<rect class="sh" x="${x0}" y="${y0}" width="${W}" height="${H}"/>`;
+ parts.forEach((q,i)=>{const w=W*q[1]/tot;if(i)s+=`<path class="ln dash" d="M${f1(x)} ${y0}V${y0+H}"/>`;s+=txt(q[0],f1(x+w/2),y0-7,'middle');x+=w});return svg(160,80,s+txt(hl,x0+W+6,y0+H/2+5))}
+function nsConeNet(th,ll){const c=[80,26],R=42,p=a=>[f1(c[0]+R*Math.cos(a*R2D)),f1(c[1]-R*Math.sin(a*R2D))],P1=p(270-th/2),P2=p(270+th/2),rr=R*th/360,cy=c[1]+R+rr;
+ return svg(160,Math.ceil(cy+rr+6),`<path class="sh" d="M${c[0]} ${c[1]}L${P1[0]} ${P1[1]}A${R} ${R} 0 ${th>180?1:0} 0 ${P2[0]} ${P2[1]}Z"/>${arcAt(c,P1,P2,9)}${txt(th+'°',c[0]-6,c[1]+24,'end')}<path class="ln dash" d="M${c[0]} ${c[1]}V${c[1]+R}"/>${txt(ll,c[0]+6,c[1]+R-6)}<circle class="ln" cx="80" cy="${f1(cy)}" r="${f1(rr)}"/>`)}
+const nsSq=al=>svg(160,96,`<rect class="sh" x="50" y="14" width="60" height="60"/>${txt(al,80,90,'middle')}${txt(al,44,49,'end')}`);
+const nsSq2=(a,b)=>svg(160,96,`<rect class="sh" x="14" y="44" width="30" height="30"/><rect class="sh" x="70" y="14" width="60" height="60"/>${txt(a,29,90,'middle')}${txt(b,100,90,'middle')}`);
+const nsRT=(a,b)=>svg(160,96,`<path class="sh" d="M40 74H110L40 14Z"/><path class="ln" d="M40 66H48V74"/>${txt(a,75,90,'middle')}${txt(b,34,49,'end')}`);
+const nsTri4=(bl,sl)=>svg(160,96,`<path class="sh" d="M28 78H98L63 14Z"/><path class="arc" style="stroke-dasharray:3 3" d="M63 14V78"/>${txt(bl,63,93,'middle')}${txt(sl,69,52)}${txt('× 4',110,56,'','v')}`);
+const nsTrap4=(tl,bl,sl)=>svg(160,96,`<path class="sh" d="M18 78H104L80 22H42Z"/><path class="arc" style="stroke-dasharray:3 3" d="M61 22V78"/>${txt(tl,61,16,'middle')}${txt(bl,61,93,'middle')}${txt(sl,67,55)}${txt('× 4',114,56,'','v')}`);
+N('math',[
+{id:'N-C2s1',u:'C2',title:'한 장 정리 ① 원기둥·부채꼴 기둥·원뿔',
+ pts:[`단위는 모두 cm. 한 줄씩 <b>밑넓이 → 옆넓이 → 겉넓이·부피</b> 순서로 채운다.`,`[공식 가리기]를 누르면 계산 칸이 가려져 <b>연습지</b>가 된다. 가린 칸을 누르면 답이 하나씩 보인다.`,`기둥: 겉넓이 = ${F('밑 × 2 + 옆')}, 부피 = ${F('밑 × 높이')} / 원뿔: 겉넓이 = ${F('밑 + 옆')}, 부피 = ${F(fr(1,3)+' × 밑 × 높이')}`],
+ sheet:[
+ {n:'원기둥',d:'반지름 3, 높이 5',fig:()=>figCyl('3','5'),b:[()=>nsC('3'),'π × 3² = 9π'],l:[()=>nsRect([['밑면의 둘레',1]],'5'),'(2π × 3) × 5 = 30π'],S:['밑 × 2 + 옆','9π × 2 + 30π<br>= 48π'],V:['밑 × 높이','9π × 5 = 45π']},
+ {n:'부채꼴 기둥',d:'반지름 6, 중심각 60°, 높이 5',fig:()=>figSecPrism(60,'6','5',''),b:[()=>nsSec(60,'6'),`π × 6² × ${fr(60,360)} = 6π`],
+  l:[()=>nsRect([['6',1],['호',1.1],['6',1]],'5'),`호 = 2π × 6 × ${fr(60,360)} = 2π<br>(6 + 6 + 2π) × 5<br>= 60 + 10π`],S:['밑 × 2 + 옆','6π × 2 + 60 + 10π<br>= 22π + 60'],V:['밑 × 높이','6π × 5 = 30π']},
+ {n:'반원 기둥',d:'반지름 4, 높이 7',fig:()=>figSecPrism(180,'4','7',''),b:[()=>nsSec(180,'4'),`π × 4² × ${fr(1,2)} = 8π`],
+  l:[()=>nsRect([['지름 8',1.3],['호',1.6]],'7'),`호 = 2π × 4 × ${fr(1,2)} = 4π<br>(8 + 4π) × 7<br>= 56 + 28π`],S:['밑 × 2 + 옆','8π × 2 + 56 + 28π<br>= 44π + 56'],V:['밑 × 높이','8π × 7 = 56π']},
+ {n:'부채꼴 기둥',d:'반지름 2, 중심각 270°, 높이 5',fig:()=>figSecPrism(270,'2','5',''),b:[()=>nsSec(270,'2'),`π × 2² × ${fr(270,360)} = 3π`],
+  l:[()=>nsRect([['2',1],['호',2.4],['2',1]],'5'),`호 = 2π × 2 × ${fr(270,360)} = 3π<br>(2 + 2 + 3π) × 5<br>= 20 + 15π`],S:['밑 × 2 + 옆','3π × 2 + 20 + 15π<br>= 21π + 20'],V:['밑 × 높이','3π × 5 = 15π']},
+ {n:'원뿔',d:'반지름 6, 모선 10, 높이 8',fig:()=>sv(figCone('6','8',false),txt('10',192,92)),b:[()=>nsC('6'),'π × 6² = 36π'],
+  l:[()=>nsConeNet(216,'10'),'π × 6 × 10 = 60π<br><small>(반지름 × 모선 × π)</small>'],S:['밑 + 옆 (밑면 1개)','36π + 60π = 96π'],V:[`${fr(1,3)} × 밑 × 높이`,`${fr(1,3)} × 36π × 8 = 96π`]}],
+ warn:['부채꼴·반원 기둥의 옆면 가로 = <b>호 + 반지름 2개</b> (반원은 호 + 지름). 그래서 겉넓이가 □π + □ 꼴이 된다.','원뿔은 겉넓이에 <b>모선(10)</b>, 부피에 <b>높이(8)</b>를 쓴다.'],
+ go:['c2-cyl','c2-secp','c2-cones','c2-conev']},
+{id:'N-C2s2',u:'C2',title:'한 장 정리 ② 각뿔·꼭짓점 삼각뿔·각뿔대',
+ pts:[`단위는 모두 cm. [공식 가리기]로 연습지처럼 풀어 본다.`,`뿔: 겉넓이 = ${F('밑 + 옆')}, 부피 = ${F(fr(1,3)+' × 밑 × 높이')} / 각뿔대: 겉넓이 = ${F('밑 2개 + 옆')}, 부피 = ${F('큰 뿔 − 작은 뿔')}`],
+ sheet:[
+ {n:'사각뿔',d:'밑면 한 변 6, 옆면 삼각형의 높이 5, 높이 4',fig:()=>figSqPyr('6','5','4'),b:[()=>nsSq('6'),'6 × 6 = 36'],l:[()=>nsTri4('6','5'),`${fr(1,2)} × 6 × 5 × 4 = 60`],S:['밑 + 옆','36 + 60 = 96'],V:[`${fr(1,3)} × 밑 × 높이`,`${fr(1,3)} × 36 × 4 = 48`]},
+ {n:'삼각뿔 (정육면체)',d:'한 모서리 12인 정육면체의 꼭짓점 A',fig:()=>figCornerPyr('12','12','12'),b:[()=>nsRT('12','12'),`${fr(1,2)} × 12 × 12 = 72`],l:null,S:null,V:[`${fr(1,3)} × 밑 × 높이`,`${fr(1,3)} × 72 × 12 = 288`]},
+ {n:'삼각뿔 (직육면체)',d:'AB = 4, AD = 3, AE = 5',fig:()=>figCornerPyr('4','3','5'),b:[()=>nsRT('4','3'),`${fr(1,2)} × 4 × 3 = 6`],l:null,S:null,V:[`${fr(1,3)} × 밑 × 높이`,`${fr(1,3)} × 6 × 5 = 10`]},
+ {n:'사각뿔대',d:'두 밑면 한 변 6, 12 · 옆면 사다리꼴의 높이 5 · 높이 4',fig:()=>figPyrFrus(2,'6','12','5',false),b:[()=>nsSq2('6','12'),'6 × 6 = 36<br>12 × 12 = 144'],
+  l:[()=>nsTrap4('6','12','5'),`${fr(1,2)} × (6 + 12) × 5 × 4 = 180`],S:['밑 2개 + 옆','36 + 144 + 180<br>= 360'],V:['큰 뿔 − 작은 뿔',`닮음비 1 : 2 → 높이 8, 4<br>${fr(1,3)} × 144 × 8 − ${fr(1,3)} × 36 × 4<br>= 384 − 48 = 336`]}],
+ warn:['꼭짓점 삼각뿔은 밑면이 직각삼각형 → '+fr(1,2)+'과 '+fr(1,3)+'을 모두 곱한다 (직육면체 부피의 '+fr(1,6)+').','사각뿔의 겉넓이에는 옆면 삼각형의 높이(5), 부피에는 뿔의 높이(4)를 쓴다.'],
+ go:['c2-sqpyr','c2-cpyr','c2-pfrus','c2-pyr']}]);
+/* --- 남은 그림 4개: 힘의 표현, 태양의 구조, 위도·경도, 이진 탐색 --- */
+const nfAr=(x1,y,x2,lab,ly)=>{const d=x2>x1?1:-1;return `<path class="arc" style="stroke-width:2.6" d="M${x1} ${y}H${x2}M${x2-8*d} ${y-5}L${x2} ${y}L${x2-8*d} ${y+5}"/>${lab?txt(lab,(x1+x2)/2,ly||y-8,'middle'):''}`};
+function nfForce(){let s=`<path class="ln" d="M10 70H320"/><rect class="sh" x="40" y="30" width="60" height="40"/><circle class="dot" cx="100" cy="50" r="3.4"/>${nfAr(100,50,220,'')}`;
+ s+=txt('작용점',100,92,'middle','v')+`<path class="ln" style="stroke-width:1" d="M100 80V56"/>`+txt('힘의 방향 →',224,45,'','v')+`<path class="ln" style="stroke-width:1" d="M100 24V18H220V24"/>`+txt('화살표 길이 = 힘의 크기',160,13,'middle');
+ s+=`<g transform="translate(0 112)">${txt('같은 방향',10,16,'','v')}${nfAr(90,10,150,'3 N',4)}${nfAr(150,10,250,'5 N',4)}${txt('→ 8 N',262,15,'','v')}
+ ${txt('반대 방향',10,52,'','v')}<rect class="sh" x="170" y="36" width="24" height="20"/>${nfAr(170,46,120,'3 N',38)}${nfAr(194,46,294,'5 N',38)}${txt('→ 2 N (5 N 쪽)',150,76,'','v')}</g>`;return svg(330,200,s)}
+function nfSun(){const c=[92,120];let s=`<circle cx="${c[0]}" cy="${c[1]}" r="100" style="fill:#f6b73c;opacity:.16"/><circle cx="${c[0]}" cy="${c[1]}" r="80" style="fill:#f6b73c;opacity:.2"/>`;
+ s+=`<circle cx="${c[0]}" cy="${c[1]}" r="62" style="fill:none;stroke:#e8553a;stroke-width:5;opacity:.85"/><circle cx="${c[0]}" cy="${c[1]}" r="59" style="fill:#f6b73c;stroke:var(--ink);stroke-width:1.2"/>`;
+ s+=`<path d="M122 63C132 32 154 30 150 70" style="fill:none;stroke:#e8553a;stroke-width:5;stroke-linecap:round"/>`;
+ [[74,108,6],[82,116,4],[110,138,5]].forEach(p=>s+=`<circle cx="${p[0]}" cy="${p[1]}" r="${p[2]}" style="fill:#5a3a10"/>`);
+ const L=(x1,y1,x2,y2,t,sub)=>`<path class="ln" style="stroke-width:1" d="M${x1} ${y1}L${x2} ${y2}H324"/>${txt(t,x2+4,y2-4,'','v')}<text x="${x2+4}" y="${y2+14}" class="v" style="font-size:11.5px;font-weight:400">${sub}</text>`;
+ s+=L(140,48,206,26,'홍염','광구 밖으로 솟는 불꽃')+L(154,120,206,84,'채층','광구 바로 위 붉은 층')+L(182,166,206,146,'코로나','가장 바깥의 대기')+L(110,140,206,196,'광구 · 흑점','표면 · 흑점은 더 낮은 온도');
+ return svg(330,232,s)}
+function nfGlobe(){const c=[150,112],r=90,P=(la,lo)=>[f1(c[0]+r*Math.cos(la*R2D)*Math.sin(lo*R2D)),f1(c[1]-r*Math.sin(la*R2D))];let s=`<circle cx="${c[0]}" cy="${c[1]}" r="${r}" style="fill:var(--ac-s);stroke:var(--ink);stroke-width:1.6"/>`;
+ [-60,-30,30,60].forEach(la=>{const y=f1(c[1]-r*Math.sin(la*R2D)),x=f1(r*Math.cos(la*R2D));s+=`<path class="ln" style="stroke-width:.8;opacity:.6" d="M${c[0]-x} ${y}H${c[0]+x}"/>`;s+=txt((la>0?'북위 ':'남위 ')+Math.abs(la)+'°',c[0]-x-4,y+4,'end')});
+ [-60,-30,30,60].forEach(lo=>{const rx=f1(r*Math.abs(Math.sin(lo*R2D)));s+=`<path class="ln" style="stroke-width:.8;opacity:.6" d="M${c[0]} ${c[1]-r}A${rx} ${r} 0 0 ${lo>0?1:0} ${c[0]} ${c[1]+r}"/>`});
+ s+=`<path class="arc" style="stroke-width:2.4" d="M${c[0]-r} ${c[1]}H${c[0]+r}"/><path class="arc" style="stroke-width:2.4" d="M${c[0]} ${c[1]-r}V${c[1]+r}"/>`;
+ s+=txt('적도 (위도 0°)',c[0]+r+4,c[1]+4,'','v')+txt('본초 자오선 (경도 0°)',c[0],c[1]-r-8,'middle','v')+txt('← 서경',c[0]-8,c[1]+r+16,'end','v')+txt('동경 →',c[0]+8,c[1]+r+16,'','v');
+ const p=P(30,45);s+=`<circle class="dot" cx="${p[0]}" cy="${p[1]}" r="3.4"/>`+txt('P',p[0]+6,p[1]-5,'','v');return svg(330,232,s)}
+function nfBsearch(){const A=[3,8,12,17,21,25,30,34,38,41,47,52,58,63,70],St=[[0,14,7],[8,14,11],[8,10,9],[10,10,10]];
+ return `<div class="ntbs"><p>정렬된 15개 자료에서 <b>47</b> 찾기 · 가운데 값과 비교해 절반씩 버린다</p>${St.map(([lo,hi,m],k)=>`<div class="ntbsr"><span>${k+1}회</span>${A.map((v,i)=>`<i class="${i===m?'m':i<lo||i>hi?'x':''}">${v}</i>`).join('')}<em>${A[m]===47?'찾음!':A[m]<47?A[m]+' < 47 → 오른쪽':A[m]+' > 47 → 왼쪽'}</em></div>`).join('')}</div>`}
+X('sci','N-K8',{figs:[{fig:nfForce,cap:'힘의 표현 · 화살표의 시작점은 작용점, 방향은 힘의 방향, 길이는 힘의 크기 / 아래: 알짜힘'}]});
+X('sci','N-K12',{figs:[{fig:nfSun,cap:'태양의 구조 · 광구(표면, 흑점·쌀알 무늬) 위로 채층, 가장 바깥에 코로나 / 채층·코로나·홍염은 개기 일식 때 잘 보인다'}]});
+X('soc','N-S1',{figs:[{fig:nfGlobe,cap:'위도·경도 · 적도 기준 남북 0°~90°(북위·남위), 본초 자오선 기준 동서 0°~180°(동경·서경) / 점 P는 북위 30°, 동경 45°'}]});
+{const n=(SUBJ.info.notes||[]).find(n=>n.id==='N-C31');if(n)n.figs=(n.figs||[]).concat([{fig:nfBsearch,cap:'이진 탐색 · 15개(2⁴ − 1개) 자료는 최대 4번 비교하면 찾는다. 순차 탐색이면 11번'}])}
 })();
 const NO={hide:false};
 const v_open=()=>document.querySelectorAll('#v-note details').forEach(d=>d.open=true);
@@ -6238,9 +6317,13 @@ function renderNote(){const v=$('#v-note');if(!v)return;const items=((SJ[CUR]||{
  v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${items.length?`${SJ[CUR].name} 요점 노트 ${items.length}개. 아래 단원 이름을 누르면 바로 이동합니다. [공식 가리기]를 누르면 핵심이 가려지고, 가린 칸을 누르면 하나씩 보입니다.`:'이 과목은 아직 요점 노트가 없습니다.'}</span><span class="sp"></span>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button><button class="btn sm" data-ntp="1">인쇄</button>`:''}</div>`+
  (items.length>1?`<nav class="bar ntnav" aria-label="요점 노트 바로가기">${items.map(x=>`<button class="chip" data-ntj="${x.id}">${x.title}</button>`).join('')}</nav>`:'')+
  items.map(x=>`<article class="es nt${NO.hide?' hide':''}" id="nt-${x.id}"><div class="est">${SUBNAME[x.u]||x.u}</div><h3 class="ntt">${x.title}</h3>
- <ul class="ntp">${x.pts.map(p=>`<li>${p}</li>`).join('')}</ul>
+ <ul class="ntp">${(x.pts||[]).map(p=>`<li>${p}</li>`).join('')}</ul>
  ${(x.fm||[]).map(f=>`<div class="ntf"><div class="ntfm f">${f[0]}</div>${f[1]?`<div class="ntfd">${f[1]}</div>`:''}</div>`).join('')}
  ${(x.figs||[]).length?`<div class="ntfigs">${x.figs.map(g=>`<figure class="fig ntfig">${g.fig()}<figcaption>${g.cap}</figcaption></figure>`).join('')}</div>`:''}
+ ${x.sheet?`<div class="nts">${x.sheet.map(r=>`<div class="ntsr"><div class="ntsc ntsn"><b>${r.n}</b><small>${r.d}</small><div class="fig">${r.fig()}</div></div>
+ <div class="ntsc"><i>밑넓이</i><div class="fig">${r.b[0]()}</div><span class="f">${r.b[1]}</span></div>
+ <div class="ntsc"><i>옆넓이</i>${r.l?`<div class="fig">${r.l[0]()}</div><span class="f">${r.l[1]}</span>`:'<span class="muted">—</span>'}</div>
+ <div class="ntsc ntsa">${r.S?`<div><i>겉넓이</i><em>${r.S[0]}</em><span class="f">${r.S[1]}</span></div>`:''}<div><i>부피</i><em>${r.V[0]}</em><span class="f">${r.V[1]}</span></div></div></div>`).join('')}</div>`:''}
  ${x.tbl?`<div class="tw"><table class="ft ntb${x.tbl.h.length>=4?' wide':''}"><thead><tr>${x.tbl.h.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${x.tbl.r.map(r=>`<tr>${r.map((c,i)=>i?`<td><span class="f">${c}</span></td>`:`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
  ${x.warn&&x.warn.length?`<div class="ntw"><b>실수 주의</b><ul>${x.warn.map(w=>`<li>${w}</li>`).join('')}</ul></div>`:''}
  ${(x.ex||[]).map((e,i)=>`<details class="ex ntx"><summary>예제 ${i+1}. ${e.t}</summary>${e.fig?`<figure class="fig">${e.fig()}</figure>`:''}<p>${e.a}</p></details>`).join('')}
