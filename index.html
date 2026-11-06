@@ -85,6 +85,7 @@ math{font-size:1.08em}
 .es .est{font-size:12.5px;color:var(--muted);margin-bottom:6px}.es .esq{font-weight:600;line-height:1.6}.es .escd{margin:8px 0;padding:8px 12px;border:1px solid var(--rule);border-radius:10px;font-size:13.5px;line-height:1.6}.es textarea{width:100%;min-height:90px;border:1px solid var(--rule);border-radius:10px;padding:8px 10px;font:inherit;background:var(--sheet);color:inherit;box-sizing:border-box}.es .esr{margin-top:10px;font-size:13.5px;line-height:1.7}.es .esr .ok{color:#1a7f4b;font-weight:700}.es .esr .no{color:#c0392b;font-weight:700}.es .esm{margin-top:6px;padding:8px 12px;background:var(--chip);border-radius:10px}
 .dday{font-weight:700;color:var(--ac,#c0392b)}.plan{margin-bottom:12px}.plan input[type=date]{font:inherit;padding:3px 6px}
 .hmeta{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding-top:2px;font-size:13px;color:var(--muted)}
+.artgo{margin-left:auto;font-weight:700;font-size:12.5px;color:var(--ac);text-decoration:none;border:1.5px solid var(--ac);border-radius:999px;padding:4px 12px;background:var(--sheet);white-space:nowrap}.artgo:hover{background:var(--ac);color:var(--on)}
 .namebox{display:flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
 .namebox input{border:1px solid var(--rule);border-radius:8px;background:var(--sheet);width:7.5em;font:inherit;padding:3px 8px;color:var(--ink)}
 
@@ -151,7 +152,7 @@ math{font-size:1.08em}
 .cause{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.cause .muted{font-size:13px;margin-right:2px}
 .causes .czl{display:grid;gap:6px;margin-top:8px}.czr{display:grid;grid-template-columns:minmax(9em,auto) 1fr 2em;gap:10px;align-items:center;font-size:13.5px}.czr b{text-align:right;font-family:var(--f-num)}
 .cztip{margin:10px 0 0;font-size:13.5px;line-height:1.65}.cztip b{color:var(--bad)}
-.nt.st{border-left:4px solid var(--ac)}.ntst{margin-right:8px;font:700 11px var(--f-body);padding:2px 8px;border-radius:999px;background:var(--ac);color:var(--on)}
+.nt.st{border-left:4px solid var(--ac)}.ntst.tbn{background:var(--ok)}.ntst{margin-right:8px;font:700 11px var(--f-body);padding:2px 8px;border-radius:999px;background:var(--ac);color:var(--on)}
 .sa-note{border:1.5px dashed var(--rule);border-radius:12px;padding:10px 14px;color:var(--muted);font-size:13.5px;margin:8px 0}
 .sachk{margin:10px 0 4px;align-items:center}.sachk .muted{margin-right:4px;font-size:13px}.q.sa .model{font-size:14.5px;margin:8px 0}
 .tx-p{margin:0 0 16px;line-height:1.6;font-size:17px}.tx-who{display:block;font-size:12.5px;color:var(--muted);margin-bottom:2px}
@@ -374,6 +375,7 @@ b.src{color:var(--ac);font-weight:600}
     <div class="sems" id="sems" role="group" aria-label="학년·학기"></div>
     <div class="subj" id="subj" role="group" aria-label="과목"></div>
     <div class="hmeta"><span id="hinfo"></span><span id="dday" class="dday" hidden></span>
+      <a class="artgo" href="https://claude.ai/artifact/3WLAoQshgPRiSaFZXvAUR2" target="_blank" rel="noopener" title="AI 선생님·교과서 본문 문항·원본 기출이 들어 있는 비공개 앱 (claude.ai 로그인 필요)">🔒 AI 선생님 앱</a>
       <label class="namebox" for="nm">이름 <input id="nm" autocomplete="off"></label></div>
   </header>
 
@@ -6670,7 +6672,7 @@ const ntHas=()=>!!((SJ[CUR]||{}).notes||[]).length;
 function renderNote(){const v=$('#v-note');if(!v)return;const all=((SJ[CUR]||{}).notes||[]).slice().sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)),acc=ntAcc(),pc=u=>acc[u]&&acc[u][0]?acc[u][1]/acc[u][0]:null,rk=u=>{const q=pc(u);return q===null?.595:q<.6?q-1:q};let items=NO.all?all:all.filter(x=>sel.has(x.u));if(NO.weak)items=items.slice().sort((a,b)=>rk(a.u)-rk(b.u)||SUBS.indexOf(a.u)-SUBS.indexOf(b.u));const us=[...new Set(items.map(x=>x.u))],weakU=us.filter(u=>pc(u)!==null&&pc(u)<.6),badge=u=>{const q=pc(u);return q===null?'<span class="ntacc">미학습</span>':`<span class="ntacc${q<.6?' lo':''}">정답률 ${Math.round(q*100)}% · ${acc[u][0]}문제</span>`};
  v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${!all.length?'이 과목은 아직 요점 노트가 없습니다.':items.length?`${SJ[CUR].name} 요점 노트 ${items.length}개${NO.all?' (전체)':` (출제 범위 · 전체 ${all.length}개 중)`}. 소단원 이름을 누르면 바로 이동합니다. [공식 가리기]를 누르면 핵심이 가려지고, 가린 칸을 누르면 하나씩 보입니다.`:`선택한 출제 범위에 요점 노트가 없습니다. 위 [출제 범위]에서 소단원을 고르거나 전체 노트를 보세요.`}</span>${all.length?`<button class="btn sm" data-ntw="1" aria-pressed="${!!NO.weak}">${NO.weak?'교과서 순서로':'약한 단원 먼저'}</button>`:''}${all.length?`<button class="btn sm" data-nta="1" aria-pressed="${!!NO.all}">${NO.all?'출제 범위만 보기':`전체 노트 보기 (${all.length})`}</button>`:''}<span class="sp"></span>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button><button class="btn sm" data-ntp="1">인쇄</button>`:''}</div>`+
  (NO.weak&&items.length?`<div class="ntweak">${weakU.length?`<b>정답률 60% 미만 소단원 ${weakU.length}개</b>를 맨 앞에 놓았습니다. 그다음 아직 안 푼 단원, 잘하는 단원 순서입니다.`:Object.keys(acc).length?'<b>정답률 60% 미만인 소단원이 없습니다.</b> 아직 안 푼 단원과 정답률이 낮은 단원부터 보여 줍니다.':'<b>아직 푼 문제가 없습니다.</b> 연습·모의고사를 풀면 정답률이 낮은 단원의 노트부터 보여 줍니다.'}</div>`:'')+(us.length>1?`<nav class="bar ntnav" aria-label="소단원 바로가기">${us.map(u=>`<button class="chip${NO.weak&&weakU.includes(u)?' lo':''}" data-ntj="${items.find(x=>x.u===u).id}">${SUBNAME[u]||u}<small>${NO.weak?(pc(u)!==null?Math.round(pc(u)*100)+'%':'미학습'):items.filter(x=>x.u===u).length}</small></button>`).join('')}</nav>`:'')+
- items.map(x=>`<article class="es nt${x.st?' st':''}${NO.hide?' hide':''}" id="nt-${x.id}"><div class="est">${x.st?'<span class="ntst">풀이 전략</span>':''}${SUBNAME[x.u]||x.u}${badge(x.u)}</div><h3 class="ntt">${x.title}</h3>
+ items.map(x=>`<article class="es nt${x.st?' st':''}${NO.hide?' hide':''}" id="nt-${x.id}"><div class="est">${x.st?'<span class="ntst">풀이 전략</span>':''}${x.tb?'<span class="ntst tbn">교과서</span>':''}${SUBNAME[x.u]||x.u}${badge(x.u)}</div><h3 class="ntt">${x.title}</h3>
  <ul class="ntp">${(x.pts||[]).map(p=>`<li>${p}</li>`).join('')}</ul>
  ${(x.fm||[]).map(f=>`<div class="ntf"><div class="ntfm f">${f[0]}</div>${f[1]?`<div class="ntfd">${f[1]}</div>`:''}</div>`).join('')}
  ${(x.figs||[]).length?`<div class="ntfigs">${x.figs.map(g=>`<figure class="fig ntfig">${g.fig()}<figcaption>${g.cap}</figcaption></figure>`).join('')}</div>`:''}
