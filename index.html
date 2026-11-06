@@ -136,6 +136,11 @@ math{font-size:1.08em}
 .ntsa{align-items:stretch;justify-content:center;gap:10px}.ntsa>div{display:flex;flex-direction:column;gap:2px;text-align:left}
 .ntsa em{font-style:normal;font-size:12px;color:var(--muted)}.ntsc .f{font-variant-numeric:tabular-nums}.ntsc small{font-size:11px}
 @media (max-width:560px){.ntsr{grid-template-columns:1fr 1fr}.ntsc:nth-child(3){border-left:0}.ntsc:nth-child(n+3){border-top:1px dashed var(--rule)}}
+.ntacc{margin-left:8px;font:600 11px var(--f-num);padding:1px 8px;border-radius:999px;background:var(--chip);color:var(--muted);white-space:nowrap}
+.ntacc.lo{background:var(--bad-soft);color:var(--bad)}
+.ntweak{margin:0 0 10px;padding:9px 12px;border-radius:10px;background:var(--bad-soft);font-size:13.5px;line-height:1.6}
+.ntweak b{color:var(--bad)}
+.ntnav .chip.lo{border-color:var(--bad);color:var(--bad)}
 .ntbs p{margin:0 0 6px;font-size:13px;text-align:center}
 .ntbsr{display:grid;grid-template-columns:2.2em repeat(15,minmax(0,1fr));gap:2px;align-items:center;margin-bottom:3px;font-family:var(--f-num);font-size:11.5px}
 .ntbsr i{font-style:normal;text-align:center;border:1px solid var(--rule);border-radius:4px;padding:3px 0;background:var(--sheet)}
@@ -5633,10 +5638,10 @@ function planCard(){const d=LS.get(ddKey(),''),pl=planToday(),n=pl.n;
  return h+'</div>'}
 function renderStats(){const v=$('#v-stats');const A=allS();const rows=SUBS.map(u=>{let n=0,c=0;T.filter(t=>t.u===u).forEach(t=>{const r=A.t[t.id];if(r){n+=r[0];c+=r[1]}});return{u,n,c}});
  v.innerHTML=`${planCard()}${statsExtra()}<div class="list">${rows.map(r=>{const p=r.n?Math.round(r.c/r.n*100):0;return `<div class="row"><div class="t"><b>${SUBNAME[r.u]}</b><p>${r.n?`${r.n}문제 풀이 · ${r.c}개 정답`:'아직 풀지 않음'}</p><div class="meter"><i class="${p<60?'lo':''}" style="width:${r.n?p:0}%"></i></div></div><div class="num">${r.n?p+'%':'—'}</div></div>`}).join('')}</div>
- <div class="bar" style="margin-top:12px"><span class="muted">정답률 60% 미만은 붉게 표시됩니다.</span><span class="sp"></span><button class="btn sm" data-act="reset">${confirmReset?`${SJ[CUR].name} 기록을 지울까요? 한 번 더 누르기`:'이 과목 기록 초기화'}</button></div>`}
+ <div class="bar" style="margin-top:12px"><span class="muted">정답률 60% 미만은 붉게 표시됩니다.</span><span class="sp"></span>${ntHas()?'<button class="btn sm" data-act="weaknote">약한 단원 노트 먼저 보기</button>':''}<button class="btn sm" data-act="reset">${confirmReset?`${SJ[CUR].name} 기록을 지울까요? 한 번 더 누르기`:'이 과목 기록 초기화'}</button></div>`}
 $('#v-exam').addEventListener('click',e=>{const b=e.target.closest('button[data-popt]');if(!b)return;e.stopPropagation();const[k,v]=b.dataset.popt.split('|');if(k==='paper'){POPT.paper=v;LS.set('m12-pdfp',v)}else{POPT.gap=+v;LS.set('m12-pdfg',+v)}renderExam()},true);
 $('#v-stats').addEventListener('change',e=>{if(e.target.id==='ddIn'){LS.set(ddKey(),e.target.value||null);ddBadge();renderStats()}});
-$('#v-stats').addEventListener('click',e=>{if(e.target.closest('[data-ddgo]')){sel=new Set(planToday().today.map(x=>x.u));renderScope();weakExam(examN);show('exam');return}const b=e.target.closest('[data-act="reset"]');if(!b)return;if(!confirmReset){confirmReset=true;renderStats();return}S={t:{},w:[]};LS.set('m12-rec-'+SK(),S);onRecord();confirmReset=false;renderStats()});
+$('#v-stats').addEventListener('click',e=>{if(e.target.closest('[data-ddgo]')){sel=new Set(planToday().today.map(x=>x.u));renderScope();weakExam(examN);show('exam');return}if(e.target.closest('[data-act="weaknote"]')){NO.weak=true;LS.set('m12-ntweak',true);show('note');window.scrollTo({top:0});return}const b=e.target.closest('[data-act="reset"]');if(!b)return;if(!confirmReset){confirmReset=true;renderStats();return}S={t:{},w:[]};LS.set('m12-rec-'+SK(),S);onRecord();confirmReset=false;renderStats()});
 
 /* ===== 요점 노트 (단원별 공식·핵심·실수 주의·예제, 자체 정리) =====
    SUBJ.<과목>.notes=[{id,u,title,pts[],tbl?{h[],r[[]]},warn[],ex[{t,fig?,a}],go[유형 id]}]
@@ -6312,13 +6317,15 @@ X('sci','N-K12',{figs:[{fig:nfSun,cap:'태양의 구조 · 광구(표면, 흑점
 X('soc','N-S1',{figs:[{fig:nfGlobe,cap:'위도·경도 · 적도 기준 남북 0°~90°(북위·남위), 본초 자오선 기준 동서 0°~180°(동경·서경) / 점 P는 북위 30°, 동경 45°'}]});
 {const n=(SUBJ.info.notes||[]).find(n=>n.id==='N-C31');if(n)n.figs=(n.figs||[]).concat([{fig:nfBsearch,cap:'이진 탐색 · 15개(2⁴ − 1개) 자료는 최대 4번 비교하면 찾는다. 순차 탐색이면 11번'}])}
 })();
-const NO={hide:false};
+const NO={hide:false,weak:LS.get('m12-ntweak',false)};
+/* 소단원별 정답률 (단원 현황과 같은 기록 allS) → {u:[푼 수, 맞힌 수]} */
+function ntAcc(){const A=allS(),acc={};T.forEach(t=>{const r=A.t[t.id];if(r){const a=acc[t.u]||(acc[t.u]=[0,0]);a[0]+=r[0];a[1]+=r[1]}});return acc}
 const v_open=()=>document.querySelectorAll('#v-note details').forEach(d=>d.open=true);
 const ntHas=()=>!!((SJ[CUR]||{}).notes||[]).length;
-function renderNote(){const v=$('#v-note');if(!v)return;const all=((SJ[CUR]||{}).notes||[]).slice().sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)),items=NO.all?all:all.filter(x=>sel.has(x.u)),us=[...new Set(items.map(x=>x.u))];
- v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${!all.length?'이 과목은 아직 요점 노트가 없습니다.':items.length?`${SJ[CUR].name} 요점 노트 ${items.length}개${NO.all?' (전체)':` (출제 범위 · 전체 ${all.length}개 중)`}. 소단원 이름을 누르면 바로 이동합니다. [공식 가리기]를 누르면 핵심이 가려지고, 가린 칸을 누르면 하나씩 보입니다.`:`선택한 출제 범위에 요점 노트가 없습니다. 위 [출제 범위]에서 소단원을 고르거나 전체 노트를 보세요.`}</span>${all.length?`<button class="btn sm" data-nta="1" aria-pressed="${!!NO.all}">${NO.all?'출제 범위만 보기':`전체 노트 보기 (${all.length})`}</button>`:''}<span class="sp"></span>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button><button class="btn sm" data-ntp="1">인쇄</button>`:''}</div>`+
- (us.length>1?`<nav class="bar ntnav" aria-label="소단원 바로가기">${us.map(u=>`<button class="chip" data-ntj="${items.find(x=>x.u===u).id}">${SUBNAME[u]||u}<small>${items.filter(x=>x.u===u).length}</small></button>`).join('')}</nav>`:'')+
- items.map(x=>`<article class="es nt${NO.hide?' hide':''}" id="nt-${x.id}"><div class="est">${SUBNAME[x.u]||x.u}</div><h3 class="ntt">${x.title}</h3>
+function renderNote(){const v=$('#v-note');if(!v)return;const all=((SJ[CUR]||{}).notes||[]).slice().sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)),acc=ntAcc(),pc=u=>acc[u]&&acc[u][0]?acc[u][1]/acc[u][0]:null,rk=u=>{const q=pc(u);return q===null?.595:q<.6?q-1:q};let items=NO.all?all:all.filter(x=>sel.has(x.u));if(NO.weak)items=items.slice().sort((a,b)=>rk(a.u)-rk(b.u)||SUBS.indexOf(a.u)-SUBS.indexOf(b.u));const us=[...new Set(items.map(x=>x.u))],weakU=us.filter(u=>pc(u)!==null&&pc(u)<.6),badge=u=>{const q=pc(u);return q===null?'<span class="ntacc">미학습</span>':`<span class="ntacc${q<.6?' lo':''}">정답률 ${Math.round(q*100)}% · ${acc[u][0]}문제</span>`};
+ v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${!all.length?'이 과목은 아직 요점 노트가 없습니다.':items.length?`${SJ[CUR].name} 요점 노트 ${items.length}개${NO.all?' (전체)':` (출제 범위 · 전체 ${all.length}개 중)`}. 소단원 이름을 누르면 바로 이동합니다. [공식 가리기]를 누르면 핵심이 가려지고, 가린 칸을 누르면 하나씩 보입니다.`:`선택한 출제 범위에 요점 노트가 없습니다. 위 [출제 범위]에서 소단원을 고르거나 전체 노트를 보세요.`}</span>${all.length?`<button class="btn sm" data-ntw="1" aria-pressed="${!!NO.weak}">${NO.weak?'교과서 순서로':'약한 단원 먼저'}</button>`:''}${all.length?`<button class="btn sm" data-nta="1" aria-pressed="${!!NO.all}">${NO.all?'출제 범위만 보기':`전체 노트 보기 (${all.length})`}</button>`:''}<span class="sp"></span>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button><button class="btn sm" data-ntp="1">인쇄</button>`:''}</div>`+
+ (NO.weak&&items.length?`<div class="ntweak">${weakU.length?`<b>정답률 60% 미만 소단원 ${weakU.length}개</b>를 맨 앞에 놓았습니다. 그다음 아직 안 푼 단원, 잘하는 단원 순서입니다.`:Object.keys(acc).length?'<b>정답률 60% 미만인 소단원이 없습니다.</b> 아직 안 푼 단원과 정답률이 낮은 단원부터 보여 줍니다.':'<b>아직 푼 문제가 없습니다.</b> 연습·모의고사를 풀면 정답률이 낮은 단원의 노트부터 보여 줍니다.'}</div>`:'')+(us.length>1?`<nav class="bar ntnav" aria-label="소단원 바로가기">${us.map(u=>`<button class="chip${NO.weak&&weakU.includes(u)?' lo':''}" data-ntj="${items.find(x=>x.u===u).id}">${SUBNAME[u]||u}<small>${NO.weak?(pc(u)!==null?Math.round(pc(u)*100)+'%':'미학습'):items.filter(x=>x.u===u).length}</small></button>`).join('')}</nav>`:'')+
+ items.map(x=>`<article class="es nt${NO.hide?' hide':''}" id="nt-${x.id}"><div class="est">${SUBNAME[x.u]||x.u}${badge(x.u)}</div><h3 class="ntt">${x.title}</h3>
  <ul class="ntp">${(x.pts||[]).map(p=>`<li>${p}</li>`).join('')}</ul>
  ${(x.fm||[]).map(f=>`<div class="ntf"><div class="ntfm f">${f[0]}</div>${f[1]?`<div class="ntfd">${f[1]}</div>`:''}</div>`).join('')}
  ${(x.figs||[]).length?`<div class="ntfigs">${x.figs.map(g=>`<figure class="fig ntfig">${g.fig()}<figcaption>${g.cap}</figcaption></figure>`).join('')}</div>`:''}
@@ -6331,7 +6338,7 @@ function renderNote(){const v=$('#v-note');if(!v)return;const all=((SJ[CUR]||{})
  ${(x.ex||[]).map((e,i)=>`<details class="ex ntx"><summary>예제 ${i+1}. ${e.t}</summary>${e.fig?`<figure class="fig">${e.fig()}</figure>`:''}<p>${e.a}</p></details>`).join('')}
  ${(x.go||[]).filter(id=>TYPE[id]).length?`<div class="bar ntg"><span class="muted">관련 유형 풀기</span>${x.go.filter(id=>TYPE[id]).map(id=>`<button class="chip" data-ntgo="${id}">${TYPE[id].name}</button>`).join('')}</div>`:''}</article>`).join('')}
 $('#v-note').addEventListener('click',e=>{const f=e.target.closest('.nt.hide .f');if(f){f.classList.toggle('on');return}const b=e.target.closest('button');if(!b)return;
- if(b.dataset.nta){NO.all=!NO.all;renderNote()}else if(b.dataset.nth){NO.hide=!NO.hide;renderNote()}else if(b.dataset.ntj){const el=document.getElementById('nt-'+b.dataset.ntj);if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'})}
+ if(b.dataset.ntw){NO.weak=!NO.weak;LS.set('m12-ntweak',NO.weak);renderNote()}else if(b.dataset.nta){NO.all=!NO.all;renderNote()}else if(b.dataset.nth){NO.hide=!NO.hide;renderNote()}else if(b.dataset.ntj){const el=document.getElementById('nt-'+b.dataset.ntj);if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'})}
  else if(b.dataset.ntp){NO.hide=false;renderNote();v_open();document.body.classList.add('ntprint');const off=()=>{document.body.classList.remove('ntprint');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);window.print()}else if(b.dataset.ntgo){newPractice(b.dataset.ntgo);show('practice');window.scrollTo({top:0})}});
 
 /* ===== 서술형 (조건형 서술: 용어 포함 확인 + 모범답안 + 스스로 채점) ===== */
