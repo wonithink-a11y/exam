@@ -5368,7 +5368,7 @@ function setSubject(id){CUR=id;OV=null;document.documentElement.dataset.s=id;con
  $('#presets').innerHTML='<span>빠른 선택</span>'+s.presets.map((p,i)=>`<button class="chip" data-pre="${i}">${p[0]}</button>`).join('')+'<button class="chip" data-pre="none">전체 해제</button><p class="muted" style="margin:6px 0 0;width:100%;font-size:12.5px">단원 이름을 누르면 그 단원 전체가 선택·해제되고, 소단원은 하나씩 눌러 고를 수 있습니다.</p>';
  P.n=0;P.ok=0;P.last=null;renderScope();newPractice();E=null;makeExam(2612,examN,null,null,{save:false});
  const wOn=eeHas(),eOn=essHas(),nOn=ntHas();$('#tabWords').hidden=!wOn;$('#tabEssay').hidden=!eOn;$('#tabNote').hidden=!nOn;{const tb=document.querySelector('.tabs'),n=5+wOn+eOn+nOn;tb.classList.toggle('six',n>=6);tb.classList.toggle('seven',n>=7);tb.style.gridTemplateColumns=n>5?`repeat(${n},1fr)`:''}W.test=null;W.les=null;
- const tab=LS.get('m12-tab','practice');if(tab==='words'){show(wOn?'words':'practice')}if(tab==='essay'){show(eOn?'essay':'practice')}if(tab==='review')renderReview();if(tab==='stats')renderStats();onSubject(id)}
+ const tab=LS.get('m12-tab','practice');if(['words','essay','note','jokbo'].includes(tab))show(tab);if(tab==='review')renderReview();if(tab==='stats')renderStats();onSubject(id)}
 function renderSem(){const [g,t,ey]=SEMNAME[SEM];$('#eyebrow').textContent=ey;$('#htitle').textContent=`${g} ${t} 문제은행`;
  $('#sems').innerHTML=Object.keys(SEMS).filter(k=>Object.keys(SEMS[k]).length).map(k=>`<button data-sem="${k}" aria-pressed="${k===SEM}">${SEMNAME[k][0]} ${SEMNAME[k][1]}</button>`).join('');
  $('#subj').innerHTML=ORDER.filter(k=>SJ[k]).map(k=>`<button data-sub="${k}" aria-pressed="false">${SJ[k].name}</button>`).join('')}
