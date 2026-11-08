@@ -375,6 +375,8 @@ b.src{color:var(--ac);font-weight:600}
 .alt{margin-top:8px;padding-top:8px;border-top:1px dashed var(--rule)}.alt:first-child{margin-top:0;padding-top:0;border-top:0}
 .mbh{font:400 16px var(--f-disp);margin:14px 0 6px;color:var(--ac)}.mbl{margin:4px 0;padding-left:20px;line-height:1.7}.mbs{border:1px solid var(--rule);border-radius:10px;padding:8px 10px;margin-top:6px}.mbs summary{cursor:pointer;line-height:1.6}.mbc{margin-top:12px;padding-top:10px;border-top:1px dashed var(--rule)}
 .pad{margin-top:10px;border:1px solid var(--rule);border-radius:12px;padding:6px 10px}.pad summary{cursor:pointer;font-weight:600}.padtl{display:grid;gap:6px;margin:8px 0 6px}.padrow{display:flex;flex-wrap:wrap;gap:5px;align-items:center}.padrow .chip{padding:3px 10px;font-size:12.5px}.padw{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;color:var(--muted);margin-left:4px}.padw input{width:110px}.padsw{width:26px;height:26px;border-radius:50%;border:2px solid var(--rule);padding:0}.padsw.on{outline:2px solid var(--ac);outline-offset:2px}.padc{display:block;width:100%;height:auto;background:#fff repeating-linear-gradient(#fff 0 27px,#eef1f8 27px 28px);border:1px solid var(--rule);border-radius:8px;touch-action:none;cursor:crosshair}.padc.po{touch-action:pan-y}
+.qsp{display:flex;flex-direction:column;gap:10px}.ql{display:contents}.qsp .pad{order:1;margin-top:0}.qsp .ql>ol.opts{order:2}.qsp .ql>.hintbox{order:3}.chip.padlay{display:none}
+@media screen and (min-width:760px){.chip.padlay{display:inline-block}:root[data-padlay="split"] .wrap{max-width:1180px}:root[data-padlay="split"] .qsp.hp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}:root[data-padlay="split"] .qsp.hp .ql{display:block}:root[data-padlay="split"] .qsp.hp .ql>*{margin-bottom:10px}:root[data-padlay="split"] .qsp.hp .pad{order:0;position:sticky;top:64px}:root[data-padlay="split"] .qsp.hp .qt{max-width:none}}
 @media screen and (min-width:1000px){.wrap{max-width:1120px}.qt,.exp,.cond,.data{max-width:760px}.fig svg{max-width:420px}.ntsc{font-size:15px;padding:12px 10px}.ntsc>i,.ntsa i,.ntsa em{font-size:13.5px}.ntsn b{font-size:16px}.ntsn small{font-size:13px}
 .ntsc .fig svg{max-width:220px}.ntsn .fig svg{max-width:250px}.ntsr:not(.g) .ntsn svg text{font-size:20px}.nt .ntfig svg{max-width:440px}.nt .ntfigs{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}.ntbsr{font-size:13.5px}}
 </style>
@@ -5632,6 +5634,7 @@ function saHTML(it,idx,o){const t=TYPE[it.id],d=it.d,done=o.graded,show=done||it
 /* ===== 풀이 칸 (필기 앱처럼): 펜·형광펜·지우개·직선, 색·굵기, 되돌리기/다시, 펜 압력, 손바닥 방지.
    획(stroke)을 벡터로 저장한다 → IndexedDB 'm12pad' (키: SK|유형id|seed, 새로고침해도 유지, 이 기기). 부모용 "풀이 기록"과 AI 풀이 비교에 쓰인다.
    획 형식 {t:'p'|'h'|'e'|'l'|'x', c:색, w:캔버스 px 굵기, p:[x,y,압력%,…], pr:펜압 사용 여부}  ('x' = 모두 지우기 표시, 되돌리기 가능) */
+document.documentElement.dataset.padlay=LS.get('m12-padlay','split');
 const PADS=new Map(),PAD_SUBJ=['math','sci','tech'];
 const PADC=['#1b1f2e','#d23b3b','#1f6fd1','#16875a','#e07b00','#7a3fd0','#8a8f9c','#ffe34d'];
 const PADT=Object.assign({tool:'p',color:'#1b1f2e',po:false},LS.get('m12-padt',{}));PADT.w=Object.assign({p:5,h:28,e:36,l:5},PADT.w||{});
@@ -5677,8 +5680,8 @@ function padHTML(it,ai,done){if(!padOn())return'';const k=padKey(it.id,it.seed),
  return `<details class="pad" data-pk="${k}" data-pid="${it.id}" data-pseed="${it.seed}" data-pok="${ok}"${has?' open':''}><summary>✏️ 풀이 칸 <span class="muted">${has?'· 저장된 풀이 있음':'· 계산하며 직접 풀어 보세요 (자동 저장)'}</span></summary>
  <div class="padtl"><div class="padrow">${[['p','✒️ 펜'],['h','🖍 형광펜'],['e','지우개'],['l','직선']].map(([t,n])=>`<button class="chip${T.tool===t?' on':''}" data-padt="t|${t}">${n}</button>`).join('')}<label class="padw">굵기 <input type="range" min="1" max="40" value="${T.w[T.tool]}" data-padw="1"></label></div>
  <div class="padrow">${PADC.map(c=>`<button class="padsw${T.color===c?' on':''}" style="background:${c}" data-padt="c|${c}" aria-label="색"></button>`).join('')}</div>
- <div class="padrow"><button class="chip" data-padt="undo">↩ 되돌리기</button><button class="chip" data-padt="redo">↪ 다시</button><button class="chip" data-padt="clear">모두 지우기</button><button class="chip" data-padt="grow">칸 늘리기</button><button class="chip${T.po?' on':''}" data-padt="po">펜만 쓰기(손바닥 방지)</button></div></div>
- <canvas class="padc${T.po?' po':''}" width="1000" height="${r?r.h:420}"></canvas></details>`}
+ <div class="padrow"><button class="chip" data-padt="undo">↩ 되돌리기</button><button class="chip" data-padt="redo">↪ 다시</button><button class="chip" data-padt="clear">모두 지우기</button><button class="chip" data-padt="grow">칸 늘리기</button><button class="chip${T.po?' on':''}" data-padt="po">펜만 쓰기(손바닥 방지)</button><button class="chip padlay" data-padt="lay">${document.documentElement.dataset.padlay==='stack'?'▥ 좌우 분할로 보기':'▤ 위아래로 보기'}</button></div></div>
+ <canvas class="padc${T.po?' po':''}" width="1000" height="${r?r.h:560}"></canvas></details>`}
 function padSync(){document.querySelectorAll('.pad').forEach(b=>{const T=PADT;b.querySelectorAll('[data-padt^="t|"]').forEach(x=>x.classList.toggle('on',x.dataset.padt==='t|'+T.tool));b.querySelectorAll('.padsw').forEach(x=>x.classList.toggle('on',x.dataset.padt==='c|'+T.color));const po=b.querySelector('[data-padt="po"]');if(po)po.classList.toggle('on',T.po);const w=b.querySelector('[data-padw]');if(w)w.value=T.w[T.tool];const cv=b.querySelector('canvas.padc');if(cv)cv.classList.toggle('po',T.po)});LS.set('m12-padt',PADT)}
 async function padInit(cv){if(cv._i)return;cv._i=1;const box=cv.closest('.pad'),k=box.dataset.pk;let r=PADS.get(k);if(!r){r=await padGet(k);if(r){r.redo=[];PADS.set(k,r)}}
  if(r){cv.height=r.h||420;padRender(cv,r.strokes);if(padHas(r)){box.open=true;const sp=box.querySelector('summary .muted');if(sp)sp.textContent='· 저장된 풀이 있음'}}}
@@ -5703,6 +5706,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
  if(a==='t'){PADT.tool=v;if(v==='h'&&['#1b1f2e','#8a8f9c'].includes(PADT.color))PADT.color='#ffe34d';padSync();return}
  if(a==='c'){PADT.color=v;if(PADT.tool==='e')PADT.tool='p';padSync();return}
  if(a==='po'){PADT.po=!PADT.po;padSync();return}
+ if(a==='lay'){const D=document.documentElement;D.dataset.padlay=D.dataset.padlay==='stack'?'split':'stack';LS.set('m12-padlay',D.dataset.padlay);document.querySelectorAll('.padlay').forEach(x=>x.textContent=D.dataset.padlay==='stack'?'▥ 좌우 분할로 보기':'▤ 위아래로 보기');return}
  const r=get();r.redo=r.redo||[];
  if(a==='undo'){const s=r.strokes.pop();if(s)r.redo.push(s)}
  else if(a==='redo'){const s=r.redo.pop();if(s)r.strokes.push(s)}
@@ -5716,7 +5720,7 @@ function qHTML(it,idx,o){if(it.d.sa)return saHTML(it,idx,o);const t=TYPE[it.id],
   return `<li><button class="opt ${c}" data-q="${idx}" data-j="${j}" ${done&&o.lock?'disabled':''}><span class="bub">${j+1}</span><span>${x}</span>${mk?`<span class="mk">${mk}</span>`:''}</button></li>`}).join('');
  const exp=`<div class="exp"><b class="h">정답 ${CIRC[ai]} · 풀이</b>${d.exp}</div>`;
  return `<article class="q" id="q${idx}" data-aik="${CUR}|${hsh(d.q)}" data-ans="${ai+1}" data-pick="${it.pick??-1}" data-done="${done?1:0}"><template class="aix">${d.exp}</template><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lv${t.lv}">${LV[t.lv]}</span></div>
- <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}${padHTML(it,ai,done)}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}
+ <div class="qsp${padOn()?' hp':''}"><div class="ql"><div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}</div>${padHTML(it,ai,done)}</div>
  ${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
 const scoped=()=>T.filter(t=>sel.has(t.u));
 const qCount=t=>t.bank?t.n:'∞';
