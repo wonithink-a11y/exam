@@ -399,7 +399,7 @@ html.padlock #v-practice>.bar:last-child{position:fixed;left:0;right:0;bottom:0;
     <h1 id="htitle">중1 2학기 문제은행</h1>
     <div class="sems" id="sems" role="group" aria-label="학년·학기"></div>
     <div class="subj" id="subj" role="group" aria-label="과목"></div>
-    <div class="hmeta"><span id="hinfo"></span><button id="fsBtn" class="fsb" type="button">⛶ 전체 화면</button><span id="dday" class="dday" hidden></span>
+    <div class="hmeta"><span id="hinfo"></span><button id="newWin" class="fsb" type="button" style="margin-left:0">↗ 새 창</button><button id="fsBtn" class="fsb" type="button" style="margin-left:6px">⛶ 전체 화면</button><span id="dday" class="dday" hidden></span>
       <a class="artgo" href="https://claude.ai/artifact/3WLAoQshgPRiSaFZXvAUR2" target="_blank" rel="noopener" title="AI 선생님·교과서 본문 문항·원본 기출이 들어 있는 비공개 앱 (claude.ai 로그인 필요)">🔒 AI 선생님 앱</a>
       <label class="namebox" for="nm">이름 <input id="nm" autocomplete="off"></label></div>
   </header>
@@ -5749,9 +5749,10 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 
 function padToast(m){let t=document.getElementById('padtoast');if(!t){t=document.createElement('div');t.id='padtoast';document.body.appendChild(t)}t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),3200)}
 function padLockSet(on){const D=document.documentElement;D.classList.toggle('padlock',on);document.querySelectorAll('.padlk').forEach(x=>x.classList.toggle('on',on));if(on){window.scrollTo(0,0);const sh=document.querySelector('#v-practice .sheet');if(sh)sh.scrollTop=0}}
+function appNewWin(){const url=/github\.io$/.test(location.hostname)?location.href:'https://claude.ai/artifact/3WLAoQshgPRiSaFZXvAUR2';let w=null;try{w=window.open(url,'_blank','noopener')}catch(e){}if(!w){try{navigator.clipboard.writeText(url)}catch(e){}padToast('새 창이 막혔어요. 주소를 복사했으니 브라우저 새 탭에 붙여 넣어 주세요: '+url)}}
 function appFullscreen(){const D=document.documentElement;const fail=()=>padToast('이 화면에서는 전체 화면을 켤 수 없어요. claude.ai 오른쪽 위의 전체 화면(⤢) 버튼을 눌러 주세요.');try{if(document.fullscreenElement){document.exitFullscreen().catch(()=>{})}else if(D.requestFullscreen){D.requestFullscreen().catch(fail)}else fail()}catch(e){fail()}}
 (function(){const f=document.createElement('div');f.id='padfloat';f.innerHTML='<button data-padfl="unlock">🔓 고정 해제</button><button data-padfl="fs">⛶ 전체 화면</button>';document.body.appendChild(f);
- document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-padfl],#fsBtn');if(!b)return;if(b.id==='fsBtn'||b.dataset.padfl==='fs'){appFullscreen();return}if(b.dataset.padfl==='unlock')padLockSet(false)},true)})();
+ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-padfl],#fsBtn,#newWin');if(!b)return;if(b.id==='newWin'){appNewWin();return}if(b.id==='fsBtn'||b.dataset.padfl==='fs'){appFullscreen();return}if(b.dataset.padfl==='unlock')padLockSet(false)},true)})();
 new MutationObserver(()=>document.querySelectorAll('canvas.padc').forEach(padInit)).observe(document.querySelector('.wrap'),{childList:true,subtree:true});
 function qHTML(it,idx,o){if(it.d.sa)return saHTML(it,idx,o);const t=TYPE[it.id],d=it.d,ai=d.opts.indexOf(d.ans),done=o.graded;
  const short=d.opts.every(x=>x.length<=14);
