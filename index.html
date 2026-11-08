@@ -373,6 +373,7 @@ b.src{color:var(--ac);font-weight:600}
 .plrs{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.plst{border:1px solid var(--rule);background:var(--chip);border-radius:999px;padding:3px 10px;font-size:12.5px;display:inline-flex;gap:4px;align-items:center}
 .plst.on{background:var(--ac);border-color:var(--ac);color:var(--on)}.plst.all{background:none;border-style:dashed;color:var(--muted)}.plri{margin-top:4px;font-size:12px}
 .alt{margin-top:8px;padding-top:8px;border-top:1px dashed var(--rule)}.alt:first-child{margin-top:0;padding-top:0;border-top:0}
+.mbh{font:400 16px var(--f-disp);margin:14px 0 6px;color:var(--ac)}.mbl{margin:4px 0;padding-left:20px;line-height:1.7}.mbs{border:1px solid var(--rule);border-radius:10px;padding:8px 10px;margin-top:6px}.mbs summary{cursor:pointer;line-height:1.6}.mbc{margin-top:12px;padding-top:10px;border-top:1px dashed var(--rule)}
 @media screen and (min-width:1000px){.wrap{max-width:1120px}.qt,.exp,.cond,.data{max-width:760px}.fig svg{max-width:420px}.ntsc{font-size:15px;padding:12px 10px}.ntsc>i,.ntsa i,.ntsa em{font-size:13.5px}.ntsn b{font-size:16px}.ntsn small{font-size:13px}
 .ntsc .fig svg{max-width:220px}.ntsn .fig svg{max-width:250px}.ntsr:not(.g) .ntsn svg text{font-size:20px}.nt .ntfig svg{max-width:440px}.nt .ntfigs{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}.ntbsr{font-size:13.5px}}
 </style>
@@ -5903,9 +5904,9 @@ function origList(){if(!HAS_ORIG)return'';const L=ORIG.filter(o=>o.subj===CUR&&(
 /* ===== 오답노트 ===== */
 function weakTypes(){return Object.entries(allS().t).map(([id,[n,c]])=>({id,n,c,w:n-c})).filter(x=>x.w>0&&TYPE[x.id]).sort((a,b)=>b.w-a.w||a.c/a.n-b.c/b.n)}
 function renderReview(){const v=$('#v-review');const wk=weakTypes(),A=allS();
- if(!A.w.length){v.innerHTML=`<div class="empty">${SJ[CUR].name}에서 아직 틀린 문제가 없습니다. 연습이나 모의고사에서 틀린 문제가 여기에 모입니다.</div>`;return}
+ if(!A.w.length){v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}<div class="empty">${SJ[CUR].name}에서 아직 틀린 문제가 없습니다. 연습이나 모의고사에서 틀린 문제가 여기에 모입니다.</div>`;return}
  const cz={};A.w.forEach(x=>{if(x.c)cz[x.c]=(cz[x.c]||0)+1});const czN=Object.values(cz).reduce((a,b)=>a+b,0),czM=Math.max(1,...Object.values(cz)),top=CAUSE.filter(([k])=>cz[k]===czM&&czN)[0];
- v.innerHTML=`<div class="scope causes"><div class="bar"><b>틀린 까닭</b><span class="muted">${czN?`고른 문제 ${czN}개 · 안 고른 문제 ${A.w.length-czN}개`:'틀린 문제 아래에서 까닭을 고르면 여기에 모입니다.'}</span></div>${czN?`<div class="czl">${CAUSE.map(([k,n])=>`<div class="czr"><span>${n}</span><div class="meter"><i class="${top&&top[0]===k?'lo':''}" style="width:${(cz[k]||0)/czM*100}%"></i></div><b>${cz[k]||0}</b></div>`).join('')}</div><p class="cztip"><b>${top[1]}</b>가 가장 많습니다. ${CAUSE_TIP[top[0]]}</p>`:''}</div>
+ v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}<div class="scope causes"><div class="bar"><b>틀린 까닭</b><span class="muted">${czN?`고른 문제 ${czN}개 · 안 고른 문제 ${A.w.length-czN}개`:'틀린 문제 아래에서 까닭을 고르면 여기에 모입니다.'}</span></div>${czN?`<div class="czl">${CAUSE.map(([k,n])=>`<div class="czr"><span>${n}</span><div class="meter"><i class="${top&&top[0]===k?'lo':''}" style="width:${(cz[k]||0)/czM*100}%"></i></div><b>${cz[k]||0}</b></div>`).join('')}</div><p class="cztip"><b>${top[1]}</b>가 가장 많습니다. ${CAUSE_TIP[top[0]]}</p>`:''}</div>
  <div class="bar" style="margin-top:14px"><h2 class="sec">자주 틀리는 유형</h2><span class="sp"></span><button class="btn pri sm" data-act="weak">약한 유형으로 10문항 시험</button></div>
  <div class="list" style="margin-top:8px">${wk.slice(0,6).map(x=>`<div class="row"><div class="t"><b>${TYPE[x.id].name}</b><p>${SUBNAME[TYPE[x.id].u]} · ${x.n}번 중 ${x.w}번 틀림</p></div><div class="acts"><button class="btn sm" data-new="${x.id}">연습</button></div></div>`).join('')}</div>
  <h2 class="sec" style="margin-top:16px">최근 틀린 문제</h2>
@@ -5948,7 +5949,7 @@ function planBoard(){const cur=plProg(CUR),A=allS(),acc={};T.forEach(t=>{const r
  const over=PL_SUBJ.filter(k=>SJ[k]).map(k=>{const q=plProg(k),n=plLeft(k);return `<button class="plc${k===CUR?' on':''}" data-plsub="${k}" style="--b:var(--${k})"><span class="plcn">${SJ[k].name}</span><span class="plcp">${q.p}%</span><span class="plcb"><i style="width:${q.p}%"></i></span><span class="plcd">${n===null?'시험일 미정':plDd(n)}</span></button>`}).join('');
  const units=SJ[CUR].units.map(u=>{const subs=u.subs.filter(x=>cur.subs.includes(x[0]));if(!subs.length)return'';const ud=subs.reduce((a,x)=>a+PL_STEPS.filter((_,i)=>cur.c[x[0]+'|'+i]).length,0),up=Math.round(ud/(subs.length*PL_STEPS.length)*100);
   return `<details class="plu" open><summary><b>${u.tag?u.tag+' ':''}${u.name}</b><span class="plup">${up}%</span></summary>${subs.map(x=>{const c=x[0],done=PL_STEPS.filter((_,i)=>cur.c[c+'|'+i]).length;
-   const info=[acc[c]&&acc[c][0]?`풀이 ${acc[c][0]}문제 · 정답률 ${Math.round(acc[c][1]/acc[c][0]*100)}%`:'아직 안 풀었어요',wrong[c]?`오답 ${wrong[c]}개`:''].filter(Boolean).join(' · ');
+   const mbn=(()=>{try{return mbList().filter(y=>y.u===c&&!y.done).length}catch(e){return 0}})();const info=[mbn?`📷 내 문제집 ${mbn}개`:'',acc[c]&&acc[c][0]?`풀이 ${acc[c][0]}문제 · 정답률 ${Math.round(acc[c][1]/acc[c][0]*100)}%`:'아직 안 풀었어요',wrong[c]?`오답 ${wrong[c]}개`:''].filter(Boolean).join(' · ');
    return `<div class="plr"><div class="plrt"><b>${esEscP(x[1])}</b><span class="muted">${done}/5</span></div><div class="plrs">${PL_STEPS.map((s,i)=>`<button class="plst${cur.c[c+'|'+i]?' on':''}" data-pl="${c}|${i}" aria-pressed="${!!cur.c[c+'|'+i]}"><span>${s[0]}</span>${s[1]}</button>`).join('')}<button class="plst all" data-plall="${c}">${done===5?'모두 해제':'모두 완료'}</button></div><div class="muted plri">${info}</div></div>`}).join('')}</details>`}).join('');
  return `<div class="plb" style="--b:var(--ac)"><div class="plhero"><div class="plring">${plRing(cur.p,'var(--ac)')}</div><div class="plht"><div class="plhk">${SJ[CUR].name} 학습 계획표</div><b class="plhm">${plMsg(cur.p)}</b><div class="muted">${cur.d}/${cur.t}단계 완료${left!==null&&left>=0?` · ${plDd(left)}${perDay?` · 하루 ${perDay}단계씩`:''}`:''}</div></div></div>
  <div class="plov">${over}</div>
@@ -7234,6 +7235,79 @@ document.addEventListener('input',e=>{const t=e.target;const box=t.closest&&t.cl
 document.addEventListener('change',e=>{const t=e.target;const box=t.closest&&t.closest('[data-aib]');if(!box)return;const st=AIS.get(box.dataset.aib);if(st&&t.dataset.aipg)st.page=+t.value},true);
 /* 화면이 다시 그려져도 열어 둔 대화를 다시 붙임 */
 new MutationObserver(()=>{for(const [k,st] of AIS){const an=st.open&&aiAnchor(k);if(an&&an.offsetParent!==null&&![...aiBoxes(k)].some(x=>x.offsetParent!==null))aiRender(k)}}).observe(document.querySelector('.wrap'),{childList:true,subtree:true});
+/* ===== 내 문제집: 문제집 사진 → 개념 · 풀이(가능한 여러 방법) · 비슷한 문제 3개 → "다시 풀 문제"로 저장 (AI 선생님이 켜진 화면에서만) =====
+   저장: m12-mb-<SK> = [{id,at,thumb,u,done,data}] (이 기기). 결과 JSON 형식은 MB_RULES 참고. 중1 범위 개념만 쓰도록 AI에게 지시한다. */
+const MB={busy:false,cur:null,sel:0,err:'',ctl:null,chat:[],asking:false};
+const mbKey=()=>'m12-mb-'+SK();
+const mbList=()=>LS.get(mbKey(),[]);
+const mbOn=()=>!!SAMPLE;
+const MB_RULES=`너는 중학교 1학년 학생의 문제집 오답 정리를 돕는 정확한 수학·과학·사회 선생님이야. 사진 속 문제를 읽고 아래 JSON 하나만 출력해. 설명 문장·코드블록 없이 JSON만 출력해.
+규칙:
+- 사진에 손글씨·채점 표시(동그라미, again 등)·낙서가 있어도 인쇄된 문제를 읽어. 문제가 여러 개면 [학생 메모]에 적힌 번호의 문제를, 없으면 가장 눈에 띄는 한 문제를 골라.
+- 중1 교육과정(2022 개정)의 개념만 써. 평행사변형의 성질, 피타고라스 정리, 닮음, 이차방정식, 삼각비, 원주각 같은 중2 이상 개념은 풀이에 쓰지 마.
+- solutions에는 중1 개념만으로 실제로 가능한 서로 다른 풀이를 1~3개 넣어. 억지로 늘리지 말고, 각 풀이의 uses에 사용한 핵심 개념(예: 삼각형의 외각, SAS 합동, 비례식)을 적어.
+- 수식은 LaTeX 없이 3/4, ×, ÷, ², ∠, °, △ 같은 일반 기호로 써.
+- 풀이는 학생이 따라 할 수 있게 steps(문자열 배열, 한 단계당 한 문장)로 짧게 쓰고, 최종 정답은 answer에 적어.
+- similar는 같은 개념의 비슷한 문제 3개(level: "쉬움", "같은 수준", "한 단계 더")이고, 숫자와 조건을 바꿔 새로 만든 문제여야 해. 그림이 필요한 문제는 그림 없이 글로 조건을 모두 설명해. 각 문제에 answer와 solution(2~3문장)을 넣어.
+- 사진이 흐리거나 읽기 어려우면 ok를 false로 하고 note에 이유를 적어. 정답에 확신이 없으면 note에 적어.
+JSON 형식:
+{"ok":true,"title":"문제를 한 줄로 요약","u":"소단원 코드(아래 목록 중 하나, 모르면 빈 문자열)","problem":"문제 전문(보기 포함)","concepts":["핵심 개념 한 줄", "…(최대 3개)"],"solutions":[{"method":"풀이 방법 이름","uses":"사용한 핵심 개념","steps":["…"],"answer":"최종 답"}],"pitfalls":["학생이 자주 하는 실수(1~2개)"],"similar":[{"level":"쉬움","q":"…","answer":"…","solution":"…"}],"note":""}`;
+function mbImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};im.src=u})}
+async function mbPrep(file,max,q){const im=await mbImg(file),k=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(im.naturalWidth*k));cv.height=Math.max(1,Math.round(im.naturalHeight*k));
+ cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);return{blob:await new Promise(r=>cv.toBlob(r,'image/jpeg',q)),url:cv.toDataURL('image/jpeg',q)}}
+function mbParse(t){t=String(t||'').replace(/```json|```/g,'');const i=t.indexOf('{'),j=t.lastIndexOf('}');if(i<0||j<i)return null;try{return JSON.parse(t.slice(i,j+1))}catch(e){return null}}
+const mbArr=v=>Array.isArray(v)?v.map(String):v?[String(v)]:[];
+async function mbAnalyze(file){if(!SAMPLE||MB.busy)return;MB.busy=true;MB.err='';MB.cur=null;MB.sel=0;MB.chat=[];MB.ctl=new AbortController();mbRender();
+ try{const memo=(document.getElementById('mbNum')||{}).value||'';const big=await mbPrep(file,1600,.82),th=await mbPrep(file,240,.6);
+  const units=SUBS.map(c=>`${c}: ${SUBNAME[c]}`).join('\n');
+  const msg=`${MB_RULES}\n\n과목: ${SJ[CUR].name} (${SJ[CUR].book})\n소단원 코드 목록:\n${units}\n\n[학생 메모]\n${memo.trim()||'(없음)'}`;
+  const r=await SAMPLE([{role:'user',content:msg}],{images:[big.blob],signal:MB.ctl.signal,cache:false});
+  const o=mbParse(r.text);if(!o){MB.err='결과를 읽지 못했어요. 사진을 더 선명하게 찍어 다시 올려 주세요.';}
+  else if(o.ok===false){MB.err=o.note||'사진 속 문제를 읽지 못했어요. 더 선명하게 찍어 주세요.'}
+  else{o.solutions=(o.solutions||[]).map(s=>({method:String(s.method||''),uses:String(s.uses||''),steps:mbArr(s.steps),answer:String(s.answer||'')}));o.similar=(o.similar||[]).map(s=>({level:String(s.level||''),q:String(s.q||''),answer:String(s.answer||''),solution:String(s.solution||'')}));o.concepts=mbArr(o.concepts);o.pitfalls=mbArr(o.pitfalls);
+   MB.cur={id:Date.now(),at:Date.now(),thumb:th.url,u:SUBS.includes(o.u)?o.u:'',done:false,data:o}}}
+ catch(e){const c=e&&e.code;MB.err=c==='cancelled'?'멈췄어요.':c==='images_unavailable'||c==='image_rejected'?'사진을 보낼 수 없어요. 다른 사진으로 다시 해 보세요.':c==='rate_limited'?'질문이 너무 많아요. 잠시 뒤에 다시 해 보세요.':c==='session_expired'?'claude.ai에 다시 로그인한 뒤 해 보세요.':(AI_ERR[c]||'연결이 끊겼어요. 다시 시도해 주세요.')}
+ finally{MB.busy=false;MB.ctl=null;mbRender()}}
+async function mbAsk(q){const o=MB.cur&&MB.cur.data;if(!SAMPLE||!o||!q.trim()||MB.asking)return;MB.asking=true;const cur={q:q.trim(),a:null};MB.chat.push(cur);mbRender();
+ try{const ctx=JSON.stringify({title:o.title,problem:o.problem,concepts:o.concepts,solutions:o.solutions});
+  const r=await SAMPLE([{role:'user',content:`${AI_RULES}\n중1 교육과정 개념만 써서 답해요.\n\n[학생이 올린 문제와 정리]\n${ctx}\n\n[학생 질문]\n${cur.q}`}],{cache:false,onText:({text})=>{cur.a=text;const el=document.querySelector('#mbBox .mbchat .aimsg.t:last-child');if(el)el.innerHTML=aiFmt(text)}});cur.a=r.text}
+ catch(e){cur.a=cur.a||'답을 받지 못했어요. 다시 물어봐 주세요.'}
+ finally{MB.asking=false;mbRender()}}
+function mbCard(it,saved){const o=it.data,E=aiEsc,sels=o.solutions;const s=sels[Math.min(MB.sel,sels.length-1)];
+ return `<div class="mbc"><div class="bar"><b style="font-size:16px">${E(o.title||'문제')}</b>${it.u?`<span class="chip on">${E(SUBNAME[it.u]||it.u)}</span>`:''}<span class="sp"></span><button class="btn sm" data-mb="close">닫기</button></div>
+  ${it.thumb?`<img src="${it.thumb}" alt="올린 문제 사진" style="max-height:110px;border-radius:8px;border:1px solid var(--rule);margin:6px 0">`:''}
+  <div class="psg" style="white-space:pre-wrap">${E(o.problem||'')}</div>
+  ${o.note?`<p class="muted" style="margin:6px 0">※ ${E(o.note)}</p>`:''}
+  ${o.concepts.length?`<h3 class="mbh">핵심 개념</h3><ul class="mbl">${o.concepts.map(c=>`<li>${E(c)}</li>`).join('')}</ul>`:''}
+  ${s?`<h3 class="mbh">풀이 ${sels.length>1?`(${sels.length}가지 방법)`:''}</h3>${sels.length>1?`<div class="bar" style="gap:6px">${sels.map((x,i)=>`<button class="chip${i===MB.sel?' on':''}" data-mb="sol|${i}">풀이 ${'①②③'[i]}</button>`).join('')}</div>`:''}
+  <div class="exp"><b class="h">풀이 ${'①②③'[Math.min(MB.sel,sels.length-1)]} · ${E(s.method)}</b>${s.uses?`<div class="muted" style="margin:2px 0 4px">사용 개념: <b>${E(s.uses)}</b></div>`:''}<ol class="mbl">${s.steps.map(t=>`<li>${E(t)}</li>`).join('')}</ol>정답: <b>${E(s.answer)}</b></div>`:''}
+  ${o.pitfalls.length?`<h3 class="mbh">틀리기 쉬운 부분</h3><ul class="mbl">${o.pitfalls.map(c=>`<li>${E(c)}</li>`).join('')}</ul>`:''}
+  ${o.similar.length?`<h3 class="mbh">비슷한 문제로 다시 풀어 보기</h3>${o.similar.map(x=>`<details class="mbs"><summary><span class="chip">${E(x.level)}</span> ${E(x.q)}</summary><div class="exp" style="margin-top:6px"><b class="h">정답 · 풀이</b>정답: <b>${E(x.answer)}</b><br>${E(x.solution)}</div></details>`).join('')}`:''}
+  <h3 class="mbh">더 궁금한 점</h3>${MB.chat.length?`<div class="mbchat ailog">${MB.chat.map(m=>`<div class="aimsg me">${E(m.q)}</div>${m.a!=null?`<div class="aimsg t">${aiFmt(m.a)}</div>`:'<div class="aimsg t think">생각하는 중…</div>'}`).join('')}</div>`:''}
+  <div class="aiin"><input id="mbQ" placeholder="예: 다른 방법은 없나요?" autocomplete="off" ${MB.asking?'disabled':''}><button class="btn sm pri" data-mb="ask" ${MB.asking?'disabled':''}>질문</button></div>
+  <div class="bar" style="margin-top:10px">${saved?`<button class="btn sm" data-mb="done|${it.id}">${it.done?'다시 풀 문제로 되돌리기':'복습 완료 ✔'}</button><button class="btn sm" data-mb="del|${it.id}">삭제</button>`:`<button class="btn pri sm" data-mb="save">다시 풀 문제로 저장</button>`}</div></div>`}
+function mbInner(){if(!mbOn())return'<div class="note">📷 <b>내 문제집</b>: 문제집 사진을 올려 개념·여러 풀이·비슷한 문제를 받는 기능은 <b>AI 선생님 앱(Claude 아티팩트)</b>에서 쓸 수 있어요.</div>';
+ const L=mbList(),open=L.filter(x=>!x.done),it=MB.cur,saved=it&&L.some(x=>x.id===it.id);
+ return `<div class="scope"><div class="bar"><b>📷 내 문제집</b><span class="muted">${SJ[CUR].name} 문제집에서 다시 풀 문제를 사진으로 올려 보세요</span></div>
+  <div class="bar" style="margin-top:8px;gap:8px"><input id="mbNum" placeholder="문제 번호(선택, 예: 13)" style="border:1px solid var(--rule);border-radius:8px;padding:6px 8px;width:11em;background:var(--sheet);color:var(--ink);font:inherit"><button class="btn pri sm" data-mb="pick" ${MB.busy?'disabled':''}>사진 올리기</button><input type="file" id="mbFile" accept="image/*" hidden>${MB.busy?'<button class="btn sm" data-mb="cancel">멈추기</button>':''}</div>
+  ${MB.busy?'<p class="aimsg t think" style="margin:8px 0 0">문제를 읽고 풀이를 만드는 중이에요… (20~40초)</p>':''}${MB.err?`<p class="ainote" style="margin:8px 0 0">${aiEsc(MB.err)}</p>`:''}
+  ${it?mbCard(it,saved):''}
+  ${L.length?`<h3 class="mbh" style="margin-top:12px">저장한 문제 <span class="muted">다시 풀 ${open.length}개 · 복습 완료 ${L.length-open.length}개</span></h3><div class="list" style="margin-top:6px">${L.map(x=>`<div class="row"><div class="t" style="display:flex;gap:10px;align-items:center">${x.thumb?`<img src="${x.thumb}" alt="" style="width:46px;height:46px;object-fit:cover;border-radius:6px;border:1px solid var(--rule)">`:''}<div><b>${aiEsc(x.data.title||'문제')}</b><p>${x.u?aiEsc(SUBNAME[x.u]||x.u)+' · ':''}${new Date(x.at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})}${x.done?' · 복습 완료':' · 다시 풀기'}</p></div></div><div class="acts"><button class="btn sm" data-mb="open|${x.id}">열기</button></div></div>`).join('')}</div>`:''}</div>`}
+function mbHTML(){return `<div id="mbBox" style="margin-bottom:14px">${mbInner()}</div>`}
+function mbRender(){const b=document.getElementById('mbBox');if(b){const q=(document.getElementById('mbQ')||{}).value,n=(document.getElementById('mbNum')||{}).value;b.innerHTML=mbInner();const q2=document.getElementById('mbQ'),n2=document.getElementById('mbNum');if(q2&&q)q2.value=q;if(n2&&n)n2.value=n}}
+$('#v-review').addEventListener('click',e=>{const b=e.target.closest('[data-mb]');if(!b)return;const[a,v]=b.dataset.mb.split('|');
+ if(a==='pick'){document.getElementById('mbFile').click();return}
+ if(a==='cancel'){if(MB.ctl)MB.ctl.abort();return}
+ if(a==='close'){MB.cur=null;MB.chat=[];mbRender();return}
+ if(a==='sol'){MB.sel=+v;mbRender();return}
+ if(a==='save'){if(!MB.cur)return;const L=mbList();if(!L.some(x=>x.id===MB.cur.id)){L.unshift(MB.cur);LS.set(mbKey(),L.slice(0,40))}mbRender();if(typeof renderStats==='function'&&!$('#v-stats').hidden)renderStats();return}
+ if(a==='open'){const it=mbList().find(x=>String(x.id)===v);if(it){MB.cur=it;MB.sel=0;MB.chat=[];mbRender()}return}
+ if(a==='done'){const L=mbList(),it=L.find(x=>String(x.id)===v);if(it){it.done=!it.done;LS.set(mbKey(),L);if(MB.cur&&MB.cur.id===it.id)MB.cur.done=it.done;mbRender()}return}
+ if(a==='del'){LS.set(mbKey(),mbList().filter(x=>String(x.id)!==v));if(MB.cur&&String(MB.cur.id)===v)MB.cur=null;mbRender();return}
+ if(a==='ask'){const q=document.getElementById('mbQ');if(q){const t=q.value;q.value='';mbAsk(t)}}});
+$('#v-review').addEventListener('change',e=>{if(e.target.id==='mbFile'&&e.target.files&&e.target.files[0]){const f=e.target.files[0];e.target.value='';mbAnalyze(f)}});
+$('#v-review').addEventListener('keydown',e=>{if(e.target.id==='mbQ'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();const t=e.target.value;e.target.value='';mbAsk(t)}});
+setTimeout(()=>{if(SAMPLE&&!$('#v-review').hidden)renderReview()},1800);
 
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
