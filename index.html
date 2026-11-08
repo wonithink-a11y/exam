@@ -5641,8 +5641,26 @@ let _pdb=null;
 function padDB(){if(!_pdb)_pdb=new Promise(res=>{try{const q=indexedDB.open('m12pad',1);q.onupgradeneeded=()=>q.result.createObjectStore('w',{keyPath:'k'});q.onsuccess=()=>res(q.result);q.onerror=()=>res(null);q.onblocked=()=>res(null)}catch(e){res(null)}});return _pdb}
 async function padGet(k){const d=await padDB();if(!d)return null;return new Promise(r=>{try{const q=d.transaction('w').objectStore('w').get(k);q.onsuccess=()=>r(q.result||null);q.onerror=()=>r(null)}catch(e){r(null)}})}
 async function padAll(){const d=await padDB();if(!d)return[];return new Promise(r=>{try{const q=d.transaction('w').objectStore('w').getAll();q.onsuccess=()=>r(q.result||[]);q.onerror=()=>r([])}catch(e){r([])}})}
-async function padPut(r){const d=await padDB();if(!d)return;const{redo,...c}=r;try{d.transaction('w','readwrite').objectStore('w').put(c)}catch(e){}}
-async function padDel(k){const d=await padDB();if(!d)return;try{d.transaction('w','readwrite').objectStore('w').delete(k)}catch(e){}}
+async function padPut(r,skipCloud){if(!skipCloud)try{padCloudPut(r)}catch(e){}const d=await padDB();if(!d)return;const{redo,...c}=r;try{d.transaction('w','readwrite').objectStore('w').put(c)}catch(e){}}
+async function padDel(k){try{padCloudDel(k)}catch(e){}const d=await padDB();if(!d)return;try{d.transaction('w','readwrite').objectStore('w').delete(k)}catch(e){}}
+/* --- 클라우드 백업: 아티팩트 db 캡처빌리티의 'pad' 컬렉션(서버 저장, 브라우저 데이터를 지워도 남음, 같은 계정의 다른 기기에서도 보임) ---
+   로컬(IndexedDB)이 먼저, db는 뒤에서 동기화. 같은 문서는 at(수정 시각)이 새로운 쪽이 이긴다. 문서 한도 256KiB → 크면 점을 솎아 낸다. */
+const PADCLOUD={db:null,q:new Map(),t:null,state:'확인 중'};
+const padCk=k=>String(k).replace(/[^A-Za-z0-9_\-.~:@+]/g,'~');
+function padThin(strokes){return strokes.map(s=>s.p.length>12?Object.assign({},s,{p:s.p.filter((_,i)=>Math.floor(i/3)%2===0)}):s)}
+function padDoc(r){let st=r.strokes,js=JSON.stringify(st);for(let i=0;i<3&&js.length>230000;i++){st=padThin(st);js=JSON.stringify(st)}if(js.length>240000)return null;
+ return{k:r.k,id:r.id,seed:r.seed,h:r.h||420,at:r.at||Date.now(),ok:r.ok==null?null:!!r.ok,rate:r.rate||null,memo:r.memo||'',ai:r.ai||'',s:js}}
+function padCloudPut(r){if(!PADCLOUD.db)return;PADCLOUD.q.set(r.k,r);clearTimeout(PADCLOUD.t);PADCLOUD.t=setTimeout(padFlush,1500)}
+async function padFlush(){const db=PADCLOUD.db;if(!db)return;const items=[...PADCLOUD.q.values()];PADCLOUD.q.clear();
+ for(const r of items){try{const d=padDoc(r);if(d)await db.doc('pad/'+padCk(r.k)).set(d)}catch(e){PADCLOUD.state=e&&e.code==='quota_exceeded'?'서버 저장 공간이 가득 찼어요':'서버 저장 실패(다음 변경 때 다시 시도)'}}}
+async function padCloudDel(k){const db=PADCLOUD.db;if(db){try{await db.doc('pad/'+padCk(k)).delete()}catch(e){}}}
+async function padPull(){const db=PADCLOUD.db;if(!db)return;try{const snap=await db.collection('pad').get(),cloud=new Map();let got=0;
+  for(const d of snap.docs){const v=d.data();if(!v||!v.k||!v.s)continue;cloud.set(v.k,v);const loc=PADS.get(v.k)||await padGet(v.k);
+   if(!loc||(loc.at||0)<(v.at||0)){let st;try{st=JSON.parse(v.s)}catch(e){continue}const r={k:v.k,id:v.id,seed:v.seed,h:v.h,at:v.at,ok:v.ok,rate:v.rate,memo:v.memo,ai:v.ai,strokes:st,redo:[]};await padPut(r,true);if(PADS.has(v.k))PADS.set(v.k,r);got++}}
+  const all=await padAll();let up=0;for(const r of all){const c=cloud.get(r.k);if(!c||(c.at||0)<(r.at||0)){padCloudPut(r);up++}}
+  PADCLOUD.state='서버에 저장됨'+(got?` · 서버에서 ${got}개 가져옴`:'')+(up?` · ${up}개 올리는 중`:'');if(got&&!$('#v-review').hidden)plogRender()}
+ catch(e){PADCLOUD.state=e&&e.code==='not_granted'?'서버 저장 꺼짐':'서버 연결 안 됨'}}
+(async()=>{try{if(typeof claude==='undefined'||!claude.use)return;const d=await claude.use('db');if(d){PADCLOUD.db=d;PADCLOUD.state='서버 저장 켜짐';setTimeout(padPull,600)}else PADCLOUD.state='이 기기에만 저장'}catch(e){PADCLOUD.state='이 기기에만 저장'}})();
 function padMark(id,seed,ok){const k=padKey(id,seed),r=PADS.get(k);if(r){r.ok=ok;padPut(r)}else padGet(k).then(x=>{if(x){x.ok=ok;padPut(x)}})}
 /* 한 획 그리기 */
 function padStroke(c,s){const p=s.p,n=p.length/3;if(!n)return;c.save();c.lineCap='round';c.lineJoin='round';c.strokeStyle=s.c;c.lineWidth=s.w;
@@ -7381,7 +7399,7 @@ async function plogRender(){const box=document.getElementById('plogBox');if(!box
  all.sort((a,b)=>b.at-a.at);const F=PL.filter,list=all.filter(r=>F==='all'||(F==='wrong'&&r.ok===false)||(F==='ung'&&r.ok==null)||(F==='todo'&&!r.rate));
  if(PL.open){const r=all.find(x=>x.k===PL.open);if(r){box.innerHTML=plogDetail(r);return}PL.open=null}
  const cnt={wrong:all.filter(r=>r.ok===false).length,todo:all.filter(r=>!r.rate).length};
- box.innerHTML=`<div class="scope"><div class="bar"><b>📒 풀이 기록</b><span class="muted">${SJ[CUR].name} · 아이가 풀이 칸에 쓴 풀이 ${all.length}개 · 부모 확인 전 ${cnt.todo}개</span></div>
+ box.innerHTML=`<div class="scope"><div class="bar"><b>📒 풀이 기록</b><span class="muted">${SJ[CUR].name} · 아이가 풀이 칸에 쓴 풀이 ${all.length}개 · 부모 확인 전 ${cnt.todo}개</span></div><p class="muted" style="margin:4px 0 0;font-size:12px">💾 ${PADCLOUD.state}</p>
   ${all.length?`<div class="bar" style="margin-top:8px">${[['all','전체'],['wrong','틀린 문제'],['ung','채점 전'],['todo','확인 전']].map(([k,n])=>`<button class="chip${F===k?' on':''}" data-pl="f|${k}">${n}</button>`).join('')}</div>
   <div class="list" style="margin-top:8px">${list.length?list.map(r=>{const t=TYPE[r.id],im=padImage(r).toDataURL('image/jpeg',.5);return `<div class="row"><div class="t" style="display:flex;gap:10px;align-items:center"><img src="${im}" alt="" style="width:92px;height:${Math.round(92*(r.h||420)/1000)}px;border:1px solid var(--rule);border-radius:6px;background:#fff"><div><b>${t.name}</b><p>${SUBNAME[t.u]} · ${new Date(r.at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})} · ${r.ok==null?'채점 전':r.ok?'맞힘':'틀림'}${r.rate?' · '+PL_RATE.find(x=>x[0]===r.rate)[1]:''}</p></div></div><div class="acts"><button class="btn sm" data-pl="o|0" data-k="${r.k}">확인</button></div></div>`}).join(''):'<div class="empty" style="margin:8px 0">해당하는 풀이가 없습니다.</div>'}</div>`:'<p class="muted" style="margin:8px 0 0">풀이 칸(수학·과학·기술가정 문제 아래)에 쓴 풀이가 여기에 자동으로 모여, 정답 풀이와 나란히 확인할 수 있습니다.</p>'}</div>`}
 function plogDetail(r){const t=TYPE[r.id],d=gen(r.id,r.seed),E=aiEsc,ai=d.opts.indexOf(d.ans),im=padImage(r).toDataURL('image/jpeg',.85);
