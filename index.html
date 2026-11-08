@@ -372,6 +372,7 @@ b.src{color:var(--ac);font-weight:600}
 .plr{padding:9px 0;border-top:1px dashed var(--rule)}.plrt{display:flex;justify-content:space-between;gap:8px;font-size:14px}
 .plrs{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.plst{border:1px solid var(--rule);background:var(--chip);border-radius:999px;padding:3px 10px;font-size:12.5px;display:inline-flex;gap:4px;align-items:center}
 .plst.on{background:var(--ac);border-color:var(--ac);color:var(--on)}.plst.all{background:none;border-style:dashed;color:var(--muted)}.plri{margin-top:4px;font-size:12px}
+.alt{margin-top:8px;padding-top:8px;border-top:1px dashed var(--rule)}.alt:first-child{margin-top:0;padding-top:0;border-top:0}
 @media screen and (min-width:1000px){.wrap{max-width:1120px}.qt,.exp,.cond,.data{max-width:760px}.fig svg{max-width:420px}.ntsc{font-size:15px;padding:12px 10px}.ntsc>i,.ntsa i,.ntsa em{font-size:13.5px}.ntsn b{font-size:16px}.ntsn small{font-size:13px}
 .ntsc .fig svg{max-width:220px}.ntsn .fig svg{max-width:250px}.ntsr:not(.g) .ntsn svg text{font-size:20px}.nt .ntfig svg{max-width:440px}.nt .ntfigs{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}.ntbsr{font-size:13.5px}}
 </style>
@@ -499,7 +500,7 @@ _T=[];
 add({id:'a1-mid',u:'A1',name:'중점과 선분의 길이',lv:1,g:R=>{const k=R.i(2,9),a=4*k,ans=3*k;
  return{q:`그림에서 점 M은 ${sg('AB')}의 중점이고, 점 N은 ${sg('AM')}의 중점이다. ${sg('AB')} = ${a} cm일 때, ${sg('NB')}의 길이는?`,
  fig:figSeg(`${a} cm`),alt:`선분 AB 위에 A, N, M, B 순서로 점이 있음`,...mc(R,ans,[k,2*k,a,5*k,ans+1],v=>v+' cm'),
- exp:`${sg('AM')} = ${sg('MB')} = ${fr(a,2)} = ${2*k} (cm)<br>${sg('NM')} = ${fr(2*k,2)} = ${k} (cm)<br>∴ ${sg('NB')} = ${sg('NM')} + ${sg('MB')} = ${k} + ${2*k} = <b>${ans} cm</b>`}}});
+ exp:`${sg('AM')} = ${sg('MB')} = ${fr(a,2)} = ${2*k} (cm)<br>${sg('NM')} = ${fr(2*k,2)} = ${k} (cm)<br>∴ ${sg('NB')} = ${sg('NM')} + ${sg('MB')} = ${k} + ${2*k} = <b>${ans} cm</b>`,m:'중점의 뜻(길이를 반씩 나누기)',alts:[['4등분해서 칸 수 세기',`AB를 4등분하면 한 칸 = ${a} ÷ 4 = ${k} cm<br>M은 AB의 중점(2칸), N은 AM의 중점(1칸)이므로 NB는 3칸 = 3 × ${k} = <b>${ans} cm</b>`]]}}});
 add({id:'a1-vert',u:'A1',name:'맞꼭지각',lv:1,g:R=>{const x=R.i(15,40),a=R.i(5,x-5),b=x-a;const e1=`(2x + ${a})°`,e2=`(3x − ${b})°`;
  return{q:`그림과 같이 두 직선이 한 점에서 만날 때, x의 값은?`,fig:figVert(e1,e2),alt:`맞꼭지각 ${e1}, ${e2}`,
  ...mc(R,x,[Math.abs(a-b),x+5,x-5,2*x,a],String),exp:`맞꼭지각의 크기는 서로 같으므로<br>2x + ${a} = 3x − ${b} &nbsp;∴ x = <b>${x}</b>`}}});
@@ -580,7 +581,7 @@ add({id:'b1-tri',u:'B1',name:'한 꼭짓점에서 그은 대각선',lv:2,g:R=>{c
  exp:`n각형은 한 꼭짓점에서 그은 대각선에 의해 (n − 2)개의 삼각형으로 나누어지므로 n − 2 = ${k} &nbsp;∴ n = ${n}<br>대각선의 개수 = ${fr(`${n}*${n-3}`,2)} = <b>${ans}개</b>`}}});
 const REGN=[5,6,8,9,10,12,15,18,20];
 add({id:'b1-reg',u:'B1',name:'정다각형의 한 내각과 한 외각',lv:1,g:R=>{const n=R.pick(REGN),e=360/n,it=180-e;const k=R.pick(['int','ext','sum']);
- if(k==='int')return{q:`정${NUM[n]}각형의 한 내각의 크기는?`,...mc(R,it,[e,180*(n-2),it+10,it-10,it+e/2],v=>v+'°'),exp:`한 외각의 크기 = ${fr(360,n)} = ${e}°<br>한 내각의 크기 = 180° − ${e}° = <b>${it}°</b>`};
+ if(k==='int')return{q:`정${NUM[n]}각형의 한 내각의 크기는?`,...mc(R,it,[e,180*(n-2),it+10,it-10,it+e/2],v=>v+'°'),exp:`한 외각의 크기 = ${fr(360,n)} = ${e}°<br>한 내각의 크기 = 180° − ${e}° = <b>${it}°</b>`,m:'한 외각 = 360° ÷ n',alts:[['내각의 크기의 합 ÷ n',`정${NUM[n]}각형의 내각의 크기의 합 = 180° × (${n} − 2) = ${(n-2)*180}°<br>한 내각 = ${(n-2)*180}° ÷ ${n} = <b>${it}°</b>`]]};
  if(k==='ext'){const nm=x=>`정${NUM[x]}각형`;return{q:`한 외각의 크기가 ${e}°인 정다각형은?`,...mc(R,nm(n),REGN.filter(x=>x!==n).map(nm).concat([nm(n+1),nm(n-1)])),exp:`정n각형의 한 외각의 크기는 ${fr('360°','n')}이므로 ${fr(360,'n')} = ${e} &nbsp;∴ n = ${n}<br>∴ <b>정${NUM[n]}각형</b>`}}
  return{q:`한 내각의 크기가 ${it}°인 정다각형의 내각의 크기의 합은?`,...mc(R,(n-2)*180,[(n-1)*180,(n-3)*180,n*180,360],v=>v+'°'),exp:`한 외각의 크기 = 180° − ${it}° = ${e}°이므로 n = ${fr(360,e)} = ${n}<br>내각의 크기의 합 = 180° × (${n} − 2) = <b>${(n-2)*180}°</b>`}}});
 add({id:'b1-ratio',u:'B1',name:'한 내각과 한 외각의 비',lv:3,g:R=>{const n=R.pick([5,6,8,9,10,12]),g=gcd(n-2,2),a=(n-2)/g,b=2/g,e=360/n,ans=n*(n-3)/2;
@@ -592,20 +593,20 @@ add({id:'b1-ext',u:'B1',name:'삼각형의 외각',lv:2,g:R=>{const q=R.i(1,2),r
  exp:`삼각형의 한 외각의 크기는 이웃하지 않는 두 내각의 크기의 합과 같으므로<br>(${ex(1,a)}) + ${q===1?'':q}x = ${ex(r,-b)} &nbsp;∴ x = <b>${x}</b>`}}});
 add({id:'b1-miss',u:'B1',name:'다각형의 내각의 크기',lv:2,g:R=>{const n=R.pick([5,6]),S=(n-2)*180;let ang,x;do{ang=[...Array(n-1)].map(()=>R.i(n===5?90:100,n===5?130:145));x=S-ang.reduce((s,v)=>s+v,0)}while(x<70||x>170);
  return{q:`${NUM[n]}각형의 내각의 크기가 각각 ${ang.map(v=>v+'°').join(', ')}, x°일 때, x의 값은?`,...mc(R,x,[x+10,x-10,x+20,360-x,x-20],String),
- exp:`${NUM[n]}각형의 내각의 크기의 합 = 180° × ${n-2} = ${S}°<br>x = ${S} − (${ang.join(' + ')}) = <b>${x}</b>`}}});
+ exp:`${NUM[n]}각형의 내각의 크기의 합 = 180° × ${n-2} = ${S}°<br>x = ${S} − (${ang.join(' + ')}) = <b>${x}</b>`,m:'다각형의 내각의 크기의 합',alts:[['다각형의 외각의 합 360° 이용',`각 내각의 외각: ${ang.map(v=>(180-v)+'°').join(', ')} → 합 ${ang.reduce((t,v)=>t+180-v,0)}°<br>외각의 크기의 합은 360°이므로 x의 외각 = 360° − ${ang.reduce((t,v)=>t+180-v,0)}° = ${360-ang.reduce((t,v)=>t+180-v,0)}°<br>∴ x = 180° − ${360-ang.reduce((t,v)=>t+180-v,0)}° = <b>${x}</b>`]]}}});
 
 /* Ⅱ-2 원과 부채꼴 */
 const TH=[30,45,60,72,90,120,135,150,240,270];
 const rFor=(R,th,den,pow,max)=>{const c=[];for(let r=2;r<=max;r++)if((Math.pow(r,pow)*th)%den===0)c.push(r);return R.pick(c)};
 add({id:'b2-arc',u:'B2',name:'부채꼴의 호의 길이',lv:1,g:R=>{const th=R.pick(TH),r=rFor(R,th,180,1,15),k=r*th/180;
  return{q:`반지름의 길이가 ${r} cm, 중심각의 크기가 ${th}°인 부채꼴의 호의 길이는?`,fig:figSector(th,`${r}cm`,`${th}°`),alt:`반지름 ${r} cm, 중심각 ${th}°인 부채꼴`,
- ...mc(R,k,[2*k,k/2,r*r*th/360,k+r,2*r],piF('cm')),exp:`(호의 길이) = 2π × ${r} × ${fr(th,360)} = <b>${k===1?'':k}π cm</b>`}}});
+ ...mc(R,k,[2*k,k/2,r*r*th/360,k+r,2*r],piF('cm')),exp:`(호의 길이) = 2π × ${r} × ${fr(th,360)} = <b>${k===1?'':k}π cm</b>`,m:'호의 길이 공식 2πr × (중심각/360)',alts:[['비례식(중심각 : 호의 길이)',`한 원에서 호의 길이는 중심각에 정비례하므로 ${th} : 360 = x : ${2*r}π<br>x = ${2*r}π × ${fr(th,360)} = <b>${k===1?'':k}π cm</b>`]]}}});
 add({id:'b2-area',u:'B2',name:'부채꼴의 넓이',lv:1,g:R=>{const th=R.pick(TH),r=rFor(R,th,360,2,12),k=r*r*th/360;
  return{q:`반지름의 길이가 ${r} cm, 중심각의 크기가 ${th}°인 부채꼴의 넓이는?`,fig:figSector(th,`${r}cm`,`${th}°`),alt:`반지름 ${r} cm, 중심각 ${th}°인 부채꼴`,
- ...mc(R,k,[2*k,r*th/180,r*r,k+r,k/2],piF('cm²')),exp:`(부채꼴의 넓이) = π × ${r}² × ${fr(th,360)} = <b>${k===1?'':k}π cm²</b>`}}});
+ ...mc(R,k,[2*k,r*th/180,r*r,k+r,k/2],piF('cm²')),exp:`(부채꼴의 넓이) = π × ${r}² × ${fr(th,360)} = <b>${k===1?'':k}π cm²</b>`,m:'부채꼴 넓이 공식 πr² × (중심각/360)',alts:[['비례식(중심각 : 넓이)',`한 원에서 부채꼴의 넓이는 중심각에 정비례하므로 ${th} : 360 = x : ${r*r}π<br>x = ${r*r}π × ${fr(th,360)} = <b>${k===1?'':k}π cm²</b>`]]}}});
 add({id:'b2-rl',u:'B2',name:'호의 길이로 넓이 구하기',lv:2,g:R=>{let r,l;do{r=R.i(2,12);l=R.i(2,10)}while((r*l)%2);const ans=r*l/2;
  return{q:`반지름의 길이가 ${r} cm이고 호의 길이가 ${l}π cm인 부채꼴의 넓이는?`,...mc(R,ans,[r*l,ans+r,l*l,r*r,ans+l],piF('cm²')),
- exp:`(부채꼴의 넓이) = ${fr(1,2)} × (반지름) × (호의 길이) = ${fr(1,2)} × ${r} × ${l}π = <b>${ans}π cm²</b>`}}});
+ exp:`(부채꼴의 넓이) = ${fr(1,2)} × (반지름) × (호의 길이) = ${fr(1,2)} × ${r} × ${l}π = <b>${ans}π cm²</b>`,m:'부채꼴 넓이 = ½ × 반지름 × 호의 길이',alts:[['원 전체에 대한 비율',`호의 길이 ${l}π는 원의 둘레 ${2*r}π의 ${fr(l,2*r)}이므로, 넓이도 원의 넓이 ${r*r}π의 ${fr(l,2*r)}이다.<br>${r*r}π × ${fr(l,2*r)} = <b>${ans}π cm²</b>`]]}}});
 add({id:'b2-prop',u:'B2',name:'중심각과 호·넓이의 정비례',lv:1,g:R=>{const t=R.pick([10,15,20,30,40]);let m,n;do{m=R.i(1,6);n=R.i(1,8)}while(m===n||n*t>300||m*t>300);
  const u=R.i(1,6),a=m*u,ans=n*u,k=R.pick(['호의 길이','넓이']),un=k==='넓이'?'cm²':'cm';
  return{q:`한 원에서 중심각의 크기가 ${m*t}°인 부채꼴의 ${k}가 ${a} ${un}일 때, 중심각의 크기가 ${n*t}°인 부채꼴의 ${k}는?`,...mc(R,ans,[a*n,ans+u,ans-u,a+n,a*m],v=>v+' '+un),
@@ -692,10 +693,10 @@ add({id:'d1-mode',u:'D1',name:'최빈값',lv:2,g:R=>{const c=R.pick([{t:'학생 
 add({id:'d1-x',u:'D1',name:'평균이 주어질 때 변량 구하기',lv:2,g:R=>{const c=R.pick(DCTX),n=5;let v,m,x;do{v=[...Array(n-1)].map(()=>R.i(c.lo,c.hi));m=R.i(c.lo+5,c.hi-5);x=m*n-v.reduce((s,y)=>s+y,0)}while(x<c.lo||x>c.hi);
  const pos=R.i(0,n-1),shown=v.slice();shown.splice(pos,0,'x');
  return{q:`다음 자료의 평균이 ${m}${c.u}일 때, x의 값은?<div class="data">${shown.join(', ')}</div>`,...mc(R,x,[x+5,x-5,m,x+10,x-10],String),
- exp:`${fr(`${v.join('+')}+x`,n)} = ${m}<br>${v.reduce((s,y)=>s+y,0)} + x = ${m*n} &nbsp;∴ x = <b>${x}</b>`}}});
+ exp:`${fr(`${v.join('+')}+x`,n)} = ${m}<br>${v.reduce((s,y)=>s+y,0)} + x = ${m*n} &nbsp;∴ x = <b>${x}</b>`,m:'평균 × 개수 = 변량의 총합',alts:[['평균과의 차(편차)의 합은 0',`각 변량에서 평균 ${m}을(를) 뺀 값을 모두 더하면 0이다.<br>${v.map(y=>y-m).join(' + ').replace(/\+ -/g,'− ')} + (x − ${m}) = 0 에서 x − ${m} = ${m*(n-1)-v.reduce((t,y)=>t+y,0)}<br>∴ x = <b>${x}</b>`]]}}});
 add({id:'d1-add',u:'D1',name:'변량 추가와 평균',lv:3,g:R=>{let m1,x;do{m1=R.i(60,85);x=R.i(45,100)}while((5*m1+x)%6||x===m1);const m2=(5*m1+x)/6;
  return{q:`학생 5명의 수학 점수의 평균이 ${m1}점이다. 한 명이 더 들어와 6명의 평균이 ${m2}점이 되었을 때, 새로 들어온 학생의 점수는?`,...mc(R,x,[m2,m1+m2-m1,6*m2-6*m1,x+6,x-6],v=>v+'점'),
- exp:`(5명의 총점) = ${m1} × 5 = ${5*m1}, (6명의 총점) = ${m2} × 6 = ${6*m2}<br>∴ ${6*m2} − ${5*m1} = <b>${x}점</b>`}}});
+ exp:`(5명의 총점) = ${m1} × 5 = ${5*m1}, (6명의 총점) = ${m2} × 6 = ${6*m2}<br>∴ ${6*m2} − ${5*m1} = <b>${x}점</b>`,m:'(총점) = (평균) × (인원수)',alts:[['평균의 변화량 이용',`평균이 ${m1}점에서 ${m2}점으로 ${m2-m1}점 변했다. 새 학생이 6명 모두에게 영향을 주므로 처음 평균과의 차가 6 × (${m2-m1})점이다.<br>(새 학생의 점수) = ${m1} + 6 × (${m2-m1}) = <b>${x}점</b>`]]}}});
 add({id:'d1-which',u:'D1',name:'알맞은 대푯값 고르기',lv:2,g:R=>{
  if(R.f()<.5){const v=[...Array(6)].map(()=>R.i(35,70));v.push(R.i(300,480));const d=R.shuffle(v);
   return{q:`다음은 학생 7명의 하루 스마트폰 사용 시간(분)이다. 이 자료의 대푯값으로 가장 적절한 것은?<div class="data">${d.join(', ')}</div>`,...fixed(['평균','중앙값','최빈값','가장 큰 값','가장 작은 값'],'중앙값'),
@@ -750,7 +751,7 @@ function figBend(a,b){const top=40,bot=170,ax=70,ta=Math.tan(a*R2D),tb=Math.tan(
  ${angMark(A,[ax+60,top],P,18,a+'°',36)}${angMark(B,[ax+60,bot],P,18,b+'°',36)}${angMark(P,A,B,16,'x',34)}`)}
 add({id:'a2-bend',u:'A2',name:'[심화] 평행선과 꺾인 선',lv:3,g:R=>{const a=R.i(25,60),b=R.i(25,60),x=a+b;
  return{q:`그림에서 l ∥ m일 때, ∠x의 크기는? ${NTS}`,fig:figBend(a,b),alt:`평행선 l, m 사이에서 꺾인 선 A–P–B, ∠A=${a}°, ∠B=${b}°, ∠P=x`,...mc(R,x,[180-x,Math.abs(a-b),x+10,2*x>180?x-10:2*x,180-a],v=>v+'°'),
- exp:`점 P를 지나고 l에 평행한 직선을 그으면, 엇각의 성질에 의해 ∠x는 위쪽 엇각 ${a}°와 아래쪽 엇각 ${b}°로 나뉜다.<br>∴ ∠x = ${a}° + ${b}° = <b>${x}°</b>`}}});
+ exp:`점 P를 지나고 l에 평행한 직선을 그으면, 엇각의 성질에 의해 ∠x는 위쪽 엇각 ${a}°와 아래쪽 엇각 ${b}°로 나뉜다.<br>∴ ∠x = ${a}° + ${b}° = <b>${x}°</b>`,m:'평행한 보조선 + 엇각',alts:[['연장선 + 엇각 + 삼각형 내각의 합',`AP를 연장해 직선 m과 만나는 점을 Q라 하면 ∠AQB의 엇각이 ${a}°이다.<br>△PQB에서 ∠BPQ = 180° − ${a}° − ${b}° = ${180-x}° 이고 ∠x는 그 보각이므로 ∠x = 180° − ${180-x}° = <b>${x}°</b>`]]}}});
 function figZig(al,be,ga,lab){const h=130/3,t=v=>Math.tan(v*R2D);let A=[0,40],P=[h/t(al),40+h],Q=[h/t(al)-h/t(be),40+2*h],B=[h/t(al)-h/t(be)+h/t(ga),170];
  const xs=[0,P[0],Q[0],B[0]],sh=165-(Math.min(...xs)+Math.max(...xs))/2;[A,P,Q,B]=[A,P,Q,B].map(p=>[p[0]+sh,p[1]]);
  return svg(330,205,`<path class="ln" d="M15 40H315M15 170H315"/>${poly([A,P,Q,B])}${txt('l',305,32,'','v')}${txt('m',305,162,'','v')}
@@ -5375,7 +5376,9 @@ const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}
 let SEM=SEMS[LS.get('m12-sem','1-2')]?LS.get('m12-sem','1-2'):'1-2',SJ=SEMS[SEM];const SK=(c=CUR)=>SEM==='1-2'?c:c+'_'+SEM.replace('-','');
 const $=s=>document.querySelector(s);
 const LV=['','하','중','상'];
-function gen(id,seed){for(let k=0;k<6;k++){try{const d=TYPE[id].g(mkR(seed+k*7919));if(d&&d.sa&&d.model)return{opts:[],ans:'',...d};if(d&&d.opts&&d.opts.length===5&&d.opts.includes(d.ans))return d}catch(e){}}
+/* 풀이가 여러 개인 문항: g()가 m(첫 풀이의 사용 개념)과 alts([[개념, 풀이]…])를 주면 exp 뒤에 '풀이 ②③'을 붙인다 */
+function withAlts(d){if(d&&d.alts&&d.alts.length&&!d._alts){d._alts=1;d.exp=`<div class="alt"><b>풀이 ① · ${d.m||'기본 풀이'}</b><br>${d.exp}</div>`+d.alts.map((x,i)=>`<div class="alt"><b>풀이 ${'②③④'[i]} · ${x[0]}</b><br>${x[1]}</div>`).join('')}return d}
+function gen(id,seed){for(let k=0;k<6;k++){try{const d=withAlts(TYPE[id].g(mkR(seed+k*7919)));if(d&&d.sa&&d.model)return{opts:[],ans:'',...d};if(d&&d.opts&&d.opts.length===5&&d.opts.includes(d.ans))return d}catch(e){}}
  return{q:'문제를 만들지 못했습니다. 다른 문제를 눌러 주세요.',opts:['-','-','-','-','-'],ans:'-',exp:''}}
 function record(id,seed,ok){const t=S.t[id]||(S.t[id]=[0,0]);t[0]++;if(ok)t[1]++;
  S.w=S.w.filter(x=>!(x.id===id&&x.seed===seed));if(!ok){S.w.unshift({id,seed,at:Date.now()});S.w=S.w.slice(0,80)}LS.set('m12-rec-'+SK(),S);onRecord()}
@@ -5473,11 +5476,11 @@ A({id:'pr-lin3',u:'PR1',name:'[심화] 일차방정식의 활용',lv:3,g:R=>{con
 A({id:'pr-rat1',u:'PR1',name:'비례식 풀기',lv:1,g:R=>{let a,b,m,c,x,form;do{a=R.i(2,9);b=R.i(2,9);m=R.i(2,7)}while(a===b);
  c=a*m;form=R.i(0,1);x=b*m;
  return{q:form?`비례식 ${a} : ${b} = ${c} : x에서 x의 값은?`:`비례식 x : ${a} = ${b*m} : ${c}에서 x의 값은?`,...(form?mc(R,x,[b+m,c-a+b,a*b,b*c,x+1],String):mc(R,a*b*m/c,[b,b+m,m,a,a*m],String)),
- exp:form?`(외항의 곱) = (내항의 곱)<br>${a} × x = ${b} × ${c} → x = ${b*c} ÷ ${a} = <b>${x}</b>`:`x × ${c} = ${a} × ${b*m} → x = ${a*b*m} ÷ ${c} = <b>${a*b*m/c}</b>`}}});
+ exp:form?`(외항의 곱) = (내항의 곱)<br>${a} × x = ${b} × ${c} → x = ${b*c} ÷ ${a} = <b>${x}</b>`:`x × ${c} = ${a} × ${b*m} → x = ${a*b*m} ÷ ${c} = <b>${a*b*m/c}</b>`,m:'비례식의 성질(외항의 곱 = 내항의 곱)',alts:[['비의 성질(같은 수를 곱하거나 나누기)',form?`${a} : ${b}의 앞의 수 ${a}에 ${m}을 곱해 ${c}가 되었으므로 뒤의 수도 ${m}을 곱한다.<br>x = ${b} × ${m} = <b>${x}</b>`:`${b*m} : ${c}의 두 항을 ${m}으로 나누면 ${b} : ${a}이다.<br>x : ${a} = ${b} : ${a} ∴ x = <b>${b}</b>`]]}}});
 A({id:'pr-rat2',u:'PR1',name:'비례배분',lv:2,g:R=>{let a,b,k,w;do{a=R.i(1,7);b=R.i(2,8)}while(a===b||gcd(a,b)>1);k=R.i(2,9);const N=k*(a+b),big=Math.max(a,b)*k,sm=Math.min(a,b)*k,ask=R.i(0,2);
  const ans=ask===0?big:ask===1?sm:big-sm,nm=['더 많은 쪽의 몫','더 적은 쪽의 몫','두 몫의 차'][ask];
  return{q:`${N}개의 구슬을 지민이와 서윤이가 ${a} : ${b}로 나누어 가질 때, ${nm}은?`,...mc(R,ans,[N-ans,ans+k,ans-k,big,sm,ans+2*k],v=>v+'개'),
- exp:`전체를 비의 합 ${a+b}로 나누어 한 칸의 크기를 구한다.<br>한 칸 = ${N} ÷ ${a+b} = ${k}(개) → 몫은 ${a*k}개, ${b*k}개<br>${nm} = <b>${ans}개</b>`}}});
+ exp:`전체를 비의 합 ${a+b}로 나누어 한 칸의 크기를 구한다.<br>한 칸 = ${N} ÷ ${a+b} = ${k}(개) → 몫은 ${a*k}개, ${b*k}개<br>${nm} = <b>${ans}개</b>`,m:'한 칸의 크기 구하기',alts:[['전체에 대한 분수',`${nm}은 전체의 ${fr(ask===2?Math.abs(a-b):ask===0?Math.max(a,b):Math.min(a,b),a+b)}이다.<br>${N} × ${fr(ask===2?Math.abs(a-b):ask===0?Math.max(a,b):Math.min(a,b),a+b)} = <b>${ans}개</b>`]]}}});
 A({id:'pr-rat3',u:'PR1',name:'[심화] 비례식의 활용 (부채꼴·상대도수)',lv:3,g:R=>{
  if(R.f()<.5){const t1=R.pick([20,30,40,45,60]),m=R.i(2,4),L=R.i(2,6)*2,ans=L*m;
   return{q:`한 원에서 중심각의 크기가 ${t1}°인 부채꼴의 호의 길이가 ${L}π cm일 때, 중심각의 크기가 ${t1*m}°인 부채꼴의 호의 길이는?`,...mc(R,ans,[L+m,ans+L,L*m/2,ans-L,L*(m+1)],v=>v+'π cm'),
