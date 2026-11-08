@@ -5859,8 +5859,11 @@ function weakExam(count,o){o=o||{};const all=o.all?T:scoped(),pool=all.filter(t=
  const sd=Math.floor(1000+Math.random()*9000);
  makeExam(sd,picks.length,picks.map(t=>t.id),'약점 집중 시험',{srcs,es:weakEssays(mkR(sd*13+5),examEs,!!o.all),weakEs:true,weakAll:!!o.all})}
 const hasSa=()=>scoped().some(t=>t.sa);
+function histPending(){try{return LS.get('m12-hist-'+SK(),[]).filter(x=>x.pk&&!x.gr&&x.ans>0&&!x.orig&&(!E||E.hk!==x.k)).slice(0,3)}catch(e){return[]}}
+function histContinue(k){const x=LS.get('m12-hist-'+SK(),[]).find(h=>h.k===+k);if(!x)return;makeExam(x.seed,x.ids.length,x.ids.filter(id=>TYPE[id]),x.label,{srcs:x.srcs,save:false});if(x.pk&&E&&E.items&&E.items.length===x.pk.length&&E.items.every((it,i)=>it.seed===x.sd[i])){E.hk=x.k;E.items.forEach((it,i)=>{if(x.pk[i]!=null)it.pick=x.pk[i];if(x.sf&&x.sf[i]!=null)it.self=x.sf[i];if(x.hp&&x.hp[i])it.help=x.hp[i]});renderExam()}show('exam');window.scrollTo({top:0})}
 function renderExam(){const v=$('#v-exam');
- const cfg=`<div class="cfg"><div class="bar"><span class="muted">문항 수</span>${[10,15,20,25].map(n=>`<button class="chip ${examN===n?'on':''}" data-n="${n}">${n}</button>`).join('')}${hasSa()?`<span class="muted">객관식 ${examN-SA_N} + 서술형 ${SA_N}</span>`:''}${(typeof essHas==='function'&&essHas())?`<span class="muted" style="margin-left:10px">서술형</span>${[0,2,3,4].map(n=>`<button class="chip ${examEs===n?'on':''}" data-esn="${n}">${n?n+'문항':'없음'}</button>`).join('')}`:''}</div>
+ const pend=histPending().map(x=>`<div class="note" style="margin-bottom:8px">📝 풀던 시험지가 있어요: <b>${x.label}</b> · ${x.ids.length}문항 중 <b>${x.ans}문항</b> 풀었어요 <button class="btn sm pri" data-hcont="${x.k}">이어 풀기</button></div>`).join('');
+ const cfg=pend+`<div class="cfg"><div class="bar"><span class="muted">문항 수</span>${[10,15,20,25].map(n=>`<button class="chip ${examN===n?'on':''}" data-n="${n}">${n}</button>`).join('')}${hasSa()?`<span class="muted">객관식 ${examN-SA_N} + 서술형 ${SA_N}</span>`:''}${(typeof essHas==='function'&&essHas())?`<span class="muted" style="margin-left:10px">서술형</span>${[0,2,3,4].map(n=>`<button class="chip ${examEs===n?'on':''}" data-esn="${n}">${n?n+'문항':'없음'}</button>`).join('')}`:''}</div>
  <div class="bar"><label for="seedIn">시험지 번호 <input id="seedIn" inputmode="numeric" placeholder="자동"></label><span class="sp"></span><button class="btn" data-act="weakmode">약점 집중</button><button class="btn pri" data-act="make">시험지 만들기</button></div>
  <p class="muted" style="margin:0">같은 과목에서 같은 번호를 넣으면 같은 시험지가 다시 나옵니다. <b>약점 집중</b>은 출제 범위 안에서 많이 틀린 유형·정답률이 낮은 단원·아직 안 풀어 본 유형을 우선 출제합니다.</p></div>`;
  if(!E||E.err){v.innerHTML=cfg+(E&&E.err?`<div class="empty" style="margin-top:12px">출제 범위를 하나 이상 선택해 주세요.</div>`:'');return}
@@ -5945,7 +5948,7 @@ async function origPdf(o,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn.text
 function examText(){let s=`${SEMNAME[SEM][0]} ${SJ[CUR].name} ${SEMNAME[SEM][1]} ${E.label} (시험지 번호 ${E.seed})\n이름: ${$('#nm').value||''}\n\n`;
  E.items.forEach((it,i)=>{s+=`${i+1}. ${it.d.sa?'[서술형] ':''}${plain(it.d.q)}\n`;if(it.d.alt)s+=`   [그림] ${it.d.alt}\n`;s+=it.d.sa?'   답: ____________________________\n\n':it.d.opts.map((o,j)=>`   ${CIRC[j]} ${plain(o)}`).join('\n')+'\n\n'});
  s+='[정답]\n'+E.items.map((it,i)=>`${i+1}.${it.d.sa?'서술형':CIRC[it.d.opts.indexOf(it.d.ans)]}`).join('  ')+'\n\n[풀이·모범 답안]\n'+E.items.map((it,i)=>`${i+1}. ${it.d.sa?'모범 답안: '+plain(it.d.model)+' / ':''}${plain(it.d.exp)}`).join('\n');return s}
-$('#v-exam').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+$('#v-exam').addEventListener('click',e=>{const hc=e.target.closest('[data-hcont]');if(hc){histContinue(hc.dataset.hcont);return}const b=e.target.closest('button');if(!b)return;
  if(b.dataset.n){examN=+b.dataset.n;LS.set('m12-n',examN);renderExam();return}
  const a=b.dataset.act;
  if(a==='make'){const sv=parseInt($('#seedIn').value,10);makeExam(sv>0?sv:Math.floor(1000+Math.random()*9000),examN);return}
@@ -5981,7 +5984,7 @@ function playOurs(o,up){const types=scoped();if(!types.length){show('exam');E={e
  makeExam(o[1],ids.length,ids,`${SJ[CUR].name} ${o[0]}${up?' · 한 단계 더':''}`);show('exam');window.scrollTo({top:0})}
 function renderJokbo(){if(OV){renderOrig();return}const v=$('#v-jokbo'),H=LS.get('m12-hist-'+SK(),[]),J=JOKBO.filter(j=>j.subj===CUR&&SEM==='1-2');const fmt=t=>new Date(t).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'});
  let h=`<h2 class="sec">우리 문제은행 시험지</h2><div class="list" style="margin-top:8px">${OURS.map((o,i)=>`<div class="jcard"><div class="t"><b>${SJ[CUR].name} ${o[0]}</b><p>${o[2]}문항 · 현재 출제 범위 기준 · 번호가 고정되어 다시 풀어도 같은 시험지</p></div><div class="acts"><button class="btn sm pri" data-our="${i}">풀기</button><button class="btn sm" data-our="${i}" data-up="1">한 단계 더</button><button class="btn sm" data-our="${i}" data-pdf="1">A3 PDF</button></div></div>`).join('')}</div>`;
- if(H.length)h+=`<h2 class="sec" style="margin-top:16px">내가 푼 시험지</h2><div class="list" style="margin-top:8px">${H.slice(0,12).map(x=>`<div class="jcard"><div class="t"><b style="font-size:15px">${x.label}</b><p>${fmt(x.at)} · ${x.ids?x.ids.length:x.n}문항 · ${x.score==null?'채점 전':x.score+'점'}</p></div><div class="acts"><button class="btn sm" ${x.orig?`data-orig="${x.orig}"`:`data-hist="${x.k}"`}>다시 풀기</button></div></div>`).join('')}</div>`;
+ if(H.length)h+=`<h2 class="sec" style="margin-top:16px">내가 푼 시험지</h2><div class="list" style="margin-top:8px">${H.slice(0,12).map(x=>`<div class="jcard"><div class="t"><b style="font-size:15px">${x.label}</b><p>${fmt(x.at)} · ${x.ids?x.ids.length:x.n}문항 · ${x.score==null?(x.ans?`<b>풀던 중 ${x.ans}/${x.ids.length}문항</b>`:'채점 전'):x.score+'점'}</p></div><div class="acts">${!x.orig&&x.pk&&!x.gr&&x.ans?`<button class="btn sm pri" data-hist="${x.k}" data-cont="1">이어 풀기</button>`:''}<button class="btn sm" ${x.orig?`data-orig="${x.orig}"`:`data-hist="${x.k}"`}>${x.pk&&!x.gr&&x.ans?'처음부터':'다시 풀기'}</button></div></div>`).join('')}</div>`;
  h+=origList();
  if(!J.length&&SEM!=='1-2'){h+=`<h2 class="sec" style="margin-top:16px">타학교 기출</h2><div class="note">${SEMNAME[SEM][0]} ${SEMNAME[SEM][1]} 타학교 기출은 아직 넣지 않았습니다. 시험이 가까워지면 무료로 받을 수 있는 자료를 찾아 추가합니다. 지금은 위의 예상 시험지와 연습·모의고사로 공부하세요.</div>`;v.innerHTML=h;return}
  if(!J.length){h+=`<h2 class="sec" style="margin-top:16px">타학교 기출</h2><div class="note">${SJ[CUR].name}${(SJ[CUR].name.charCodeAt(SJ[CUR].name.length-1)-44032)%28?'은':'는'} 학교별 기말고사를 공개한 자료를 찾지 못했습니다. 시중 기출문제집(예: 100발100중·내신콘서트 ${CUR==='eng'?'동아 윤정미판':''})이나 학교에서 받은 시험지를 사진으로 보내 주시면 같은 유형으로 재구성해 여기에 추가할 수 있습니다.</div>`;v.innerHTML=h;return}
@@ -5998,7 +6001,7 @@ $('#v-jokbo').addEventListener('click',e=>{const b=e.target.closest('button');if
  if(b.dataset.jy!=null){jYear=+b.dataset.jy;renderJokbo();return}
  if(b.dataset.our!=null){playOurs(OURS[+b.dataset.our],!!b.dataset.up);if(b.dataset.pdf)examPdf();return}
  if(b.dataset.jk){playJokbo(JOKBO.find(j=>j.key===b.dataset.jk),!!b.dataset.fresh,!!b.dataset.up);if(b.dataset.pdf)examPdf();return}
- if(b.dataset.hist){const x=LS.get('m12-hist-'+SK(),[]).find(h=>h.k===+b.dataset.hist);if(x){makeExam(x.seed,x.ids.length,x.ids.filter(id=>TYPE[id]),x.label,{srcs:x.srcs,save:false});show('exam');window.scrollTo({top:0})}}});
+ if(b.dataset.hist){if(b.dataset.cont){histContinue(b.dataset.hist);return}const x=LS.get('m12-hist-'+SK(),[]).find(h=>h.k===+b.dataset.hist);if(x){makeExam(x.seed,x.ids.length,x.ids.filter(id=>TYPE[id]),x.label,{srcs:x.srcs,save:false});show('exam');window.scrollTo({top:0})}}});
 
 /* ===== 내 기출 자료 (원본 + OMR 채점) ===== */
 let OV=null;
@@ -7301,7 +7304,9 @@ let _rs=null;
 function resumeSave(){clearTimeout(_rs);_rs=setTimeout(()=>{try{const R={at:Date.now(),subj:CUR,sem:SEM,lv:P.lv,n:P.n,ok:P.ok};
   if(P.it)R.p={id:P.it.id,seed:P.it.seed,pick:P.it.pick,self:P.it.self,show:!!P.it.show,help:P.it.help||0};
   if(E&&!E.err&&E.items)R.e={seed:E.seed,label:E.label,graded:E.graded,hk:E.hk,weak:E.weak,weakAll:E.weakAll,items:E.items.map(i=>({id:i.id,seed:i.seed,pick:i.pick,self:i.self,src:i.src,help:i.help||0})),es:(E.es||[]).map(x=>x.id)};
-  R.es={ans:ES.ans,done:ES.done,chk:ES.chk};R.sat=SAT;LS.set('m12-resume',R)}catch(e){}},250)}
+  R.es={ans:ES.ans,done:ES.done,chk:ES.chk};R.sat=SAT;LS.set('m12-resume',R);histProgress()}catch(e){}},250)}
+/* 모의고사 중간 저장: '내가 푼 시험지' 항목에 고른 답·문항 seed를 계속 저장 → 다른 시험을 시작해도 나중에 "이어 풀기"로 그 상태에서 계속 */
+function histProgress(){if(!E||E.err||!E.items||!E.hk)return;const H=LS.get('m12-hist-'+SK(),[]),h=H.find(x=>x.k===E.hk);if(!h)return;h.sd=E.items.map(i=>i.seed);h.pk=E.items.map(i=>i.pick==null?null:i.pick);h.sf=E.items.map(i=>i.self==null?null:i.self);h.hp=E.items.map(i=>i.help||0);h.gr=!!E.graded;h.ans=E.items.filter(i=>i.pick!=null||i.self!=null).length;h.upd=Date.now();LS.set('m12-hist-'+SK(),H)}
 function resumeLoad(){try{const R=LS.get('m12-resume',null);if(!R||R.subj!==CUR||R.sem!==SEM||Date.now()-R.at>3*864e5)return;
   if(R.es){Object.assign(ES.ans,R.es.ans||{});Object.assign(ES.done,R.es.done||{});Object.assign(ES.chk,R.es.chk||{})}if(R.sat)Object.assign(SAT,R.sat);
   if(R.p&&TYPE[R.p.id]){P.it={id:R.p.id,seed:R.p.seed,d:gen(R.p.id,R.p.seed),pick:R.p.pick==null?null:R.p.pick};if(R.p.self!=null)P.it.self=R.p.self;if(R.p.show)P.it.show=true;if(R.p.help)P.it.help=R.p.help;P.last=R.p.id;P.lv=R.lv||0;P.n=R.n||0;P.ok=R.ok||0;renderPractice()}
