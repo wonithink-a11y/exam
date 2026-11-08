@@ -5499,6 +5499,52 @@ Object.assign(HINT,{
  'pr-lin3':['구하려는 것을 <b>x</b>로 놓고, 문장에서 <b>같은 양</b> 두 가지를 찾는다 (나이 비교, 사탕 전체 개수, 합).','같은 양을 등호로 이어 식을 세운다. 푼 뒤 문제의 뜻(사람 수는 자연수)에 맞는지 확인'],
  'pr-rat3':['한 원에서 부채꼴의 <b>호의 길이는 중심각에 비례</b>한다. 상대도수 = 도수 ÷ 전체.','비례식: (중심각) : (중심각) = (호) : (호) → 외항의 곱 = 내항의 곱. 도수 = 전체 × 상대도수']});
 })();
+/* ===== 자료 해석 체크리스트 (표·그래프 문제를 풀 때 확인할 순서, 과목별) ===== */
+(function(){
+const F=s=>`<span class="f">${s}</span>`;
+const add=(k,list)=>{SUBJ[k].notes=(SUBJ[k].notes||[]).concat(list)};
+add('math',[
+{id:'N-CK-D2',u:'D2',title:'자료 해석 체크리스트: 도수분포표·히스토그램·상대도수',
+ pts:[`① ${F('제목·단위')}(명, 점, cm)와 ${F('계급의 크기')}를 먼저 확인한다`,
+  `② ${F('도수의 총합')}을 구한다 (표에 빈칸이 있으면 총합 − 나머지 도수로 채운다)`,
+  `③ 히스토그램: 막대 ${F('높이 = 도수')}, 직사각형 넓이의 합 = ${F('계급의 크기 × 도수의 총합')}`,
+  `④ ${F('상대도수 = 도수 ÷ 도수의 총합')}, 상대도수의 합은 1. 비율(%)은 상대도수 × 100`,
+  `⑤ 총합이 다른 두 집단은 도수가 아니라 ${F('상대도수')}로 비교한다`,
+  `⑥ "○ 이상 △ 미만": ○는 포함, △는 ${F('포함하지 않음')} → 경계값이 어느 계급인지 확인`,
+  `⑦ 보기마다 직접 계산해 ○·×를 표시한 뒤 고른다`],
+ tbl:{h:['묻는 것','구하는 식'],r:[['도수','총합 × 상대도수'],['상대도수','도수 ÷ 총합'],['넓이의 합','계급의 크기 × 총합'],['○ 이상 비율','해당 계급 이상의 도수 합 ÷ 총합 × 100']]},
+ warn:['도수가 큰 쪽이 항상 비율이 큰 것은 아니다 (총합이 다르면 <b>상대도수</b>).','계급의 <b>경계값</b>(이상·미만)을 잘못 읽어 한 계급이 어긋나는 실수.','히스토그램의 <b>세로축은 도수</b>(상대도수 그래프와 구분).'],
+ go:['d2-histg','d2-rel2','d2-hist','d2-pct','d1-stem']},
+{id:'N-CK-Z1',u:'Z1',title:'자료 해석 체크리스트: 좌표평면 위의 그래프',
+ pts:[`① ${F('가로축·세로축')}이 무엇인지, 단위가 무엇인지 읽는다`,
+  `② 구간별로 ${F('오른쪽 위(증가) / 수평(일정) / 오른쪽 아래(감소)')}를 나눠 이야기로 바꾼다 (수평 = 멈춤·일정)`,
+  `③ 정비례 y = ax: ${F('원점을 지나는 직선')} (a > 0이면 1·3사분면) / 반비례 y = a/x: ${F('원점에 대칭인 한 쌍의 곡선')}`,
+  `④ 그래프가 지나는 ${F('읽기 쉬운 점')}(눈금이 딱 맞는 점)을 찾아 대입해 a를 구한다`,
+  `⑤ 구한 식에 다른 x를 넣어 y를 확인하고, 보기와 하나씩 대조한다`],
+ warn:['시간–거리 그래프에서 수평 구간은 <b>멈춘 것</b>(속력이 일정한 것 아님).','반비례 그래프는 <b>축과 만나지 않는다</b>.','점의 좌표는 (x좌표, y좌표) 순서.'],
+ go:['z1-graph','z2-dir','z2-inv','z2-area','z1-tri']}]);
+add('sci',[
+{id:'N-CK-K',u:'K11',title:'자료 해석 체크리스트: 과학 그래프',
+ pts:[`① ${F('가로축·세로축')}의 물리량과 단위를 읽는다 (시간, 온도, 압력, 부피, 늘어난 길이 …)`,
+  `② 그래프가 ${F('수평')}인 구간의 뜻: 가열 곡선 → 상태 변화 중(온도 일정), 속력–시간 → 속력 일정(알짜힘 0)`,
+  `③ ${F('증가/감소')} 모양 읽기: 속력 증가 = 운동 방향으로 알짜힘, 감소 = 반대 방향`,
+  `④ 모양으로 관계 판단: ${F('원점을 지나는 직선')} = 비례(탄성력·샤를), ${F('곡선')} = 반비례(보일), 두 그래프가 ${F('만나는 점')} = 열평형`,
+  `⑤ 읽기 쉬운 점 하나를 골라 대입한다 (P₁V₁ = P₂V₂, 늘어난 길이 ÷ 무게 …)`,
+  `⑥ 단위(N, cm, °C, mL)를 맞춘 뒤 보기와 대조한다`],
+ tbl:{h:['그래프 모양','의미','예'],r:[['수평 구간 (온도–시간)','상태 변화 중','녹는점·끓는점'],['수평 구간 (속력–시간)','속력 일정, 알짜힘 0','등속 운동'],['원점을 지나는 직선','비례 관계','탄성력–늘어난 길이, 샤를 법칙'],['곡선 (한쪽 증가, 다른 쪽 감소)','반비례','보일 법칙'],['두 곡선이 만남','열평형','온도 변화 그래프']]},
+ warn:['수평 구간을 "열이 이동하지 않는다"로 읽는 오류 — 가열 곡선의 수평 구간에서도 <b>열은 흡수</b>되고 있다.','압력–부피 그래프는 직선이 아니라 <b>곡선</b>.','그래프가 만난 뒤에는 온도가 같아 <b>열이 이동하지 않는다</b>.'],
+ go:['k5-eqg','k7-curve','k8-sgraph','k9b-graph','k11-gc','k11-bg','k15-cmp']}]);
+add('soc',[
+{id:'N-CK-S',u:'S10',title:'자료 해석 체크리스트: 사회 표·그래프',
+ pts:[`① ${F('제목·출처·단위·연도')}를 읽는다 (명, %, ℃, mm)`,
+  `② 값을 ${F('숫자로 옮겨 적는다')} (눈금·막대 높이를 읽어 표로 정리)`,
+  `③ 증감은 ${F('차이')}로, 비율 변화는 ${F('%p(퍼센트포인트)')}로 계산한다`,
+  `④ 보기의 ${F('극단 표현')}(모두, 항상, 가장, ~뿐)에 표시하고 반례를 찾는다`,
+  `⑤ 기후 그래프: ${F('꺾은선 = 기온, 막대 = 강수량')} → 최한월 기온·연교차·비 오는 시기로 기후 판단`,
+  `⑥ 보기마다 계산해 ○·×를 표시한 뒤 마지막에 고른다`],
+ warn:['%와 %p를 혼동 (30% → 45%는 <b>15%p 증가</b>, 15% 증가가 아님).','그래프의 <b>연도·기준</b>이 다른 값을 비교.','기후 그래프에서 기온과 강수량 <b>눈금 방향</b>(왼쪽/오른쪽)을 바꿔 읽는 실수.'],
+ go:['s10-turn','s10-dist','s3-clim','s4-clim']}]);
+})();
 /* 영어 심화 힌트 */
 Object.assign(HINT,{
  'eg-err':['문장마다 <b>동사부터</b> 본다: 주어와 수 일치, 시제(과거/현재), did·didn\'t·have to 뒤 <b>동사원형</b>.','그다음 형태를 본다: 비교급(-er / more 중 하나만), 최상급(the + -est / most), want·decide + to부정사, enjoy·finish + -ing'],
@@ -5773,17 +5819,21 @@ function hashS(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.i
 function profileIds(R,n,subs,level){const p=JPROF[level]||JPROF['중'],pool=T.filter(t=>subs.includes(t.u));const n1=Math.round(n*p[0]),n3=Math.round(n*p[2]),n2=n-n1-n3;let ids=[];
  [[1,n1],[2,n2],[3,n3]].forEach(([lv,c])=>{if(!c)return;let ts=pool.filter(t=>t.lv===lv);if(!ts.length)ts=pool.filter(t=>t.lv===Math.max(1,lv-1));if(!ts.length)ts=pool;ids.push(...pickTypes(R,c,ts).map(t=>t.id))});
  return ids.sort((a,b)=>SUBS.indexOf(TYPE[a].u)-SUBS.indexOf(TYPE[b].u)||TYPE[a].lv-TYPE[b].lv)}
-function playJokbo(j,fresh){const seed=fresh?Math.floor(1000+Math.random()*9000):hashS(j.key+j.school);
- if(j.items){const its=j.items.filter(x=>TYPE[x[0]]);makeExam(seed,its.length,its.map(x=>x[0]),`${j.school} ${j.year} ${j.exam} 재구성`,{srcs:its.map(x=>`${j.school} ${x[1]}`)})}
- else{const ids=profileIds(mkR(seed),j.n,j.subs,j.level);makeExam(seed,ids.length,ids,`${j.school} ${j.year} 기말 재구성`,{srcs:ids.map(()=>`${j.school} ${j.year} 같은 범위`)})}
+/* 한 단계 더: 시험지의 각 문항을 같은 소단원의 한 단계 어려운 유형(없으면 같은 난이도의 다른 상 유형)으로 바꾼다 */
+function stepUp(ids,R){return ids.map(id=>{const t=TYPE[id];if(!t||t.sa)return id;const same=T.filter(x=>x.u===t.u&&!x.sa&&x.id!==id&&TYPE[x.id]);const up=same.filter(x=>x.lv>t.lv);
+  const pool=up.length?up.filter(x=>x.lv===Math.min(...up.map(y=>y.lv))):(t.lv===3?same.filter(x=>x.lv===3):[]);return pool.length?R.pick(pool).id:id})}
+function playJokbo(j,fresh,up){const seed=fresh?Math.floor(1000+Math.random()*9000):hashS(j.key+j.school);
+ if(j.items){const its=j.items.filter(x=>TYPE[x[0]]);makeExam(seed,its.length,up?stepUp(its.map(x=>x[0]),mkR(seed+5)):its.map(x=>x[0]),`${j.school} ${j.year} ${j.exam} 재구성${up?' · 한 단계 더':''}`,{srcs:its.map(x=>`${j.school} ${x[1]}`)})}
+ else{const ids=profileIds(mkR(seed),j.n,j.subs,j.level);makeExam(seed,ids.length,up?stepUp(ids,mkR(seed+5)):ids,`${j.school} ${j.year} 기말 재구성${up?' · 한 단계 더':''}`,{srcs:ids.map(()=>`${j.school} ${j.year} 같은 범위`)})}
  show('exam');window.scrollTo({top:0})}
 const OURS=[['예상 1회',1101,20],['예상 2회',1202,20],['예상 3회',1303,25],['예상 4회 (심화)',1404,20,true],['예상 5회 (심화)',1505,25,true]];
-function playOurs(o){const types=scoped();if(!types.length){show('exam');E={err:true};renderExam();return}let ids;
+function playOurs(o,up){const types=scoped();if(!types.length){show('exam');E={err:true};renderExam();return}let ids;
  if(o[3]){const R=mkR(o[1]);const hard=types.filter(t=>t.lv===3),rest=types.filter(t=>t.lv<3);const nh=Math.min(Math.round(o[2]*.4),hard.length?o[2]:0);ids=[...pickTypes(R,nh,hard.length?hard:types),...pickTypes(R,o[2]-nh,rest.length?rest:types)].map(t=>t.id).sort((a,b)=>SUBS.indexOf(TYPE[a].u)-SUBS.indexOf(TYPE[b].u)||TYPE[a].lv-TYPE[b].lv)}
  else ids=pickTypes(mkR(o[1]),o[2],types).map(t=>t.id);
- makeExam(o[1],ids.length,ids,`${SJ[CUR].name} ${o[0]}`);show('exam');window.scrollTo({top:0})}
+ if(up)ids=stepUp(ids,mkR(o[1]+5));
+ makeExam(o[1],ids.length,ids,`${SJ[CUR].name} ${o[0]}${up?' · 한 단계 더':''}`);show('exam');window.scrollTo({top:0})}
 function renderJokbo(){if(OV){renderOrig();return}const v=$('#v-jokbo'),H=LS.get('m12-hist-'+SK(),[]),J=JOKBO.filter(j=>j.subj===CUR&&SEM==='1-2');const fmt=t=>new Date(t).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'});
- let h=`<h2 class="sec">우리 문제은행 시험지</h2><div class="list" style="margin-top:8px">${OURS.map((o,i)=>`<div class="jcard"><div class="t"><b>${SJ[CUR].name} ${o[0]}</b><p>${o[2]}문항 · 현재 출제 범위 기준 · 번호가 고정되어 다시 풀어도 같은 시험지</p></div><div class="acts"><button class="btn sm pri" data-our="${i}">풀기</button><button class="btn sm" data-our="${i}" data-pdf="1">A3 PDF</button></div></div>`).join('')}</div>`;
+ let h=`<h2 class="sec">우리 문제은행 시험지</h2><div class="list" style="margin-top:8px">${OURS.map((o,i)=>`<div class="jcard"><div class="t"><b>${SJ[CUR].name} ${o[0]}</b><p>${o[2]}문항 · 현재 출제 범위 기준 · 번호가 고정되어 다시 풀어도 같은 시험지</p></div><div class="acts"><button class="btn sm pri" data-our="${i}">풀기</button><button class="btn sm" data-our="${i}" data-up="1">한 단계 더</button><button class="btn sm" data-our="${i}" data-pdf="1">A3 PDF</button></div></div>`).join('')}</div>`;
  if(H.length)h+=`<h2 class="sec" style="margin-top:16px">내가 푼 시험지</h2><div class="list" style="margin-top:8px">${H.slice(0,12).map(x=>`<div class="jcard"><div class="t"><b style="font-size:15px">${x.label}</b><p>${fmt(x.at)} · ${x.ids?x.ids.length:x.n}문항 · ${x.score==null?'채점 전':x.score+'점'}</p></div><div class="acts"><button class="btn sm" ${x.orig?`data-orig="${x.orig}"`:`data-hist="${x.k}"`}>다시 풀기</button></div></div>`).join('')}</div>`;
  h+=origList();
  if(!J.length&&SEM!=='1-2'){h+=`<h2 class="sec" style="margin-top:16px">타학교 기출</h2><div class="note">${SEMNAME[SEM][0]} ${SEMNAME[SEM][1]} 타학교 기출은 아직 넣지 않았습니다. 시험이 가까워지면 무료로 받을 수 있는 자료를 찾아 추가합니다. 지금은 위의 예상 시험지와 연습·모의고사로 공부하세요.</div>`;v.innerHTML=h;return}
@@ -5794,13 +5844,13 @@ function renderJokbo(){if(OV){renderOrig();return}const v=$('#v-jokbo'),H=LS.get
  <div class="jsum" style="margin-top:8px"><div><b>${fin.length}개</b><span>중1 2학기 기말 수집</span></div><div><b>${avg}문항</b><span>평균 문항 수</span></div><div><b>${c3}%</b><span>입체도형 출제</span></div><div><b>${stP}%</b><span>통계 출제</span></div><div><b>${saP}%</b><span>서술형 있음</span></div></div>
  <div class="note" style="margin-top:10px">원본 시험지는 학원·분석 사이트에서 유료 또는 로그인으로만 공개되어 앱에 옮기지 않았습니다. 대신 각 학교의 <b>문항 수·출제 범위·난이도</b>를 그대로 맞춘 재구성 시험지를 만듭니다. 문항별 분석이 공개된 시험은 <b>원문항 번호 순서대로 같은 유형</b>을 출제합니다. 학교 이름 아래 링크에서 원본 정보를 확인할 수 있습니다.</div>
  <div class="bar" style="margin-top:10px"><span class="muted">연도</span><button class="chip ${!jYear?'on':''}" data-jy="0">전체</button>${yrs.map(y=>`<button class="chip ${jYear===y?'on':''}" data-jy="${y}">${y}</button>`).join('')}</div>
- <div class="list" style="margin-top:8px">${F.map(j=>`<div class="jcard"><div class="t"><b>${j.school}</b> <span class="muted">${j.region}</span>${j.items?'<span class="pill hot">문항별 재현</span>':''}${j.level!=='중'?`<span class="pill hot">${j.level}</span>`:''}<p>${j.year} 1학년 2학기 ${j.exam}고사 · ${j.n}문항${j.sa?` (서술형 ${j.sa})`:''} · ${j.rangeName}</p>${j.note?`<p>${j.note}</p>`:''}<a href="${j.url}" target="_blank" rel="noopener">원본 정보 보기 ↗</a></div><div class="acts"><button class="btn sm pri" data-jk="${j.key}">풀기</button><button class="btn sm" data-jk="${j.key}" data-fresh="1">숫자 바꿔 풀기</button><button class="btn sm" data-jk="${j.key}" data-pdf="1">A3 PDF</button></div></div>`).join('')}</div>`;
+ <div class="list" style="margin-top:8px">${F.map(j=>`<div class="jcard"><div class="t"><b>${j.school}</b> <span class="muted">${j.region}</span>${j.items?'<span class="pill hot">문항별 재현</span>':''}${j.level!=='중'?`<span class="pill hot">${j.level}</span>`:''}<p>${j.year} 1학년 2학기 ${j.exam}고사 · ${j.n}문항${j.sa?` (서술형 ${j.sa})`:''} · ${j.rangeName}</p>${j.note?`<p>${j.note}</p>`:''}<a href="${j.url}" target="_blank" rel="noopener">원본 정보 보기 ↗</a></div><div class="acts"><button class="btn sm pri" data-jk="${j.key}">풀기</button><button class="btn sm" data-jk="${j.key}" data-fresh="1">숫자 바꿔 풀기</button><button class="btn sm" data-jk="${j.key}" data-up="1">한 단계 더</button><button class="btn sm" data-jk="${j.key}" data-pdf="1">A3 PDF</button></div></div>`).join('')}</div>`;
  v.innerHTML=h}
 $('#v-jokbo').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.dataset.orig){openOrig(b.dataset.orig);return}
  if(b.dataset.jy!=null){jYear=+b.dataset.jy;renderJokbo();return}
- if(b.dataset.our!=null){playOurs(OURS[+b.dataset.our]);if(b.dataset.pdf)examPdf();return}
- if(b.dataset.jk){playJokbo(JOKBO.find(j=>j.key===b.dataset.jk),!!b.dataset.fresh);if(b.dataset.pdf)examPdf();return}
+ if(b.dataset.our!=null){playOurs(OURS[+b.dataset.our],!!b.dataset.up);if(b.dataset.pdf)examPdf();return}
+ if(b.dataset.jk){playJokbo(JOKBO.find(j=>j.key===b.dataset.jk),!!b.dataset.fresh,!!b.dataset.up);if(b.dataset.pdf)examPdf();return}
  if(b.dataset.hist){const x=LS.get('m12-hist-'+SK(),[]).find(h=>h.k===+b.dataset.hist);if(x){makeExam(x.seed,x.ids.length,x.ids.filter(id=>TYPE[id]),x.label,{srcs:x.srcs,save:false});show('exam');window.scrollTo({top:0})}}});
 
 /* ===== 내 기출 자료 (원본 + OMR 채점) ===== */
