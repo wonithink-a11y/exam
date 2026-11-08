@@ -374,6 +374,7 @@ b.src{color:var(--ac);font-weight:600}
 .plst.on{background:var(--ac);border-color:var(--ac);color:var(--on)}.plst.all{background:none;border-style:dashed;color:var(--muted)}.plri{margin-top:4px;font-size:12px}
 .alt{margin-top:8px;padding-top:8px;border-top:1px dashed var(--rule)}.alt:first-child{margin-top:0;padding-top:0;border-top:0}
 .mbh{font:400 16px var(--f-disp);margin:14px 0 6px;color:var(--ac)}.mbl{margin:4px 0;padding-left:20px;line-height:1.7}.mbs{border:1px solid var(--rule);border-radius:10px;padding:8px 10px;margin-top:6px}.mbs summary{cursor:pointer;line-height:1.6}.mbc{margin-top:12px;padding-top:10px;border-top:1px dashed var(--rule)}
+.pad{margin-top:10px;border:1px solid var(--rule);border-radius:12px;padding:6px 10px}.pad summary{cursor:pointer;font-weight:600}.padbar{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 6px}.padbar .chip{padding:3px 10px;font-size:12.5px}.padc{display:block;width:100%;height:auto;background:#fff repeating-linear-gradient(#fff 0 27px,#eef1f8 27px 28px);border:1px solid var(--rule);border-radius:8px;touch-action:none;cursor:crosshair}
 @media screen and (min-width:1000px){.wrap{max-width:1120px}.qt,.exp,.cond,.data{max-width:760px}.fig svg{max-width:420px}.ntsc{font-size:15px;padding:12px 10px}.ntsc>i,.ntsa i,.ntsa em{font-size:13.5px}.ntsn b{font-size:16px}.ntsn small{font-size:13px}
 .ntsc .fig svg{max-width:220px}.ntsn .fig svg{max-width:250px}.ntsr:not(.g) .ntsn svg text{font-size:20px}.nt .ntfig svg{max-width:440px}.nt .ntfigs{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}.ntbsr{font-size:13.5px}}
 </style>
@@ -5628,13 +5629,37 @@ function saHTML(it,idx,o){const t=TYPE[it.id],d=it.d,done=o.graded,show=done||it
   :`${satBox(hsh(d.q),'답을 직접 써 보세요 (종이에 써도 됩니다)')}<div class="sa-note">서술형 — 보기가 없습니다.${o.fold?' 채점하면 모범 답안이 나옵니다.':''}</div>${o.fold?'':`<button class="btn" data-act="sashow">모범 답안 보기</button>`}`;
  return `<article class="q sa" id="q${idx}" data-aik="${CUR}|${hsh(d.q+'|'+(d.fig||'')+'|'+d.opts.join('|'))}" data-ans="0" data-pick="-1" data-done="${show?1:0}"><template class="aix">${d.model}<br>${d.exp}</template><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name.replace('[서술형] ','')}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lvsa">서술형</span></div>
  <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${body}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
+/* ===== 풀이 칸: 문제 아래에서 손글씨(펜·태블릿·손가락)로 계산·풀이를 쓰고, 채점 뒤에도 그대로 보이며 AI 선생님이 내 풀이를 점검할 수 있다 =====
+   PAD[문항 키] = 그림 dataURL (이 화면을 열어 둔 동안 유지). 수학·과학·기술가정에서 켜진다. */
+const PAD=new Map(),PAD_SUBJ=['math','sci','tech'],PADT={mode:'pen',color:'#1b1f2e'};
+const padOn=()=>PAD_SUBJ.includes(CUR);
+function padHTML(key,done){if(!padOn())return'';const has=PAD.has(key);
+ return `<details class="pad" data-pk="${String(key).replace(/"/g,'&quot;')}"${has?' open':''}><summary>✏️ 풀이 칸 <span class="muted">계산하며 직접 풀어 보세요${has?' · 쓴 풀이 있음':''}</span></summary><div class="padbar">${[['검정','#1b1f2e'],['빨강','#d23b3b'],['파랑','#1f6fd1']].map(([n,c])=>`<button class="chip${PADT.mode==='pen'&&PADT.color===c?' on':''}" data-padt="c|${c}">${n}</button>`).join('')}<button class="chip${PADT.mode==='eraser'?' on':''}" data-padt="eraser">지우개</button><button class="chip" data-padt="undo">되돌리기</button><button class="chip" data-padt="clear">모두 지우기</button><button class="chip" data-padt="grow">칸 늘리기</button></div><canvas class="padc" width="1000" height="420"></canvas></details>`}
+function padInit(cv){if(cv._i)return;cv._i=1;cv._h=[];const u=PAD.get(cv.closest('.pad').dataset.pk);if(u){const im=new Image();im.onload=()=>{if(im.height>cv.height)cv.height=im.height;cv.getContext('2d').drawImage(im,0,0)};im.src=u}}
+const padPt=(cv,e)=>{const r=cv.getBoundingClientRect(),s=cv.width/r.width;return[(e.clientX-r.left)*s,(e.clientY-r.top)*s,s]};
+const padSave=cv=>{const k=cv.closest('.pad').dataset.pk;PAD.set(k,cv.toDataURL('image/png'));const sp=cv.closest('.pad').querySelector('summary .muted');if(sp)sp.textContent=' 쓴 풀이 있음'};
+function padSeg(cv,a,b){const c=cv.getContext('2d'),s=b[2];c.lineCap='round';c.lineJoin='round';c.globalCompositeOperation=PADT.mode==='eraser'?'destination-out':'source-over';c.strokeStyle=PADT.color;c.lineWidth=(PADT.mode==='eraser'?20:2.4)*s*(b.p||1);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke()}
+let padD=null;
+document.addEventListener('pointerdown',e=>{const cv=e.target.closest&&e.target.closest('canvas.padc');if(!cv)return;e.preventDefault();padInit(cv);try{cv.setPointerCapture(e.pointerId)}catch(_){}
+ cv._h.push(cv.toDataURL());if(cv._h.length>20)cv._h.shift();const p=padPt(cv,e);padD={cv,last:p,id:e.pointerId};padSeg(cv,p,[p[0]+.01,p[1],p[2]])},true);
+document.addEventListener('pointermove',e=>{if(!padD||e.pointerId!==padD.id)return;e.preventDefault();const p=padPt(padD.cv,e);padSeg(padD.cv,padD.last,p);padD.last=p},true);
+const padEnd=e=>{if(!padD||(e&&e.pointerId!==padD.id))return;padSave(padD.cv);padD=null};
+document.addEventListener('pointerup',padEnd,true);document.addEventListener('pointercancel',padEnd,true);
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-padt]');if(!b)return;e.stopPropagation();const box=b.closest('.pad'),cv=box.querySelector('canvas.padc'),[a,v]=b.dataset.padt.split('|');padInit(cv);
+ if(a==='c'){PADT.mode='pen';PADT.color=v}else if(a==='eraser'){PADT.mode='eraser'}
+ else if(a==='undo'){const u=cv._h.pop();if(u){const im=new Image();im.onload=()=>{const c=cv.getContext('2d');c.globalCompositeOperation='source-over';c.clearRect(0,0,cv.width,cv.height);c.drawImage(im,0,0);padSave(cv)};im.src=u}}
+ else if(a==='clear'){cv._h.push(cv.toDataURL());cv.getContext('2d').clearRect(0,0,cv.width,cv.height);PAD.delete(box.dataset.pk);const sp=box.querySelector('summary .muted');if(sp)sp.textContent=' 계산하며 직접 풀어 보세요'}
+ else if(a==='grow'){const old=cv.toDataURL(),im=new Image();im.onload=()=>{cv.height+=300;const c=cv.getContext('2d');c.globalCompositeOperation='source-over';c.drawImage(im,0,0);padSave(cv)};im.src=old}
+ box.querySelectorAll('.padbar [data-padt^="c|"],.padbar [data-padt="eraser"]').forEach(x=>{const[y,w]=x.dataset.padt.split('|');x.classList.toggle('on',y==='c'?(PADT.mode==='pen'&&PADT.color===w):PADT.mode==='eraser')})},true);
+new MutationObserver(()=>document.querySelectorAll('canvas.padc').forEach(padInit)).observe(document.querySelector('.wrap'),{childList:true,subtree:true});
+async function padBlob(url){try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});const cv=document.createElement('canvas');cv.width=im.width;cv.height=im.height;const c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.drawImage(im,0,0);return await new Promise(r=>cv.toBlob(r,'image/jpeg',.85))}catch(e){return null}}
 function qHTML(it,idx,o){if(it.d.sa)return saHTML(it,idx,o);const t=TYPE[it.id],d=it.d,ai=d.opts.indexOf(d.ans),done=o.graded;
  const short=d.opts.every(x=>x.length<=14);
  const opts=d.opts.map((x,j)=>{let c='',mk='';if(done){if(j===ai){c='ok';mk='정답'}if(it.pick===j&&j!==ai){c='no';mk='내 답'}}else if(it.pick===j)c='on';
   return `<li><button class="opt ${c}" data-q="${idx}" data-j="${j}" ${done&&o.lock?'disabled':''}><span class="bub">${j+1}</span><span>${x}</span>${mk?`<span class="mk">${mk}</span>`:''}</button></li>`}).join('');
  const exp=`<div class="exp"><b class="h">정답 ${CIRC[ai]} · 풀이</b>${d.exp}</div>`;
  return `<article class="q" id="q${idx}" data-aik="${CUR}|${hsh(d.q)}" data-ans="${ai+1}" data-pick="${it.pick??-1}" data-done="${done?1:0}"><template class="aix">${d.exp}</template><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lv${t.lv}">${LV[t.lv]}</span></div>
- <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}
+ <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}${padHTML(CUR+'|'+hsh(d.q),done)}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}
  ${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
 const scoped=()=>T.filter(t=>sel.has(t.u));
 const qCount=t=>t.bank?t.n:'∞';
@@ -7177,8 +7202,8 @@ async function aiCtx(key){const st=AIS.get(key);const sj=SJ[CUR];
     const ans=+art.dataset.ans,pick=+art.dataset.pick,done=art.dataset.done==='1';
     const tp=document.createElement('div');tp.innerHTML=art.querySelector('template.aix')?.innerHTML||'';
     const state=!done?(pick>=0?`학생이 ${CIRC[pick]}를 골랐고 아직 채점 전`:'아직 풀지 않음'):(pick===ans-1?`학생이 ${CIRC[pick]}를 골라 맞힘`:pick>=0?`학생이 ${CIRC[pick]}를 골랐고 틀림`:'답을 고르지 않은 채 채점됨');
-    const imgs=[];const svg=art.querySelector('.fig svg');if(svg&&AI_IMG){const b=await aiSvgBlob(svg);if(b)imgs.push(b)}
-    return{imgs,txt:`과목: ${sj.name} (${sj.book})\n단원·유형: ${aiTxt(art.querySelector('.tag'))}\n\n[문제]\n${aiTxt(art.querySelector('.qt'))}${svg?`\n(그림이 있는 문제${imgs.length?' — 그림을 이미지로 함께 보냄':''})`:''}\n\n[보기]\n${opts}\n\n[정답·풀이]\n정답 ${CIRC[ans-1]}\n${aiTxt(tp)}\n\n[학생 상태]\n${state}`}}
+    const imgs=[];const svg=art.querySelector('.fig svg');if(svg&&AI_IMG){const b=await aiSvgBlob(svg);if(b)imgs.push(b)}const pd=PAD.get(key);if(pd&&AI_IMG){const pb=await padBlob(pd);if(pb)imgs.push(pb)}
+    return{imgs,txt:`과목: ${sj.name} (${sj.book})\n단원·유형: ${aiTxt(art.querySelector('.tag'))}\n\n[문제]\n${aiTxt(art.querySelector('.qt'))}${svg?`\n(그림이 있는 문제${imgs.length?' — 그림을 이미지로 함께 보냄':''})`:''}\n\n[보기]\n${opts}\n\n[정답·풀이]\n정답 ${CIRC[ans-1]}\n${aiTxt(tp)}\n\n[학생 상태]\n${state}${pd&&imgs.length?'\n\n[학생 풀이 이미지] 마지막 이미지는 학생이 손으로 쓴 풀이예요. 풀이 과정을 단계별로 읽고 맞는 단계와 틀린 단계를 짚어 줘요. 글씨가 안 보이면 솔직히 말해요.':''}`}}
   /* 원본 시험지 */
   const o=OV&&OV.o;if(!o)return{txt:'',imgs:[]};const num=(st.num||'').trim();const imgs=[];
   if(o.pages&&AI_IMG&&st.page){try{const r=await fetch(`jokbo/${o.key}/p-${st.page}.jpg`);if(r.ok)imgs.push(await r.blob())}catch(e){}}
@@ -7186,8 +7211,8 @@ async function aiCtx(key){const st=AIS.get(key);const sj=SJ[CUR];
     const p=OV.pick[i]||[];var stt=!OV.graded?(p.length?`학생이 ${p.map(n=>CIRC[n-1]).join(', ')}에 표시했고 아직 채점 전`:'아직 풀지 않음'):(it.a?(oOk(it,p)?'맞힘':`학생이 ${p.length?p.map(n=>CIRC[n-1]).join(', '):'무표기'}로 틀림`):'서술형 — 학생이 스스로 채점')}}
   return{imgs,txt:`과목: ${sj.name}\n시험지: ${o.title} (${o.meta})\n${imgs.length?`[이미지] 이 시험지 ${st.page}쪽 사진을 함께 보냄. 사진 속에서 해당 번호 문제를 찾아 읽어요.`:'[이미지 없음] 학생이 문제 내용을 직접 적었을 수 있어요.'}\n문제 번호: ${num||'(지정 안 함)'}\n\n[정답·풀이]\n${ak||'(답안표에서 찾지 못함)'}\n\n[학생 상태]\n${stt||'알 수 없음'}`}}
 function aiQuick(st){if(st.kind==='o')return['이 문제 힌트 주세요','풀이를 단계별로 알려 주세요','관련 개념을 정리해 주세요','비슷한 문제 하나 내 주세요'];
-  const art=document.querySelector(`article[data-aik="${st.key}"]`);const done=art&&art.dataset.done==='1',wrong=done&&+art.dataset.pick!==+art.dataset.ans-1;
-  return done?['왜 이게 정답인가요?',...(wrong?['제 답은 왜 틀렸나요?']:[]),'더 쉽게 설명해 주세요','비슷한 문제 하나 내 주세요']:['힌트 주세요','관련 개념을 설명해 주세요','어떤 순서로 풀면 돼요?']}
+  const art=document.querySelector(`article[data-aik="${st.key}"]`);const done=art&&art.dataset.done==='1',wrong=done&&+art.dataset.pick!==+art.dataset.ans-1;const mine=PAD.has(st.key)?['내 풀이가 맞는지 확인해 주세요']:[];
+  return done?[...mine,'왜 이게 정답인가요?',...(wrong?['제 답은 왜 틀렸나요?']:[]),'더 쉽게 설명해 주세요','비슷한 문제 하나 내 주세요']:[...mine,'힌트 주세요','관련 개념을 설명해 주세요','어떤 순서로 풀면 돼요?']}
 function aiBoxHTML(st){const o=st.kind==='o'&&OV?OV.o:null;
   return `<div class="aibox" data-aib="${st.key}">
   <div class="aihd"><b>AI 선생님</b><span class="muted">질문할 때마다 Claude 사용량이 조금 쓰여요</span><button class="aiclose" data-aic="1" aria-label="닫기">닫기</button></div>
