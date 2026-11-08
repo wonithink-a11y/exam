@@ -385,6 +385,7 @@ html.padlock .padcv{width:min(100%,calc((100vh - 250px) * 1000 / var(--ch,860)))
 html.padlock #v-practice>.bar:last-child{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0!important;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--sheet);box-shadow:0 -4px 16px rgba(0,0,0,.25);justify-content:center}
 #padfloat{display:none;position:fixed;top:8px;right:8px;z-index:40;gap:6px}html.padlock #padfloat{display:flex}#padfloat button{border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:999px;padding:6px 12px;font-weight:600;font-size:13px;box-shadow:var(--shadow);cursor:pointer}
 #padtoast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:50;background:#1b1f2e;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;max-width:88vw;opacity:0;pointer-events:none;transition:opacity .2s}#padtoast.on{opacity:1}
+.fsb{margin-left:auto;font-weight:700;font-size:12.5px;color:var(--ac);border:1.5px solid var(--ac);border-radius:999px;padding:4px 12px;background:var(--sheet);white-space:nowrap;cursor:pointer}.fsb:hover{background:var(--ac);color:var(--on)}
 @media screen and (min-width:1000px){.wrap{max-width:1120px}.qt,.exp,.cond,.data{max-width:760px}.fig svg{max-width:420px}.ntsc{font-size:15px;padding:12px 10px}.ntsc>i,.ntsa i,.ntsa em{font-size:13.5px}.ntsn b{font-size:16px}.ntsn small{font-size:13px}
 .ntsc .fig svg{max-width:220px}.ntsn .fig svg{max-width:250px}.ntsr:not(.g) .ntsn svg text{font-size:20px}.nt .ntfig svg{max-width:440px}.nt .ntfigs{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}.ntbsr{font-size:13.5px}}
 </style>
@@ -398,7 +399,7 @@ html.padlock #v-practice>.bar:last-child{position:fixed;left:0;right:0;bottom:0;
     <h1 id="htitle">중1 2학기 문제은행</h1>
     <div class="sems" id="sems" role="group" aria-label="학년·학기"></div>
     <div class="subj" id="subj" role="group" aria-label="과목"></div>
-    <div class="hmeta"><span id="hinfo"></span><button id="fsBtn" class="artgo" type="button" style="cursor:pointer">⛶ 전체 화면</button><span id="dday" class="dday" hidden></span>
+    <div class="hmeta"><span id="hinfo"></span><button id="fsBtn" class="fsb" type="button">⛶ 전체 화면</button><span id="dday" class="dday" hidden></span>
       <a class="artgo" href="https://claude.ai/artifact/3WLAoQshgPRiSaFZXvAUR2" target="_blank" rel="noopener" title="AI 선생님·교과서 본문 문항·원본 기출이 들어 있는 비공개 앱 (claude.ai 로그인 필요)">🔒 AI 선생님 앱</a>
       <label class="namebox" for="nm">이름 <input id="nm" autocomplete="off"></label></div>
   </header>
