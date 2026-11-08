@@ -382,7 +382,7 @@ html.padlock body{padding-block:8px 74px}
 html.padlock .sheet{max-height:calc(100vh - 96px);overflow-y:auto;overscroll-behavior:contain;margin-top:0!important}
 html.padlock .qsp.hp .pad{top:0}
 html.padlock .padcv{--padmax:calc(100vh - 190px)}
-html.padlock #v-practice>.bar:last-child{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0!important;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--sheet);box-shadow:0 -4px 16px rgba(0,0,0,.25);justify-content:center}
+#v-practice>.bar:last-child{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0!important;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--sheet);box-shadow:0 -4px 16px rgba(0,0,0,.25);justify-content:center;gap:10px}#v-practice{padding-bottom:84px}
 #padfloat{display:none;position:fixed;top:8px;right:8px;z-index:40;gap:6px}html.padlock #padfloat{display:flex}#padfloat button{border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:999px;padding:6px 12px;font-weight:600;font-size:13px;box-shadow:var(--shadow);cursor:pointer}
 #padtoast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:50;background:#1b1f2e;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;max-width:88vw;opacity:0;pointer-events:none;transition:opacity .2s}#padtoast.on{opacity:1}
 .fsb{margin-left:auto;font-weight:700;font-size:12.5px;color:var(--ac);border:1.5px solid var(--ac);border-radius:999px;padding:4px 12px;background:var(--sheet);white-space:nowrap;cursor:pointer}.fsb:hover{background:var(--ac);color:var(--on)}
