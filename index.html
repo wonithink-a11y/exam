@@ -6209,9 +6209,9 @@ function hpList(){return(S.hp||[]).filter(x=>x.ok&&x.lv>=2&&!x.done&&TYPE[x.id])
 function hpHTML(){const L=hpList();if(!L.length)return '';
  return `<h2 class="sec" style="margin-top:16px">💡 도움받아 푼 문제 · 복습 필요 <span class="muted" style="font-size:12.5px;font-weight:400">정답이지만 힌트 2단계 이상이나 풀이 전략·요점을 본 문제</span></h2><div class="list" style="margin-top:8px">${L.slice(0,15).map(x=>`<div class="row"><div class="t"><b>${TYPE[x.id].name}</b><p>${SUBNAME[TYPE[x.id].u]} · ${HELP_NAME[x.lv]}까지 보고 풀었어요 · ${new Date(x.at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})}</p></div><div class="acts"><button class="btn sm" data-same="${x.id}" data-seed="${x.seed}">다시 풀기</button><button class="btn sm" data-new="${x.id}">비슷한 문제</button><button class="btn sm" data-hpdone="${x.id}|${x.seed}">복습 완료</button></div></div>`).join('')}</div>`}
 function renderReview(){const v=$('#v-review');const wk=weakTypes(),A=allS();
- if(!A.w.length){v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}${(()=>{try{return plogHTML()}catch(e){return''}})()}${(()=>{try{return hpHTML()}catch(e){return''}})()}<div class="empty">${SJ[CUR].name}에서 아직 틀린 문제가 없습니다. 연습이나 모의고사에서 틀린 문제가 여기에 모입니다.</div>`;return}
+ if(!A.w.length){v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}${(()=>{try{return wkHTML()}catch(e){return''}})()}${(()=>{try{return plogHTML()}catch(e){return''}})()}${(()=>{try{return hpHTML()}catch(e){return''}})()}<div class="empty">${SJ[CUR].name}에서 아직 틀린 문제가 없습니다. 연습이나 모의고사에서 틀린 문제가 여기에 모입니다.</div>`;return}
  const cz={};A.w.forEach(x=>{if(x.c)cz[x.c]=(cz[x.c]||0)+1});const czN=Object.values(cz).reduce((a,b)=>a+b,0),czM=Math.max(1,...Object.values(cz)),top=CAUSE.filter(([k])=>cz[k]===czM&&czN)[0];
- v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}${(()=>{try{return plogHTML()}catch(e){return''}})()}${(()=>{try{return hpHTML()}catch(e){return''}})()}<div class="scope causes"><div class="bar"><b>틀린 까닭</b><span class="muted">${czN?`고른 문제 ${czN}개 · 안 고른 문제 ${A.w.length-czN}개`:'틀린 문제 아래에서 까닭을 고르면 여기에 모입니다.'}</span></div>${czN?`<div class="czl">${CAUSE.map(([k,n])=>`<div class="czr"><span>${n}</span><div class="meter"><i class="${top&&top[0]===k?'lo':''}" style="width:${(cz[k]||0)/czM*100}%"></i></div><b>${cz[k]||0}</b></div>`).join('')}</div><p class="cztip"><b>${top[1]}</b>가 가장 많습니다. ${CAUSE_TIP[top[0]]}</p>`:''}</div>
+ v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}${(()=>{try{return wkHTML()}catch(e){return''}})()}${(()=>{try{return plogHTML()}catch(e){return''}})()}${(()=>{try{return hpHTML()}catch(e){return''}})()}<div class="scope causes"><div class="bar"><b>틀린 까닭</b><span class="muted">${czN?`고른 문제 ${czN}개 · 안 고른 문제 ${A.w.length-czN}개`:'틀린 문제 아래에서 까닭을 고르면 여기에 모입니다.'}</span></div>${czN?`<div class="czl">${CAUSE.map(([k,n])=>`<div class="czr"><span>${n}</span><div class="meter"><i class="${top&&top[0]===k?'lo':''}" style="width:${(cz[k]||0)/czM*100}%"></i></div><b>${cz[k]||0}</b></div>`).join('')}</div><p class="cztip"><b>${top[1]}</b>가 가장 많습니다. ${CAUSE_TIP[top[0]]}</p>`:''}</div>
  <div class="bar" style="margin-top:14px"><h2 class="sec">자주 틀리는 유형</h2><span class="sp"></span><button class="btn pri sm" data-act="weak">약한 유형으로 10문항 시험</button></div>
  <div class="list" style="margin-top:8px">${wk.slice(0,6).map(x=>`<div class="row"><div class="t"><b>${TYPE[x.id].name}</b><p>${SUBNAME[TYPE[x.id].u]} · ${x.n}번 중 ${x.w}번 틀림</p></div><div class="acts"><button class="btn sm" data-new="${x.id}">연습</button></div></div>`).join('')}</div>
  <h2 class="sec" style="margin-top:16px">최근 틀린 문제</h2>
@@ -7653,6 +7653,92 @@ $('#v-review').addEventListener('click',e=>{const b=e.target.closest('[data-mb]'
  if(a==='ask'){const q=document.getElementById('mbQ');if(q){const t=q.value;q.value='';mbAsk(t)}}});
 $('#v-review').addEventListener('change',e=>{if(e.target.id==='mbFile'&&e.target.files&&e.target.files[0]){const f=e.target.files[0];e.target.value='';mbAnalyze(f)}});
 $('#v-review').addEventListener('keydown',e=>{if(e.target.id==='mbQ'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();const t=e.target.value;e.target.value='';mbAsk(t)}});
+/* ===== 문제집 약점 분석: 문제집 사진(여러 장) → AI가 ○ · △ · again · 사선 표시를 읽어 다시 볼 문제 추출 → 확인·수정 → 약점 요약 → 약점 집중 출제 / 비슷한 문제 =====
+   저장: m12-wk-<SK> = [{id,at,items:[{no,pg,mark,title,u,concept}],summary,sim:[{concept,level,q,answer,solution}]}] (이 기기). mark: o 맞음 / tri 다시 볼 문제(△) / again / x 틀림(사선). AI 선생님이 켜진 화면에서만. */
+const WK={busy:false,msg:'',err:'',open:null,sumBusy:false,simBusy:false,ctl:null,show:new Set()};
+const wkKey=()=>'m12-wk-'+SK();
+const wkList=()=>LS.get(wkKey(),[]);
+const WK_MARK={o:['○ 맞음',0],tri:['△ 다시',2],again:['again',3],x:['✕ 틀림',3]},WK_ORD=['o','tri','again','x'];
+const WK_RULES=`너는 중학교 1학년 학생의 문제집 사진에서 학생이 남긴 채점·복습 표시를 읽는 정확한 선생님이야. 사진 한 장을 보고 아래 JSON 하나만 출력해. 설명 문장·코드블록 없이 JSON만 출력해.
+표시 규칙(학부모가 정한 약속):
+- 문제 번호에 동그라미(○) = 맞은 문제 → mark "o"
+- 문제 번호에 세모(△)나 "again"이라고 적힌 것 = 맞았어도 다시 볼 문제 → "tri"(세모) 또는 "again"
+- 번호 위에 빨간 사선(／ ✕)이 그어져 있으면 틀린 문제 → "x"
+- 동그라미와 again이 함께 있으면 "again". 번호 근처에 again이 적혀 있으면 그 번호의 문제로 본다(바로 위·옆의 번호).
+- 아무 표시도 없는 문제는 items에 넣지 마. 표시가 있는 문제만 넣어.
+- 한 쪽에 문제가 많아도 표시된 문제는 빠짐없이 넣고, 번호는 인쇄된 번호 그대로(예: "04", "29") 써.
+- title은 문제 내용을 12자 안팎으로 요약, concept은 그 문제의 핵심 개념(예: "이등분선이 만드는 각", "삼각형이 하나로 정해지는 조건", "별 모양 각의 합").
+- u는 아래 소단원 코드 중 가장 알맞은 하나(모르면 빈 문자열).
+- 사진이 흐리거나 문제집이 아니면 ok를 false로 하고 note에 이유를 적어.
+JSON 형식: {"ok":true,"page":"쪽 번호(보이면)","items":[{"no":"04","mark":"o|tri|again|x","title":"…","concept":"…","u":"코드"}],"note":""}`;
+const wkWt=m=>(WK_MARK[m]||[0,0])[1];
+function wkAgg(){const us={},cs={};wkList().forEach(r=>r.items.forEach(it=>{const w=wkWt(it.mark);if(!w)return;if(it.u&&SUBS.includes(it.u))us[it.u]=(us[it.u]||0)+w;if(it.concept)cs[it.concept]=(cs[it.concept]||0)+w}));return{us,cs}}
+async function wkRun(files){if(!SAMPLE||WK.busy||!files.length)return;files=files.slice(0,8);WK.busy=true;WK.err='';WK.ctl=new AbortController();const items=[],fails=[];wkRender();
+ const units=SUBS.map(c=>`${c}: ${SUBNAME[c]}`).join('\n');
+ for(let i=0;i<files.length;i++){if(WK.ctl.signal.aborted)break;WK.msg=`사진 ${i+1}/${files.length}장 읽는 중… (장당 20~40초)`;wkRender();
+  try{const big=await mbPrep(files[i],1800,.85);
+   const r=await SAMPLE([{role:'user',content:`${WK_RULES}\n\n과목: ${SJ[CUR].name} (${SJ[CUR].book})\n소단원 코드 목록:\n${units}`}],{images:[big.blob],signal:WK.ctl.signal,cache:false});
+   const o=mbParse(r.text);if(!o||o.ok===false){fails.push(`${i+1}번째 사진(${(o&&o.note)||'읽지 못함'})`);continue}
+   (o.items||[]).forEach(x=>{const mk=WK_MARK[x.mark]?x.mark:'tri';items.push({no:String(x.no||'').slice(0,8),pg:String(o.page||'').slice(0,8),mark:mk,title:String(x.title||'').slice(0,40),concept:String(x.concept||'').slice(0,50),u:SUBS.includes(x.u)?x.u:''})})}
+  catch(e){const c=e&&e.code;if(c==='cancelled'){fails.push('중단');break}fails.push(`${i+1}번째 사진(${AI_ERR[c]||'연결 오류'})`)}}
+ WK.busy=false;WK.ctl=null;WK.msg='';
+ if(items.length){const rec={id:Date.now(),at:Date.now(),items,summary:'',sim:[]},L=wkList();L.unshift(rec);LS.set(wkKey(),L.slice(0,12));WK.open=rec.id}
+ WK.err=fails.length?(items.length?'일부 사진은 읽지 못했어요: ':'읽지 못했어요: ')+fails.join(', ')+'. 더 선명하게 찍어 다시 올려 보세요.':(items.length?'':'표시된 문제를 찾지 못했어요.');
+ wkRender()}
+function wkSave(rec){const L=wkList(),i=L.findIndex(x=>x.id===rec.id);if(i>=0){L[i]=rec;LS.set(wkKey(),L)}}
+async function wkSummary(rec){if(!SAMPLE||WK.sumBusy)return;WK.sumBusy=true;WK.err='';wkRender();
+ try{const un=c=>SUBNAME[c]||'기타',rows=rec.items.filter(x=>wkWt(x.mark)).map(x=>`${x.pg?x.pg+'쪽 ':''}${x.no}번 [${WK_MARK[x.mark][0]}] ${x.title} / 개념: ${x.concept} / 단원: ${un(x.u)}`).join('\n'),ok=rec.items.filter(x=>x.mark==='o').length;
+  const msg=`너는 중1 수학 선생님이야. 학부모가 문제집(${SJ[CUR].book})에서 학생이 다시 볼 문제로 표시한 목록이야.\n[다시 볼 문제]\n${rows||'(없음)'}\n[맞은 문제 수] ${ok}\n\n다음을 한국어로 6줄 이내로 써 줘. 번호 목록 없이 짧은 문장으로.\n1. 가장 약한 개념 2~3가지(문제 번호를 근거로)\n2. 공통된 실수 원인 추정\n3. 공부 방법 한 줄씩 (이 앱에서 무엇을 풀면 좋은지: 문제집 약점 유형, 풀이 전략 카드, 풀이 칸에 직접 쓰기)\nLaTeX 없이 일반 기호만 써.`;
+  const r=await SAMPLE([{role:'user',content:msg}],{cache:false});rec.summary=String(r.text||'').trim();wkSave(rec)}
+ catch(e){WK.err=(e&&e.code&&AI_ERR[e.code])||'요약을 만들지 못했어요. 다시 시도해 주세요.'}
+ finally{WK.sumBusy=false;wkRender()}}
+async function wkSim(rec){if(!SAMPLE||WK.simBusy)return;WK.simBusy=true;WK.err='';wkRender();
+ try{const cs={};rec.items.forEach(x=>{const w=wkWt(x.mark);if(w&&x.concept)cs[x.concept]=(cs[x.concept]||0)+w});const top=Object.entries(cs).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);if(!top.length){WK.err='다시 볼 문제가 없어요.';return}
+  const msg=`${MB_RULES.split('\nJSON 형식')[0].split('\n').filter(l=>/중1 교육과정|수식은|similar는 같은|그림이 필요/.test(l)).join('\n')}\n\n학생이 문제집에서 다시 볼 문제로 표시한 약한 개념이야: ${top.join(' / ')}\n개념마다 비슷한 문제를 2개씩(level: "같은 수준", "한 단계 더") 새로 만들어. 그림이 필요 없게 글로 조건을 모두 설명하고, answer와 solution(2~3문장)을 넣어. JSON 하나만 출력해.\n{"similar":[{"concept":"…","level":"같은 수준","q":"…","answer":"…","solution":"…"}]}\n과목: ${SJ[CUR].name}`;
+  const r=await SAMPLE([{role:'user',content:msg}],{cache:false}),o=mbParse(r.text);
+  if(!o||!Array.isArray(o.similar)||!o.similar.length){WK.err='문제를 만들지 못했어요. 다시 시도해 주세요.';return}
+  rec.sim=o.similar.slice(0,8).map(s=>({concept:String(s.concept||''),level:String(s.level||''),q:String(s.q||''),answer:String(s.answer||''),solution:String(s.solution||'')}));wkSave(rec)}
+ catch(e){WK.err=(e&&e.code&&AI_ERR[e.code])||'문제를 만들지 못했어요. 다시 시도해 주세요.'}
+ finally{WK.simBusy=false;wkRender()}}
+function wkExam(){const{us}=wkAgg(),ids=Object.keys(us);if(!ids.length)return;
+ const types=T.filter(t=>!t.sa&&us[t.u]);if(!types.length)return;const seed=Math.floor(1000+Math.random()*9000),R=mkR(seed),n=Math.min(examN,types.length),pool=types.map(t=>({t,w:us[t.u]*(/문제집 약점/.test(t.name)?3:1)})),pick=[];
+ while(pick.length<n&&pool.length){const tot=pool.reduce((a,x)=>a+x.w,0);let r=R.f()*tot,k=0;for(;k<pool.length-1;k++){r-=pool[k].w;if(r<=0)break}pick.push(pool.splice(k,1)[0].t)}
+ pick.sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)||a.lv-b.lv);makeExam(seed,pick.length,pick.map(t=>t.id),'문제집 약점 집중 시험',{srcs:pick.map(t=>`문제집 약점 · ${SUBNAME[t.u]}`),es:[]});show('exam');window.scrollTo({top:0})}
+function wkInner(){if(!SAMPLE)return'<div class="note">📚 <b>문제집 약점 분석</b>: 문제집 사진을 여러 장 올려 ○·△·again 표시를 읽고 약한 부분을 찾아 집중 출제하는 기능은 <b>AI 선생님 앱(Claude 아티팩트)</b>에서 쓸 수 있어요.</div>';
+ const E=aiEsc,L=wkList(),{us,cs}=wkAgg(),topU=Object.entries(us).sort((a,b)=>b[1]-a[1]).slice(0,6),mx=Math.max(1,...topU.map(x=>x[1])),rec=L.find(x=>x.id===WK.open);
+ return `<div class="scope"><div class="bar"><b>📚 문제집 약점 분석</b><span class="muted">${SJ[CUR].name} 문제집 사진 → ○ · △ · again 표시를 읽어 약한 부분을 찾아요</span></div>
+  <div class="bar" style="margin-top:8px;gap:8px"><button class="btn pri sm" data-wk="pick" ${WK.busy?'disabled':''}>사진 올리기 (여러 장)</button><input type="file" id="wkFile" accept="image/*" multiple hidden>${WK.busy?'<button class="btn sm" data-wk="cancel">멈추기</button>':''}<span class="muted">○ 맞음 · △/again 다시 볼 문제 · 빨간 사선 틀림 · 한 번에 8장까지</span></div>
+  ${WK.busy?`<p class="aimsg t think" style="margin:8px 0 0">${E(WK.msg||'읽는 중…')}</p>`:''}${WK.err?`<p class="ainote" style="margin:8px 0 0">${E(WK.err)}</p>`:''}
+  ${topU.length?`<h3 class="mbh" style="margin-top:12px">약한 소단원 <span class="muted">저장된 ${L.length}회분 합계 · again·틀림 3점, △ 2점</span></h3><div class="list" style="margin-top:6px">${topU.map(([u,w])=>`<div class="row"><div class="t"><b>${E(SUBNAME[u]||u)}</b><div class="meter"><i class="lo" style="width:${Math.round(w/mx*100)}%"></i></div></div><div class="num">${w}점</div></div>`).join('')}</div>
+   ${Object.keys(cs).length?`<p class="muted" style="margin:6px 0 0;font-size:12.5px">약한 개념: ${Object.entries(cs).sort((a,b)=>b[1]-a[1]).slice(0,6).map(x=>E(x[0])).join(' · ')}</p>`:''}
+   <div class="bar" style="margin-top:8px;gap:8px"><button class="btn pri sm" data-wk="exam">약점 집중 모의고사 만들기</button><button class="btn sm" data-wk="scope">이 단원들로 연습 범위 설정</button></div>`:''}
+  ${rec?wkCard(rec):''}
+  ${L.length?`<h3 class="mbh" style="margin-top:12px">올린 기록</h3><div class="list" style="margin-top:6px">${L.map(r=>{const n=r.items.filter(x=>wkWt(x.mark)).length;return `<div class="row"><div class="t"><b>${new Date(r.at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})} · 표시 ${r.items.length}개</b><p>다시 볼 문제 ${n}개 · 맞은 문제 ${r.items.length-n}개</p></div><div class="acts"><button class="btn sm" data-wk="open|${r.id}">열기</button><button class="btn sm" data-wk="del|${r.id}">삭제</button></div></div>`}).join('')}</div>`:''}</div>`}
+function wkCard(rec){const E=aiEsc;
+ return `<div class="scope" style="margin-top:12px"><div class="bar"><b>읽은 결과 확인</b><span class="sp"></span><button class="btn sm" data-wk="close">닫기</button></div>
+  <p class="muted" style="margin:4px 0 8px;font-size:12.5px">AI가 잘못 읽은 표시는 눌러서 바꾸세요. (○→△→again→✕ 순서로 바뀜) 소단원은 약점 집계에 쓰여요.</p>
+  <div class="list">${rec.items.map((x,i)=>`<div class="row"><div class="t"><b>${x.pg?E(x.pg)+'쪽 ':''}${E(x.no)}번 · ${E(x.title||'문제')}</b><p>${E(x.concept||'')}${x.u?` · ${E(SUBNAME[x.u]||x.u)}`:''}</p></div><div class="acts"><button class="chip${wkWt(x.mark)?' on':''}" data-wk="mark|${i}">${WK_MARK[x.mark][0]}</button><button class="btn sm" data-wk="rm|${i}">삭제</button></div></div>`).join('')}</div>
+  <div class="bar" style="margin-top:10px;gap:8px"><button class="btn pri sm" data-wk="sum" ${WK.sumBusy?'disabled':''}>약점 요약 만들기</button><button class="btn sm" data-wk="sim" ${WK.simBusy?'disabled':''}>AI 비슷한 문제 받기</button></div>
+  ${WK.sumBusy?'<p class="aimsg t think" style="margin:8px 0 0">요약하는 중이에요…</p>':''}${rec.summary?`<div class="aimsg t" style="margin-top:8px"><b>약점 요약</b><br>${aiFmt(rec.summary)}</div>`:''}
+  ${WK.simBusy?'<p class="aimsg t think" style="margin:8px 0 0">비슷한 문제를 만드는 중이에요… (20~40초)</p>':''}
+  ${rec.sim&&rec.sim.length?`<h3 class="mbh" style="margin-top:12px">AI가 만든 비슷한 문제</h3>${rec.sim.map((s,i)=>`<div class="exp" style="margin-bottom:8px"><b class="h">${E(s.concept)} · ${E(s.level)}</b><div>${aiFmt(s.q)}</div><div class="bar" style="margin-top:6px"><button class="btn sm" data-wk="ans|${i}">${WK.show.has(rec.id+'|'+i)?'정답 숨기기':'정답·풀이 보기'}</button></div>${WK.show.has(rec.id+'|'+i)?`<div style="margin-top:6px"><b>정답</b> ${E(s.answer)}<br>${aiFmt(s.solution)}</div>`:''}</div>`).join('')}`:''}</div>`}
+function wkHTML(){return `<div id="wkBox" style="margin-bottom:14px">${wkInner()}</div>`}
+function wkRender(){const b=document.getElementById('wkBox');if(b)b.innerHTML=wkInner()}
+$('#v-review').addEventListener('click',e=>{const b=e.target.closest('[data-wk]');if(!b)return;const[a,v]=b.dataset.wk.split('|'),L=wkList(),rec=L.find(x=>x.id===WK.open);
+ if(a==='pick'){document.getElementById('wkFile').click();return}
+ if(a==='cancel'){if(WK.ctl)WK.ctl.abort();return}
+ if(a==='open'){WK.open=+v;wkRender();return}
+ if(a==='close'){WK.open=null;wkRender();return}
+ if(a==='del'){LS.set(wkKey(),L.filter(x=>x.id!==+v));if(WK.open===+v)WK.open=null;wkRender();return}
+ if(a==='exam'){wkExam();return}
+ if(a==='scope'){const t=Object.entries(wkAgg().us).sort((x,y)=>y[1]-x[1]).slice(0,6).map(x=>x[0]);if(!t.length)return;sel=new Set(t);LS.set('m12-sel-'+SK(),[...sel]);renderScope();newPractice();show('practice');window.scrollTo({top:0});return}
+ if(!rec)return;
+ if(a==='mark'){const x=rec.items[+v];x.mark=WK_ORD[(WK_ORD.indexOf(x.mark)+1)%WK_ORD.length];wkSave(rec);wkRender();return}
+ if(a==='rm'){rec.items.splice(+v,1);wkSave(rec);wkRender();return}
+ if(a==='sum'){wkSummary(rec);return}
+ if(a==='sim'){wkSim(rec);return}
+ if(a==='ans'){const k=rec.id+'|'+v;WK.show.has(k)?WK.show.delete(k):WK.show.add(k);wkRender()}});
+$('#v-review').addEventListener('change',e=>{if(e.target.id==='wkFile'&&e.target.files&&e.target.files.length){const fs=[...e.target.files];e.target.value='';wkRun(fs)}});
 setTimeout(()=>{if(SAMPLE&&!$('#v-review').hidden)renderReview()},1800);
 /* ===== 풀이 기록 (부모 확인용): 아이가 풀이 칸에 쓴 풀이를 문제·정답 풀이와 나란히 보고, 평가·메모를 남기고, AI로 풀이를 비교한다 ===== */
 const PL={filter:'all',open:null,busy:false,txt:'',err:'',light:false};
