@@ -6789,7 +6789,11 @@ $('#v-note').addEventListener('click',e=>{const f=e.target.closest('.nt.hide .f'
  else if(b.dataset.ntp){NO.hide=false;renderNote();v_open();document.body.classList.add('ntprint');const off=()=>{document.body.classList.remove('ntprint');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);window.print()}else if(b.dataset.ntgo){newPractice(b.dataset.ntgo);show('practice');window.scrollTo({top:0})}});
 
 /* ===== 서술형 (조건형 서술: 용어 포함 확인 + 모범답안 + 스스로 채점) ===== */
-const ES={ans:{},done:{}};
+const ES={ans:{},done:{},chk:{}};
+/* 서술형 채점 기준표: <조건>의 (N점)을 배점으로 쓰고, 조건마다 충족 여부를 체크해 점수를 합산한다 (점수 표기가 없으면 균등 배분) */
+const esCondPts=x=>{const p=x.conds.map(c=>{const m=c.match(/\((\d+)점\)/);return m?+m[1]:0});return p.every(v=>v)?p:x.conds.map(()=>x.pts/x.conds.length)};
+const esRubric=x=>{const P=esCondPts(x),ck=ES.chk[x.id]||[],got=P.reduce((a,v,i)=>a+(ck[i]?v:0),0);
+ return `<div class="esrb" style="margin-top:8px;padding:8px 12px;border:1px solid var(--rule);border-radius:10px"><b>채점 기준표</b> <span class="muted">조건마다 내 답안이 충족했는지 체크</span>${x.conds.map((c,i)=>`<label style="display:flex;gap:8px;align-items:flex-start;margin-top:6px;font-size:13.5px"><input type="checkbox" data-escond="${x.id}|${i}"${ck[i]?' checked':''}><span>${'ㄱㄴㄷㄹ'[i]}. ${esEsc(c.replace(/\s*\(\d+점\)/,''))} <b>(${P[i]}점)</b></span></label>`).join('')}<div style="margin-top:8px">내 점수 <b>${got}/${x.pts}점</b></div></div>`};
 const essHas=()=>!!((SJ[CUR]||{}).essay||[]).length;
 const esEsc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const esKey=()=>'m12-es-'+SK();
@@ -6797,12 +6801,13 @@ let esRecAll=()=>LS.get(esKey(),{});
 const esCheck=(x,t)=>{t=t.replace(/\s+/g,'').toLowerCase();return x.kw.map(g=>g.some(k=>t.includes(k.replace(/\s+/g,'').toLowerCase())))};
 function renderEssay(){const v=$('#v-essay'),items=SJ[CUR].essay.filter(x=>sel.has(x.u)),rec=esRecAll();
  v.innerHTML=(items.length?`<p class="muted" style="margin:0 0 10px;font-size:13px">출제 범위 안의 서술형 ${items.length}문항. 조건을 지켜 쓰고 [채점]을 누르면 필요한 용어가 들어갔는지 확인하고 모범답안을 보여 줍니다.</p>`:'<p class="muted">선택한 출제 범위에 서술형 문항이 없습니다.</p>')+items.map(x=>{const d=ES.done[x.id],a=ES.ans[x.id]||'',r=rec[x.id];let res='';
-  if(d){const hit=esCheck(x,a),n=hit.filter(Boolean).length;res=`<div class="esr">필수 용어 <b>${n}/${x.kw.length}</b> · ${x.kw.map((g,i)=>`<span class="${hit[i]?'ok':'no'}">${hit[i]?'✔':'✘'}${esEsc(g[0])}</span>`).join(' ')}<div class="esm"><b>모범답안</b><br>${esEsc(x.model)}</div><div class="bar" style="margin-top:8px"><span class="muted">내 답안과 비교해 스스로 채점</span><span class="sp"></span><button class="btn sm" data-esmk="${x.id}|2">충분히 썼다</button><button class="btn sm" data-esmk="${x.id}|1">일부 빠졌다</button><button class="btn sm" data-esmk="${x.id}|0">다시 공부</button></div></div>`}
+  if(d){const hit=esCheck(x,a),n=hit.filter(Boolean).length;res=`<div class="esr">필수 용어 <b>${n}/${x.kw.length}</b> · ${x.kw.map((g,i)=>`<span class="${hit[i]?'ok':'no'}">${hit[i]?'✔':'✘'}${esEsc(g[0])}</span>`).join(' ')}${esRubric(x)}<div class="esm"><b>모범답안</b><br>${esEsc(x.model)}</div><div class="bar" style="margin-top:8px"><span class="muted">내 답안과 비교해 스스로 채점</span><span class="sp"></span><button class="btn sm" data-esmk="${x.id}|2">충분히 썼다</button><button class="btn sm" data-esmk="${x.id}|1">일부 빠졌다</button><button class="btn sm" data-esmk="${x.id}|0">다시 공부</button></div></div>`}
   return `<div class="es"><div class="est">${SUBNAME[x.u]} · ${esEsc(x.name)} · ${x.pts}점${r?` · 최근 ${['다시 공부','일부 빠졌다','충분히 썼다'][r[1]]} (${r[0]}회)`:''}</div><div class="esq">${esEsc(x.q)}</div><div class="escd"><b>&lt;조건&gt;</b><br>${x.conds.map((c,i)=>`${'ㄱㄴㄷㄹ'[i]}. ${esEsc(c)}`).join('<br>')}</div><textarea data-esid="${x.id}" placeholder="여기에 답안을 쓰세요">${esEsc(a)}</textarea><div class="bar" style="margin-top:8px"><button class="btn sm" data-esgo="${x.id}">채점</button><button class="btn sm" data-esclr="${x.id}">지우기</button></div>${res}</div>`}).join('')}
 $('#v-essay').addEventListener('input',e=>{const t=e.target.closest('textarea[data-esid]');if(t)ES.ans[t.dataset.esid]=t.value});
+$('#v-essay').addEventListener('change',e=>{const c=e.target.closest('input[data-escond]');if(!c)return;const[id,i]=c.dataset.escond.split('|');(ES.chk[id]=ES.chk[id]||[])[+i]=c.checked;renderEssay()});
 $('#v-essay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.dataset.esgo){ES.done[b.dataset.esgo]=true;renderEssay()}
- else if(b.dataset.esclr){delete ES.ans[b.dataset.esclr];delete ES.done[b.dataset.esclr];renderEssay()}
+ else if(b.dataset.esclr){delete ES.ans[b.dataset.esclr];delete ES.done[b.dataset.esclr];delete ES.chk[b.dataset.esclr];renderEssay()}
  else if(b.dataset.esmk){const[id,m]=b.dataset.esmk.split('|'),rec=LS.get(esKey(),{});rec[id]=[((rec[id]||[0])[0])+1,+m,Date.now()];LS.set(esKey(),rec);onRecord();renderEssay()}});
 
 /* ===== 영단어 (교과서 단원 단어 · 단어장 · 표 형식 학습지 · 인쇄) ===== */
