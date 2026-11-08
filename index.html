@@ -5387,7 +5387,7 @@ const ORDER=['kor','eng','math','sci','soc','eth','tech','info'];
 /* 동기화 훅: 웹앱(PWA) 버전에서 다른 기기 기록을 합쳐 보여 줄 때 덮어쓴다 */
 let allS=()=>S,onRecord=()=>{},onSubject=()=>{},statsExtra=()=>'';
 let CUR,UNITS,T,SUBS,SUBNAME,TYPE,S,sel;
-const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));try{kvPut(k)}catch(e){}}catch(e){}}};
 let SEM=SEMS[LS.get('m12-sem','1-2')]?LS.get('m12-sem','1-2'):'1-2',SJ=SEMS[SEM];const SK=(c=CUR)=>SEM==='1-2'?c:c+'_'+SEM.replace('-','');
 const $=s=>document.querySelector(s);
 const LV=['','하','중','상'];
@@ -5693,6 +5693,36 @@ M.notes=(M.notes||[]).concat([
   ex:[{t:'내부의 한 점에서 꼭짓점에 선분을 그어 삼각형 14개',a:'n = 14 → 대각선 14 × 11 ÷ 2 = 77개'}],go:['b1-inpt','b1-diagx','b1-regsum','b1-judge2','b1-diag']}]);
 M.presets.push(['문제집 약점(다각형)',['B1']]);
 })();
+/* ===== 문제집 약점 보강 ②: 정다각형 속 이등변삼각형·대각선 교점·평행 대각선의 각 (EBS 뉴런 71쪽 31, 기출 STEP3-3 유형) ===== */
+(function(){
+const M=SUBJ.math,A=o=>M.T.push(o);
+const nm=n=>`정${NUM[n]}각형`,V='ABCDEFGHIJKL';
+A({id:'b1-reginsc',u:'B1',name:'[문제집 약점] 정다각형의 한 꼭짓점에서 그은 대각선 사이의 각',lv:2,g:R=>{
+ const n=R.pick([5,6,8,9,10,12]),k=R.i(1,Math.min(4,n-3)),w=180*k/n,X=V[1],Y=V[1+k];
+ const i=180-360/n,tri=(180-i)/2;
+ return{q:`${nm(n)} ${V.slice(0,n)}에서 ∠${X}${V[0]}${Y}의 크기는? (꼭짓점 ${V[0]}에서 두 꼭짓점 ${X}, ${Y}에 선분을 그었을 때, ${X}와 ${Y} 사이에는 변이 ${k}개 있다)`,...mc(R,w,[w+tri,w*2,180-w,i,w/2+9],v=>(Number.isInteger(v)?v:Math.round(v*10)/10)+'°'),
+  m:'꼭짓점에서 인접한 꼭짓점으로 대각선을 그으면 이등변삼각형',
+  exp:`정다각형은 변의 길이가 모두 같으므로 한 꼭짓점에서 이웃한 두 꼭짓점을 이은 삼각형은 이등변삼각형이다.<br>한 내각 = 180° − 360° ÷ ${n} = ${i}°이고, 변 ${k}개만큼 이은 각은 한 외각의 절반씩 ${k}번 → 360° ÷ ${n} ÷ 2 × ${k} = <b>${w}°</b>`,
+  alts:[['원주각처럼 생각하기(같은 길이의 변 → 같은 각)',`정${NUM[n]}각형의 변이 ${k}개 걸치는 각은 변 하나당 ${180/n}°씩이므로 ${180/n}° × ${k} = <b>${w}°</b>`]]}}});
+A({id:'b1-regpent',u:'B1',name:'[문제집 약점] 정오각형의 두 대각선이 만나는 점의 각',lv:3,g:R=>{
+ const k=R.pick([0,1,2]);
+ const T=[['∠AFB',108,'△ABF는 ∠FAB = ∠FBA = 36°인 이등변삼각형이므로 ∠AFB = 180° − 36° − 36° = 108°'],['∠AFE',72,'∠AFB와 ∠AFE는 일직선을 이루는 이웃한 각이므로 ∠AFE = 180° − 108° = 72°'],['∠EAF',72,'∠EAF = ∠EAB − ∠FAB = 108° − 36° = 72°']][k];
+ return{q:`정오각형 ABCDE에서 대각선 AC와 BE의 교점을 F라 할 때, ${T[0]}의 크기는?`,...mc(R,T[1],[36,108,72,144,54,126].filter(v=>v!==T[1]).slice(0,5),v=>v+'°'),
+  exp:`정오각형의 한 내각은 108°이고, △ABC는 AB = BC인 이등변삼각형이므로 ∠BAC = (180° − 108°) ÷ 2 = 36°이다. 같은 방법으로 ∠ABE = 36°이다.<br>${T[2]}<br>∴ <b>${T[1]}°</b>`}}});
+A({id:'b1-hexpar',u:'B1',name:'[문제집 약점] 정육각형에서 평행한 대각선과 각',lv:3,g:R=>{
+ const k=R.pick([0,1,2]);
+ const T=[['대각선 BE와 변 AB가 이루는 ∠ABE',60,'AF // BE이므로 동측내각의 합 ∠FAB + ∠ABE = 180°, 정육각형의 한 내각이 120°이므로 ∠ABE = 180° − 120° = 60°'],['∠BEF',60,'AF // BE이므로 ∠AFE + ∠BEF = 180°이고 ∠AFE = 120°이므로 ∠BEF = 60°'],['∠EBC',60,'정육각형의 한 내각 ∠ABC = 120°이고 ∠ABE = 60°이므로 ∠EBC = 120° − 60° = 60°']][k];
+ return{q:`정육각형 ABCDEF에서 대각선 BE는 변 AF와 평행하다. ${T[0]}의 크기는?`,...mc(R,T[1],[30,45,90,120,150],v=>v+'°'),
+  exp:`정육각형의 한 내각의 크기는 180° × (6 − 2) ÷ 6 = 120°이다.<br>${T[2]}<br>∴ <b>${T[1]}°</b>`,m:'평행선에서 동측내각의 합은 180°',
+  alts:[['대칭으로 보기','정육각형은 대각선 BE로 위아래가 같은 모양(사다리꼴 ABEF 두 개)이므로 BE는 ∠ABC(120°)를 60°, 60°로 나눈다. ∠ABE = ∠EBC = 60°']]}}});
+Object.assign(HINT,{
+ 'b1-reginsc':['정다각형은 변이 모두 같으므로 이웃한 두 변과 대각선이 이루는 삼각형은 이등변삼각형이에요.','한 외각 360° ÷ n의 절반이 변 하나가 만드는 각이에요. 걸친 변의 개수만큼 곱해요.'],
+ 'b1-regpent':['먼저 △ABC와 △ABE 같은 이등변삼각형의 밑각(36°)을 구해요.','교점 주변의 각은 삼각형의 내각의 합 180°, 일직선 180°로 구해요.'],
+ 'b1-hexpar':['정육각형의 한 내각은 120°. 평행선에서 동측내각의 합이 180°인 것을 이용해요.','AF // BE이면 ∠FAB + ∠ABE = 180°.']});
+M.notes=(M.notes||[]).concat([{id:'N-ST-B1e',u:'B1',st:true,title:'풀이 전략: 정다각형 속 각은 "이등변삼각형 + 평행선"',
+  pts:['정다각형은 변이 모두 같아서 이웃한 두 변과 대각선이 만드는 삼각형은 <b>이등변삼각형</b>이다 → 밑각 = (180° − 한 내각) ÷ 2','정오각형: 한 내각 108°, 밑각 36° / 정육각형: 한 내각 120°, 밑각 30°','평행선(정육각형의 AF // BE 등)이 나오면 엇각·동측내각(합 180°)으로 각을 옮긴다','교점 주변은 삼각형의 내각의 합, 일직선 180°, 맞꼭지각으로 하나씩 채워 나간다','문제집에서 "∠AFB = 108°" 같은 중간 각을 먼저 그림에 적어 두고 푼다'],
+  ex:[{t:'정오각형 ABCDE에서 AC와 BE의 교점 F, ∠AFE?',a:'∠BAC = ∠ABE = 36°, ∠AFB = 108° → ∠AFE = 72°'}],go:['b1-reginsc','b1-regpent','b1-hexpar','b1-reg']}]);
+})();
 /* ===== 자료 해석 체크리스트 (표·그래프 문제를 풀 때 확인할 순서, 과목별) ===== */
 (function(){
 const F=s=>`<span class="f">${s}</span>`;
@@ -5847,6 +5877,22 @@ async function padPull(){const db=PADCLOUD.db;if(!db)return;try{const snap=await
   PADCLOUD.state='서버에 저장됨'+(got?` · 서버에서 ${got}개 가져옴`:'')+(up?` · ${up}개 올리는 중`:'');if(got&&!$('#v-review').hidden)plogRender()}
  catch(e){PADCLOUD.state=e&&e.code==='not_granted'?'서버 저장 꺼짐':'서버 연결 안 됨'}}
 (async()=>{try{if(typeof claude==='undefined'||!claude.use)return;const d=await claude.use('db');if(d){PADCLOUD.db=d;PADCLOUD.state='서버 저장 켜짐';setTimeout(padPull,600)}else PADCLOUD.state='이 기기에만 저장'}catch(e){PADCLOUD.state='이 기기에만 저장'}})();
+/* ===== 기록 서버 저장: 풀이 기록·정답 기록·내 문제집·문제집 약점·계획·모의고사 기록을 서버(db, kv 컬렉션)에도 저장 — 브라우저 데이터를 지워도 복구, 다른 기기에서도 이어서 ===== */
+const KV_RE=/^m12-(rec|pl|mb|wk|hist|sel)-/;const KVQ=new Set();let kvT=null;
+const kvAt=()=>{try{return JSON.parse(localStorage.getItem('m12-kvat')||'{}')}catch(e){return{}}};
+function kvPut(k){try{if(!KV_RE.test(k))return;const m=kvAt();m[k]=Date.now();localStorage.setItem('m12-kvat',JSON.stringify(m));if(PADCLOUD.db){KVQ.add(k);clearTimeout(kvT);kvT=setTimeout(kvFlush,3000)}}catch(e){}}
+async function kvFlush(){const db=PADCLOUD.db;if(!db)return;const ks=[...KVQ];KVQ.clear();
+ for(const k of ks){try{let raw=localStorage.getItem(k);if(raw==null)continue;if(raw.length>200000&&/^m12-mb-/.test(k)){try{const a=JSON.parse(raw);a.forEach(x=>delete x.thumb);raw=JSON.stringify(a)}catch(e){}}if(raw.length>250000)continue;await db.doc('kv/'+padCk(k)).set({k,v:raw,at:kvAt()[k]||Date.now()})}catch(e){}}}
+async function kvPull(){const db=PADCLOUD.db;if(!db)return;try{const snap=await db.collection('kv').get(),cloud=new Map(),m=kvAt();let got=0;
+  for(const d of snap.docs){const v=d.data();if(!v||!KV_RE.test(v.k||'')||typeof v.v!=='string')continue;cloud.set(v.k,v);const loc=localStorage.getItem(v.k),la=m[v.k]||0;
+   if((loc==null||la>0)&&(v.at||0)>la){try{JSON.parse(v.v)}catch(e){continue}localStorage.setItem(v.k,v.v);m[v.k]=v.at;got++}}
+  localStorage.setItem('m12-kvat',JSON.stringify(m));
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!KV_RE.test(k))continue;const c=cloud.get(k);if(!c||(m[k]||0)>(c.at||0)||(!m[k]&&c&&false)){if(!m[k]){m[k]=Date.now();localStorage.setItem('m12-kvat',JSON.stringify(m))}KVQ.add(k)}}
+  if(KVQ.size)kvFlush();
+  PADCLOUD.state=PADCLOUD.state.replace(/ · 기록 .*$/,'')+` · 기록 서버 저장됨${got?` (서버에서 ${got}개 가져옴)`:''}`;
+  if(got){try{setSubject(CUR)}catch(e){}}}
+ catch(e){}}
+setTimeout(()=>{if(PADCLOUD.db)kvPull();else setTimeout(()=>{if(PADCLOUD.db)kvPull()},2500)},1800);
 function padMark(id,seed,ok,help){const k=padKey(id,seed),r=PADS.get(k);if(r){r.ok=ok;r.help=help||0;padPut(r)}else padGet(k).then(x=>{if(x){x.ok=ok;x.help=help||0;padPut(x)}})}
 /* 한 획 그리기 */
 function padStroke(c,s,dk){const p=s.p,n=p.length/3;if(!n)return;c.save();c.lineCap='round';c.lineJoin='round';c.strokeStyle=padCol(s.c,dk);c.lineWidth=s.w;
