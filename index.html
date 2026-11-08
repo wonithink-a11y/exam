@@ -361,6 +361,17 @@ b.src{color:var(--ac);font-weight:600}
 @media (prefers-reduced-motion:no-preference){.aimsg.think{animation:aipulse 1.4s ease-in-out infinite}@keyframes aipulse{50%{opacity:.45}}}
 
 @media (prefers-reduced-motion:no-preference){.opt,.btn,.chip,.subj button,.tabs button{transition:background-color .15s,color .15s,border-color .15s,box-shadow .15s}}
+.plb{background:var(--sheet);border:1px solid var(--rule);border-radius:18px;padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.plhero{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,var(--ac-s),var(--sheet));border-radius:14px;padding:12px 14px}
+.plring{flex:none}.plht{min-width:0;display:grid;gap:2px}.plhk{font:400 17px var(--f-disp);color:var(--ac)}.plhm{font-size:15px}
+.plov{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px;margin-top:12px}
+.plc{--b:var(--ac);border:1.5px solid var(--rule);background:var(--sheet);border-radius:14px;padding:8px 10px;display:grid;gap:3px;text-align:left}
+.plc.on{border-color:var(--b);background:var(--ac-s)}.plcn{font:400 15px var(--f-disp);color:var(--b)}.plcp{font:700 18px var(--f-num)}
+.plcb{height:6px;background:var(--chip);border-radius:999px;overflow:hidden}.plcb i{display:block;height:100%;background:var(--b);border-radius:999px}.plcd{font-size:11.5px;color:var(--muted)}
+.plu{margin-top:8px;border:1px solid var(--rule);border-radius:12px;padding:6px 12px}.plu summary{cursor:pointer;display:flex;justify-content:space-between;gap:8px;padding:4px 0}.plup{font:700 13px var(--f-num);color:var(--ac)}
+.plr{padding:9px 0;border-top:1px dashed var(--rule)}.plrt{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.plrs{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.plst{border:1px solid var(--rule);background:var(--chip);border-radius:999px;padding:3px 10px;font-size:12.5px;display:inline-flex;gap:4px;align-items:center}
+.plst.on{background:var(--ac);border-color:var(--ac);color:var(--on)}.plst.all{background:none;border-style:dashed;color:var(--muted)}.plri{margin-top:4px;font-size:12px}
 @media screen and (min-width:1000px){.wrap{max-width:1120px}.qt,.exp,.cond,.data{max-width:760px}.fig svg{max-width:420px}.ntsc{font-size:15px;padding:12px 10px}.ntsc>i,.ntsa i,.ntsa em{font-size:13.5px}.ntsn b{font-size:16px}.ntsn small{font-size:13px}
 .ntsc .fig svg{max-width:220px}.ntsn .fig svg{max-width:250px}.ntsr:not(.g) .ntsn svg text{font-size:20px}.nt .ntfig svg{max-width:440px}.nt .ntfigs{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}.ntbsr{font-size:13.5px}}
 </style>
@@ -384,7 +395,7 @@ b.src{color:var(--ac);font-weight:600}
     <button role="tab" data-tab="exam" aria-selected="false">모의고사</button>
     <button role="tab" data-tab="jokbo" aria-selected="false">족보</button>
     <button role="tab" data-tab="review" aria-selected="false">오답노트</button>
-    <button role="tab" data-tab="stats" aria-selected="false">단원 현황</button>
+    <button role="tab" data-tab="stats" aria-selected="false">계획·현황</button>
     <button role="tab" data-tab="words" aria-selected="false" id="tabWords" hidden>영단어</button>
     <button role="tab" data-tab="essay" aria-selected="false" id="tabEssay" hidden>서술형</button>
     <button role="tab" data-tab="note" aria-selected="false" id="tabNote" hidden>요점</button>
@@ -5917,8 +5928,37 @@ function planCard(){const d=LS.get(ddKey(),''),pl=planToday(),n=pl.n;
  else if(!pl.us.length)h+='<p class="muted" style="margin:6px 0 0">출제 범위가 비어 있습니다. 연습·모의고사 탭에서 소단원을 선택하세요.</p>';
  else h+=`<p style="margin:8px 0 4px;font-size:13.5px">출제 범위 ${pl.us.length}개 소단원 · 하루 약 ${pl.today.length}개씩 · <b>오늘 집중 범위</b></p><div style="display:flex;flex-wrap:wrap;gap:6px">${pl.today.map(x=>`<span class="chip">${SUBNAME[x.u]} <small>${x.n?Math.round(x.p*100)+'%':'미학습'}</small></span>`).join('')}</div><div class="bar" style="margin-top:8px"><button class="btn sm" data-ddgo="1">오늘 범위로 약점 집중 시험</button></div>`;
  return h+'</div>'}
+/* ===== 학습 계획표: 과목별·소단원별로 5단계(요점·연습·심화·오답·실전)를 체크하고 진행률을 본다 =====
+   저장: m12-pl-<SK(과목)> = {"소단원|단계번호":1}. 계획 범위 = 과목의 기본 출제 범위(def) */
+const PL_STEPS=[['📖','요점 읽기'],['✏️','연습 풀기'],['🔥','심화·서술형'],['🔁','오답 복습'],['📝','실전 확인']];
+const PL_SUBJ=['kor','eng','math','sci','soc','tech'];
+const plKey=id=>'m12-pl-'+SK(id);
+const plSubs=id=>{const s=SJ[id];if(!s)return[];const all=s.units.flatMap(u=>u.subs.map(x=>x[0]));return(s.def||all).filter(c=>all.includes(c))};
+function plProg(id){const c=LS.get(plKey(id),{}),subs=plSubs(id);let d=0;subs.forEach(u=>PL_STEPS.forEach((_,i)=>{if(c[u+'|'+i])d++}));return{d,t:subs.length*PL_STEPS.length,c,subs,p:subs.length?Math.round(d/(subs.length*PL_STEPS.length)*100):0}}
+const plLeft=id=>{const d=LS.get('m12-dday-'+SK(id),null);if(!d)return null;const n=new Date();n.setHours(0,0,0,0);return Math.round((new Date(d+'T00:00:00')-n)/864e5)};
+const plMsg=p=>p===0?'시작이 반! 첫 단원부터 체크해 봐요 🌱':p<30?'좋은 출발이에요 🚀':p<60?'절반을 향해 가는 중 💪':p<90?'거의 다 왔어요 🔥':p<100?'마지막 점검만 남았어요 ✨':'🎉 계획 완료! 오답을 한 번 더 훑어봐요';
+const plDd=n=>n===null?'':n>0?`D-${n}`:n===0?'D-DAY':'종료';
+function plRing(p,col){const r=34,c=2*Math.PI*r;return `<svg viewBox="0 0 84 84" width="84" height="84" role="img" aria-label="진행률 ${p}%"><circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--rule)" stroke-width="9"/><circle cx="42" cy="42" r="${r}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(c*p/100).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 42 42)"/><text x="42" y="48" text-anchor="middle" style="font:700 19px var(--f-num);fill:var(--ink)">${p}%</text></svg>`}
+function planBoard(){const cur=plProg(CUR),A=allS(),acc={};T.forEach(t=>{const r=A.t[t.id];if(r){const a=acc[t.u]||(acc[t.u]=[0,0]);a[0]+=r[0];a[1]+=r[1]}});
+ const wrong={};S.w.forEach(x=>{const t=TYPE[x.id];if(t)wrong[t.u]=(wrong[t.u]||0)+1});
+ const left=plLeft(CUR),remain=cur.t-cur.d,perDay=left>0?Math.ceil(remain/left):null;
+ const over=PL_SUBJ.filter(k=>SJ[k]).map(k=>{const q=plProg(k),n=plLeft(k);return `<button class="plc${k===CUR?' on':''}" data-plsub="${k}" style="--b:var(--${k})"><span class="plcn">${SJ[k].name}</span><span class="plcp">${q.p}%</span><span class="plcb"><i style="width:${q.p}%"></i></span><span class="plcd">${n===null?'시험일 미정':plDd(n)}</span></button>`}).join('');
+ const units=SJ[CUR].units.map(u=>{const subs=u.subs.filter(x=>cur.subs.includes(x[0]));if(!subs.length)return'';const ud=subs.reduce((a,x)=>a+PL_STEPS.filter((_,i)=>cur.c[x[0]+'|'+i]).length,0),up=Math.round(ud/(subs.length*PL_STEPS.length)*100);
+  return `<details class="plu" open><summary><b>${u.tag?u.tag+' ':''}${u.name}</b><span class="plup">${up}%</span></summary>${subs.map(x=>{const c=x[0],done=PL_STEPS.filter((_,i)=>cur.c[c+'|'+i]).length;
+   const info=[acc[c]&&acc[c][0]?`풀이 ${acc[c][0]}문제 · 정답률 ${Math.round(acc[c][1]/acc[c][0]*100)}%`:'아직 안 풀었어요',wrong[c]?`오답 ${wrong[c]}개`:''].filter(Boolean).join(' · ');
+   return `<div class="plr"><div class="plrt"><b>${esEscP(x[1])}</b><span class="muted">${done}/5</span></div><div class="plrs">${PL_STEPS.map((s,i)=>`<button class="plst${cur.c[c+'|'+i]?' on':''}" data-pl="${c}|${i}" aria-pressed="${!!cur.c[c+'|'+i]}"><span>${s[0]}</span>${s[1]}</button>`).join('')}<button class="plst all" data-plall="${c}">${done===5?'모두 해제':'모두 완료'}</button></div><div class="muted plri">${info}</div></div>`}).join('')}</details>`}).join('');
+ return `<div class="plb" style="--b:var(--ac)"><div class="plhero"><div class="plring">${plRing(cur.p,'var(--ac)')}</div><div class="plht"><div class="plhk">${SJ[CUR].name} 학습 계획표</div><b class="plhm">${plMsg(cur.p)}</b><div class="muted">${cur.d}/${cur.t}단계 완료${left!==null&&left>=0?` · ${plDd(left)}${perDay?` · 하루 ${perDay}단계씩`:''}`:''}</div></div></div>
+ <div class="plov">${over}</div>
+ <p class="muted" style="margin:10px 0 6px;font-size:12.5px">소단원마다 단계를 마칠 때 눌러 체크하세요. 연습 풀이와 오답 개수는 기록에서 자동으로 보여 줘요.</p>${units}
+ <div class="bar" style="margin-top:8px"><span class="sp"></span><button class="btn sm" data-plreset="1">${plConfirm?'정말 지울까요? 한 번 더 누르기':'이 과목 계획 체크 초기화'}</button></div></div>`}
+let plConfirm=false;const esEscP=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+$('#v-stats').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.plsub){if(b.dataset.plsub!==CUR)setSubject(b.dataset.plsub);return}
+ if(b.dataset.pl){const c=LS.get(plKey(CUR),{});c[b.dataset.pl]?delete c[b.dataset.pl]:c[b.dataset.pl]=1;LS.set(plKey(CUR),c);plConfirm=false;renderStats();return}
+ if(b.dataset.plall){const c=LS.get(plKey(CUR),{}),u=b.dataset.plall,all=PL_STEPS.every((_,i)=>c[u+'|'+i]);PL_STEPS.forEach((_,i)=>all?delete c[u+'|'+i]:c[u+'|'+i]=1);LS.set(plKey(CUR),c);renderStats();return}
+ if(b.dataset.plreset){if(plConfirm){LS.set(plKey(CUR),{});plConfirm=false}else plConfirm=true;renderStats()}});
 function renderStats(){const v=$('#v-stats');const A=allS();const rows=SUBS.map(u=>{let n=0,c=0;T.filter(t=>t.u===u).forEach(t=>{const r=A.t[t.id];if(r){n+=r[0];c+=r[1]}});return{u,n,c}});
- v.innerHTML=`${planCard()}${statsExtra()}<div class="list">${rows.map(r=>{const p=r.n?Math.round(r.c/r.n*100):0;return `<div class="row"><div class="t"><b>${SUBNAME[r.u]}</b><p>${r.n?`${r.n}문제 풀이 · ${r.c}개 정답`:'아직 풀지 않음'}</p><div class="meter"><i class="${p<60?'lo':''}" style="width:${r.n?p:0}%"></i></div></div><div class="num">${r.n?p+'%':'—'}</div></div>`}).join('')}</div>
+ v.innerHTML=`${planBoard()}${planCard()}${statsExtra()}<div class="list">${rows.map(r=>{const p=r.n?Math.round(r.c/r.n*100):0;return `<div class="row"><div class="t"><b>${SUBNAME[r.u]}</b><p>${r.n?`${r.n}문제 풀이 · ${r.c}개 정답`:'아직 풀지 않음'}</p><div class="meter"><i class="${p<60?'lo':''}" style="width:${r.n?p:0}%"></i></div></div><div class="num">${r.n?p+'%':'—'}</div></div>`}).join('')}</div>
  <div class="bar" style="margin-top:12px"><span class="muted">정답률 60% 미만은 붉게 표시됩니다.</span><span class="sp"></span>${ntHas()?'<button class="btn sm" data-act="weaknote">약한 단원 노트 먼저 보기</button>':''}<button class="btn sm" data-act="reset">${confirmReset?`${SJ[CUR].name} 기록을 지울까요? 한 번 더 누르기`:'이 과목 기록 초기화'}</button></div>`}
 $('#v-exam').addEventListener('click',e=>{const b=e.target.closest('button[data-popt]');if(!b)return;e.stopPropagation();const[k,v]=b.dataset.popt.split('|');if(k==='paper'){POPT.paper=v;LS.set('m12-pdfp',v)}else{POPT.gap=+v;LS.set('m12-pdfg',+v)}renderExam()},true);
 $('#v-stats').addEventListener('change',e=>{if(e.target.id==='ddIn'){LS.set(ddKey(),e.target.value||null);ddBadge();renderStats()}});
