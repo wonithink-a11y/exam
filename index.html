@@ -374,7 +374,7 @@ b.src{color:var(--ac);font-weight:600}
 .plst.on{background:var(--ac);border-color:var(--ac);color:var(--on)}.plst.all{background:none;border-style:dashed;color:var(--muted)}.plri{margin-top:4px;font-size:12px}
 .alt{margin-top:8px;padding-top:8px;border-top:1px dashed var(--rule)}.alt:first-child{margin-top:0;padding-top:0;border-top:0}
 .mbh{font:400 16px var(--f-disp);margin:14px 0 6px;color:var(--ac)}.mbl{margin:4px 0;padding-left:20px;line-height:1.7}.mbs{border:1px solid var(--rule);border-radius:10px;padding:8px 10px;margin-top:6px}.mbs summary{cursor:pointer;line-height:1.6}.mbc{margin-top:12px;padding-top:10px;border-top:1px dashed var(--rule)}
-.pad{margin-top:10px;border:1px solid var(--rule);border-radius:12px;padding:6px 10px}.pad summary{cursor:pointer;font-weight:600}.padbar{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 6px}.padbar .chip{padding:3px 10px;font-size:12.5px}.padc{display:block;width:100%;height:auto;background:#fff repeating-linear-gradient(#fff 0 27px,#eef1f8 27px 28px);border:1px solid var(--rule);border-radius:8px;touch-action:none;cursor:crosshair}
+.pad{margin-top:10px;border:1px solid var(--rule);border-radius:12px;padding:6px 10px}.pad summary{cursor:pointer;font-weight:600}.padtl{display:grid;gap:6px;margin:8px 0 6px}.padrow{display:flex;flex-wrap:wrap;gap:5px;align-items:center}.padrow .chip{padding:3px 10px;font-size:12.5px}.padw{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;color:var(--muted);margin-left:4px}.padw input{width:110px}.padsw{width:26px;height:26px;border-radius:50%;border:2px solid var(--rule);padding:0}.padsw.on{outline:2px solid var(--ac);outline-offset:2px}.padc{display:block;width:100%;height:auto;background:#fff repeating-linear-gradient(#fff 0 27px,#eef1f8 27px 28px);border:1px solid var(--rule);border-radius:8px;touch-action:none;cursor:crosshair}.padc.po{touch-action:pan-y}
 @media screen and (min-width:1000px){.wrap{max-width:1120px}.qt,.exp,.cond,.data{max-width:760px}.fig svg{max-width:420px}.ntsc{font-size:15px;padding:12px 10px}.ntsc>i,.ntsa i,.ntsa em{font-size:13.5px}.ntsn b{font-size:16px}.ntsn small{font-size:13px}
 .ntsc .fig svg{max-width:220px}.ntsn .fig svg{max-width:250px}.ntsr:not(.g) .ntsn svg text{font-size:20px}.nt .ntfig svg{max-width:440px}.nt .ntfigs{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}.ntbsr{font-size:13.5px}}
 </style>
@@ -5382,7 +5382,7 @@ const LV=['','하','중','상'];
 function withAlts(d){if(d&&d.alts&&d.alts.length&&!d._alts){d._alts=1;d.exp=`<div class="alt"><b>풀이 ① · ${d.m||'기본 풀이'}</b><br>${d.exp}</div>`+d.alts.map((x,i)=>`<div class="alt"><b>풀이 ${'②③④'[i]} · ${x[0]}</b><br>${x[1]}</div>`).join('')}return d}
 function gen(id,seed){for(let k=0;k<6;k++){try{const d=withAlts(TYPE[id].g(mkR(seed+k*7919)));if(d&&d.sa&&d.model)return{opts:[],ans:'',...d};if(d&&d.opts&&d.opts.length===5&&d.opts.includes(d.ans))return d}catch(e){}}
  return{q:'문제를 만들지 못했습니다. 다른 문제를 눌러 주세요.',opts:['-','-','-','-','-'],ans:'-',exp:''}}
-function record(id,seed,ok){const t=S.t[id]||(S.t[id]=[0,0]);t[0]++;if(ok)t[1]++;
+function record(id,seed,ok){try{padMark(id,seed,ok)}catch(e){}const t=S.t[id]||(S.t[id]=[0,0]);t[0]++;if(ok)t[1]++;
  S.w=S.w.filter(x=>!(x.id===id&&x.seed===seed));if(!ok){S.w.unshift({id,seed,at:Date.now()});S.w=S.w.slice(0,80)}LS.set('m12-rec-'+SK(),S);onRecord()}
 function plain(h){return h.replace(/<math>[\s\S]*?<\/math>/g,m=>{const p=m.match(/<mrow>([\s\S]*?)<\/mrow><mrow>([\s\S]*?)<\/mrow>/);const s=x=>x.replace(/<[^>]+>/g,'');return p?`(${s(p[1])})/(${s(p[2])})`:s(m)})
  .replace(/<span class="sg">(.*?)<\/span>/g,'$1').replace(/<br\s*\/?>/g,'\n').replace(/<div class="psg">/g,'\n').replace(/<\/(div|p|tr)>/g,'\n').replace(/<\/t[dh]>/g,'\t').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\n{2,}/g,'\n').trim()}
@@ -5629,37 +5629,76 @@ function saHTML(it,idx,o){const t=TYPE[it.id],d=it.d,done=o.graded,show=done||it
   :`${satBox(hsh(d.q),'답을 직접 써 보세요 (종이에 써도 됩니다)')}<div class="sa-note">서술형 — 보기가 없습니다.${o.fold?' 채점하면 모범 답안이 나옵니다.':''}</div>${o.fold?'':`<button class="btn" data-act="sashow">모범 답안 보기</button>`}`;
  return `<article class="q sa" id="q${idx}" data-aik="${CUR}|${hsh(d.q+'|'+(d.fig||'')+'|'+d.opts.join('|'))}" data-ans="0" data-pick="-1" data-done="${show?1:0}"><template class="aix">${d.model}<br>${d.exp}</template><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name.replace('[서술형] ','')}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lvsa">서술형</span></div>
  <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${body}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
-/* ===== 풀이 칸: 문제 아래에서 손글씨(펜·태블릿·손가락)로 계산·풀이를 쓰고, 채점 뒤에도 그대로 보이며 AI 선생님이 내 풀이를 점검할 수 있다 =====
-   PAD[문항 키] = 그림 dataURL (이 화면을 열어 둔 동안 유지). 수학·과학·기술가정에서 켜진다. */
-const PAD=new Map(),PAD_SUBJ=['math','sci','tech'],PADT={mode:'pen',color:'#1b1f2e'};
+/* ===== 풀이 칸 (필기 앱처럼): 펜·형광펜·지우개·직선, 색·굵기, 되돌리기/다시, 펜 압력, 손바닥 방지.
+   획(stroke)을 벡터로 저장한다 → IndexedDB 'm12pad' (키: SK|유형id|seed, 새로고침해도 유지, 이 기기). 부모용 "풀이 기록"과 AI 풀이 비교에 쓰인다.
+   획 형식 {t:'p'|'h'|'e'|'l'|'x', c:색, w:캔버스 px 굵기, p:[x,y,압력%,…], pr:펜압 사용 여부}  ('x' = 모두 지우기 표시, 되돌리기 가능) */
+const PADS=new Map(),PAD_SUBJ=['math','sci','tech'];
+const PADC=['#1b1f2e','#d23b3b','#1f6fd1','#16875a','#e07b00','#7a3fd0','#8a8f9c','#ffe34d'];
+const PADT=Object.assign({tool:'p',color:'#1b1f2e',po:false},LS.get('m12-padt',{}));PADT.w=Object.assign({p:5,h:28,e:36,l:5},PADT.w||{});
 const padOn=()=>PAD_SUBJ.includes(CUR);
-function padHTML(key,done){if(!padOn())return'';const has=PAD.has(key);
- return `<details class="pad" data-pk="${String(key).replace(/"/g,'&quot;')}"${has?' open':''}><summary>✏️ 풀이 칸 <span class="muted">계산하며 직접 풀어 보세요${has?' · 쓴 풀이 있음':''}</span></summary><div class="padbar">${[['검정','#1b1f2e'],['빨강','#d23b3b'],['파랑','#1f6fd1']].map(([n,c])=>`<button class="chip${PADT.mode==='pen'&&PADT.color===c?' on':''}" data-padt="c|${c}">${n}</button>`).join('')}<button class="chip${PADT.mode==='eraser'?' on':''}" data-padt="eraser">지우개</button><button class="chip" data-padt="undo">되돌리기</button><button class="chip" data-padt="clear">모두 지우기</button><button class="chip" data-padt="grow">칸 늘리기</button></div><canvas class="padc" width="1000" height="420"></canvas></details>`}
-function padInit(cv){if(cv._i)return;cv._i=1;cv._h=[];const u=PAD.get(cv.closest('.pad').dataset.pk);if(u){const im=new Image();im.onload=()=>{if(im.height>cv.height)cv.height=im.height;cv.getContext('2d').drawImage(im,0,0)};im.src=u}}
+const padKey=(id,seed)=>SK()+'|'+id+'|'+seed;
+let _pdb=null;
+function padDB(){if(!_pdb)_pdb=new Promise(res=>{try{const q=indexedDB.open('m12pad',1);q.onupgradeneeded=()=>q.result.createObjectStore('w',{keyPath:'k'});q.onsuccess=()=>res(q.result);q.onerror=()=>res(null);q.onblocked=()=>res(null)}catch(e){res(null)}});return _pdb}
+async function padGet(k){const d=await padDB();if(!d)return null;return new Promise(r=>{try{const q=d.transaction('w').objectStore('w').get(k);q.onsuccess=()=>r(q.result||null);q.onerror=()=>r(null)}catch(e){r(null)}})}
+async function padAll(){const d=await padDB();if(!d)return[];return new Promise(r=>{try{const q=d.transaction('w').objectStore('w').getAll();q.onsuccess=()=>r(q.result||[]);q.onerror=()=>r([])}catch(e){r([])}})}
+async function padPut(r){const d=await padDB();if(!d)return;const{redo,...c}=r;try{d.transaction('w','readwrite').objectStore('w').put(c)}catch(e){}}
+async function padDel(k){const d=await padDB();if(!d)return;try{d.transaction('w','readwrite').objectStore('w').delete(k)}catch(e){}}
+function padMark(id,seed,ok){const k=padKey(id,seed),r=PADS.get(k);if(r){r.ok=ok;padPut(r)}else padGet(k).then(x=>{if(x){x.ok=ok;padPut(x)}})}
+/* 한 획 그리기 */
+function padStroke(c,s){const p=s.p,n=p.length/3;if(!n)return;c.save();c.lineCap='round';c.lineJoin='round';c.strokeStyle=s.c;c.lineWidth=s.w;
+ if(s.t==='e'){c.globalCompositeOperation='destination-out';c.strokeStyle='#000'}else if(s.t==='h'){c.globalAlpha=.38;c.lineCap='butt'}
+ if(s.pr&&s.t==='p'&&n>1){for(let i=1;i<n;i++){c.lineWidth=s.w*(.35+1.3*((p[i*3-1]+p[i*3+2])/200));c.beginPath();c.moveTo(p[i*3-3],p[i*3-2]);c.lineTo(p[i*3],p[i*3+1]);c.stroke()}}
+ else{c.beginPath();c.moveTo(p[0],p[1]);if(n===1)c.lineTo(p[0]+.01,p[1]);else if(n===2||s.t==='l')c.lineTo(p[(n-1)*3],p[(n-1)*3+1]);else{for(let i=1;i<n-1;i++){const mx=(p[i*3]+p[i*3+3])/2,my=(p[i*3+1]+p[i*3+4])/2;c.quadraticCurveTo(p[i*3],p[i*3+1],mx,my)}c.lineTo(p[(n-1)*3],p[(n-1)*3+1])}c.stroke()}
+ c.restore()}
+function padRender(cv,strokes){const c=cv.getContext('2d');c.clearRect(0,0,cv.width,cv.height);strokes.forEach(s=>{if(s.t==='x')c.clearRect(0,0,cv.width,cv.height);else padStroke(c,s)})}
+/* 부모용·AI용 이미지: 흰 바탕 */
+function padImage(r,type){const t=document.createElement('canvas');t.width=1000;t.height=r.h||420;padRender(t,r.strokes);const o=document.createElement('canvas');o.width=t.width;o.height=t.height;const c=o.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,o.width,o.height);c.drawImage(t,0,0);return o}
+async function padBlob(r){try{return await new Promise(res=>padImage(r).toBlob(res,'image/jpeg',.88))}catch(e){return null}}
+const padHas=r=>!!(r&&r.strokes&&r.strokes.some(s=>s.t!=='x'));
+function padHTML(it,ai,done){if(!padOn())return'';const k=padKey(it.id,it.seed),r=PADS.get(k),has=padHas(r),T=PADT,ok=done?(it.pick===ai?1:0):'';
+ return `<details class="pad" data-pk="${k}" data-pid="${it.id}" data-pseed="${it.seed}" data-pok="${ok}"${has?' open':''}><summary>✏️ 풀이 칸 <span class="muted">${has?'· 저장된 풀이 있음':'· 계산하며 직접 풀어 보세요 (자동 저장)'}</span></summary>
+ <div class="padtl"><div class="padrow">${[['p','✒️ 펜'],['h','🖍 형광펜'],['e','지우개'],['l','직선']].map(([t,n])=>`<button class="chip${T.tool===t?' on':''}" data-padt="t|${t}">${n}</button>`).join('')}<label class="padw">굵기 <input type="range" min="1" max="40" value="${T.w[T.tool]}" data-padw="1"></label></div>
+ <div class="padrow">${PADC.map(c=>`<button class="padsw${T.color===c?' on':''}" style="background:${c}" data-padt="c|${c}" aria-label="색"></button>`).join('')}</div>
+ <div class="padrow"><button class="chip" data-padt="undo">↩ 되돌리기</button><button class="chip" data-padt="redo">↪ 다시</button><button class="chip" data-padt="clear">모두 지우기</button><button class="chip" data-padt="grow">칸 늘리기</button><button class="chip${T.po?' on':''}" data-padt="po">펜만 쓰기(손바닥 방지)</button></div></div>
+ <canvas class="padc${T.po?' po':''}" width="1000" height="${r?r.h:420}"></canvas></details>`}
+function padSync(){document.querySelectorAll('.pad').forEach(b=>{const T=PADT;b.querySelectorAll('[data-padt^="t|"]').forEach(x=>x.classList.toggle('on',x.dataset.padt==='t|'+T.tool));b.querySelectorAll('.padsw').forEach(x=>x.classList.toggle('on',x.dataset.padt==='c|'+T.color));const po=b.querySelector('[data-padt="po"]');if(po)po.classList.toggle('on',T.po);const w=b.querySelector('[data-padw]');if(w)w.value=T.w[T.tool];const cv=b.querySelector('canvas.padc');if(cv)cv.classList.toggle('po',T.po)});LS.set('m12-padt',PADT)}
+async function padInit(cv){if(cv._i)return;cv._i=1;const box=cv.closest('.pad'),k=box.dataset.pk;let r=PADS.get(k);if(!r){r=await padGet(k);if(r){r.redo=[];PADS.set(k,r)}}
+ if(r){cv.height=r.h||420;padRender(cv,r.strokes);if(padHas(r)){box.open=true;const sp=box.querySelector('summary .muted');if(sp)sp.textContent='· 저장된 풀이 있음'}}}
 const padPt=(cv,e)=>{const r=cv.getBoundingClientRect(),s=cv.width/r.width;return[(e.clientX-r.left)*s,(e.clientY-r.top)*s,s]};
-const padSave=cv=>{const k=cv.closest('.pad').dataset.pk;PAD.set(k,cv.toDataURL('image/png'));const sp=cv.closest('.pad').querySelector('summary .muted');if(sp)sp.textContent=' 쓴 풀이 있음'};
-function padSeg(cv,a,b){const c=cv.getContext('2d'),s=b[2];c.lineCap='round';c.lineJoin='round';c.globalCompositeOperation=PADT.mode==='eraser'?'destination-out':'source-over';c.strokeStyle=PADT.color;c.lineWidth=(PADT.mode==='eraser'?20:2.4)*s*(b.p||1);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke()}
 let padD=null;
-document.addEventListener('pointerdown',e=>{const cv=e.target.closest&&e.target.closest('canvas.padc');if(!cv)return;e.preventDefault();padInit(cv);try{cv.setPointerCapture(e.pointerId)}catch(_){}
- cv._h.push(cv.toDataURL());if(cv._h.length>20)cv._h.shift();const p=padPt(cv,e);padD={cv,last:p,id:e.pointerId};padSeg(cv,p,[p[0]+.01,p[1],p[2]])},true);
-document.addEventListener('pointermove',e=>{if(!padD||e.pointerId!==padD.id)return;e.preventDefault();const p=padPt(padD.cv,e);padSeg(padD.cv,padD.last,p);padD.last=p},true);
-const padEnd=e=>{if(!padD||(e&&e.pointerId!==padD.id))return;padSave(padD.cv);padD=null};
+document.addEventListener('pointerdown',e=>{const cv=e.target.closest&&e.target.closest('canvas.padc');if(!cv)return;if(PADT.po&&e.pointerType==='touch')return;e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}
+ const box=cv.closest('.pad'),k=box.dataset.pk;let r=PADS.get(k);if(!r){r={k,id:box.dataset.pid,seed:+box.dataset.pseed,h:cv.height,strokes:[],redo:[],at:Date.now(),ok:null};PADS.set(k,r)}
+ if(box.dataset.pok!=='')r.ok=box.dataset.pok==='1';r.redo=[];r.h=cv.height;const T=PADT,t=T.tool,pt=padPt(cv,e),pen=e.pointerType==='pen';
+ const cache=document.createElement('canvas');cache.width=cv.width;cache.height=cv.height;cache.getContext('2d').drawImage(cv,0,0);
+ const st={t,c:t==='e'?'#000':T.color,w:+(T.w[t]/2*pt[2]).toFixed(2),p:[Math.round(pt[0]),Math.round(pt[1]),pen&&e.pressure>0?Math.round(e.pressure*100):50],pr:pen&&t==='p'};
+ padD={cv,r,st,cache,id:e.pointerId,box};padLive()},true);
+function padLive(){const d=padD;if(!d)return;const c=d.cv.getContext('2d');c.clearRect(0,0,d.cv.width,d.cv.height);c.drawImage(d.cache,0,0);padStroke(c,d.st)}
+document.addEventListener('pointermove',e=>{const d=padD;if(!d||e.pointerId!==d.id)return;e.preventDefault();const pen=e.pointerType==='pen',evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+ for(const ev of(evs.length?evs:[e])){const pt=padPt(d.cv,ev),x=Math.round(pt[0]),y=Math.round(pt[1]),pr=pen&&ev.pressure>0?Math.round(ev.pressure*100):50;
+  if(d.st.t==='l'){d.st.p=[d.st.p[0],d.st.p[1],d.st.p[2],x,y,pr]}else{const p=d.st.p,n=p.length;if(Math.abs(p[n-3]-x)+Math.abs(p[n-2]-y)>=1)p.push(x,y,pr)}}
+ padLive()},true);
+function padEnd(e){const d=padD;if(!d||(e&&e.pointerId!==d.id))return;padD=null;d.r.strokes.push(d.st);d.r.at=Date.now();padRender(d.cv,d.r.strokes);padPut(d.r);const sp=d.box.querySelector('summary .muted');if(sp)sp.textContent='· 저장됨'}
 document.addEventListener('pointerup',padEnd,true);document.addEventListener('pointercancel',padEnd,true);
-document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-padt]');if(!b)return;e.stopPropagation();const box=b.closest('.pad'),cv=box.querySelector('canvas.padc'),[a,v]=b.dataset.padt.split('|');padInit(cv);
- if(a==='c'){PADT.mode='pen';PADT.color=v}else if(a==='eraser'){PADT.mode='eraser'}
- else if(a==='undo'){const u=cv._h.pop();if(u){const im=new Image();im.onload=()=>{const c=cv.getContext('2d');c.globalCompositeOperation='source-over';c.clearRect(0,0,cv.width,cv.height);c.drawImage(im,0,0);padSave(cv)};im.src=u}}
- else if(a==='clear'){cv._h.push(cv.toDataURL());cv.getContext('2d').clearRect(0,0,cv.width,cv.height);PAD.delete(box.dataset.pk);const sp=box.querySelector('summary .muted');if(sp)sp.textContent=' 계산하며 직접 풀어 보세요'}
- else if(a==='grow'){const old=cv.toDataURL(),im=new Image();im.onload=()=>{cv.height+=300;const c=cv.getContext('2d');c.globalCompositeOperation='source-over';c.drawImage(im,0,0);padSave(cv)};im.src=old}
- box.querySelectorAll('.padbar [data-padt^="c|"],.padbar [data-padt="eraser"]').forEach(x=>{const[y,w]=x.dataset.padt.split('|');x.classList.toggle('on',y==='c'?(PADT.mode==='pen'&&PADT.color===w):PADT.mode==='eraser')})},true);
+document.addEventListener('input',e=>{const w=e.target.closest&&e.target.closest('[data-padw]');if(!w)return;PADT.w[PADT.tool]=+w.value;LS.set('m12-padt',PADT)},true);
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-padt]');if(!b)return;e.stopPropagation();const box=b.closest('.pad'),cv=box.querySelector('canvas.padc'),[a,v]=b.dataset.padt.split('|');
+ const get=()=>{const k=box.dataset.pk;let r=PADS.get(k);if(!r){r={k,id:box.dataset.pid,seed:+box.dataset.pseed,h:cv.height,strokes:[],redo:[],at:Date.now(),ok:null};PADS.set(k,r)}return r};
+ if(a==='t'){PADT.tool=v;if(v==='h'&&['#1b1f2e','#8a8f9c'].includes(PADT.color))PADT.color='#ffe34d';padSync();return}
+ if(a==='c'){PADT.color=v;if(PADT.tool==='e')PADT.tool='p';padSync();return}
+ if(a==='po'){PADT.po=!PADT.po;padSync();return}
+ const r=get();r.redo=r.redo||[];
+ if(a==='undo'){const s=r.strokes.pop();if(s)r.redo.push(s)}
+ else if(a==='redo'){const s=r.redo.pop();if(s)r.strokes.push(s)}
+ else if(a==='clear'){if(padHas(r)){r.strokes.push({t:'x',c:'#000',w:1,p:[]});r.redo=[]}}
+ else if(a==='grow'){r.h=cv.height+300;cv.height=r.h}
+ r.at=Date.now();padRender(cv,r.strokes);padPut(r);const sp=box.querySelector('summary .muted');if(sp)sp.textContent=padHas(r)?'· 저장됨':'· 계산하며 직접 풀어 보세요 (자동 저장)'},true);
 new MutationObserver(()=>document.querySelectorAll('canvas.padc').forEach(padInit)).observe(document.querySelector('.wrap'),{childList:true,subtree:true});
-async function padBlob(url){try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});const cv=document.createElement('canvas');cv.width=im.width;cv.height=im.height;const c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.drawImage(im,0,0);return await new Promise(r=>cv.toBlob(r,'image/jpeg',.85))}catch(e){return null}}
 function qHTML(it,idx,o){if(it.d.sa)return saHTML(it,idx,o);const t=TYPE[it.id],d=it.d,ai=d.opts.indexOf(d.ans),done=o.graded;
  const short=d.opts.every(x=>x.length<=14);
  const opts=d.opts.map((x,j)=>{let c='',mk='';if(done){if(j===ai){c='ok';mk='정답'}if(it.pick===j&&j!==ai){c='no';mk='내 답'}}else if(it.pick===j)c='on';
   return `<li><button class="opt ${c}" data-q="${idx}" data-j="${j}" ${done&&o.lock?'disabled':''}><span class="bub">${j+1}</span><span>${x}</span>${mk?`<span class="mk">${mk}</span>`:''}</button></li>`}).join('');
  const exp=`<div class="exp"><b class="h">정답 ${CIRC[ai]} · 풀이</b>${d.exp}</div>`;
  return `<article class="q" id="q${idx}" data-aik="${CUR}|${hsh(d.q)}" data-ans="${ai+1}" data-pick="${it.pick??-1}" data-done="${done?1:0}"><template class="aix">${d.exp}</template><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lv${t.lv}">${LV[t.lv]}</span></div>
- <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}${padHTML(CUR+'|'+hsh(d.q),done)}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}
+ <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}${padHTML(it,ai,done)}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}
  ${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
 const scoped=()=>T.filter(t=>sel.has(t.u));
 const qCount=t=>t.bank?t.n:'∞';
@@ -5929,9 +5968,9 @@ function origList(){if(!HAS_ORIG)return'';const L=ORIG.filter(o=>o.subj===CUR&&(
 /* ===== 오답노트 ===== */
 function weakTypes(){return Object.entries(allS().t).map(([id,[n,c]])=>({id,n,c,w:n-c})).filter(x=>x.w>0&&TYPE[x.id]).sort((a,b)=>b.w-a.w||a.c/a.n-b.c/b.n)}
 function renderReview(){const v=$('#v-review');const wk=weakTypes(),A=allS();
- if(!A.w.length){v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}<div class="empty">${SJ[CUR].name}에서 아직 틀린 문제가 없습니다. 연습이나 모의고사에서 틀린 문제가 여기에 모입니다.</div>`;return}
+ if(!A.w.length){v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}${(()=>{try{return plogHTML()}catch(e){return''}})()}<div class="empty">${SJ[CUR].name}에서 아직 틀린 문제가 없습니다. 연습이나 모의고사에서 틀린 문제가 여기에 모입니다.</div>`;return}
  const cz={};A.w.forEach(x=>{if(x.c)cz[x.c]=(cz[x.c]||0)+1});const czN=Object.values(cz).reduce((a,b)=>a+b,0),czM=Math.max(1,...Object.values(cz)),top=CAUSE.filter(([k])=>cz[k]===czM&&czN)[0];
- v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}<div class="scope causes"><div class="bar"><b>틀린 까닭</b><span class="muted">${czN?`고른 문제 ${czN}개 · 안 고른 문제 ${A.w.length-czN}개`:'틀린 문제 아래에서 까닭을 고르면 여기에 모입니다.'}</span></div>${czN?`<div class="czl">${CAUSE.map(([k,n])=>`<div class="czr"><span>${n}</span><div class="meter"><i class="${top&&top[0]===k?'lo':''}" style="width:${(cz[k]||0)/czM*100}%"></i></div><b>${cz[k]||0}</b></div>`).join('')}</div><p class="cztip"><b>${top[1]}</b>가 가장 많습니다. ${CAUSE_TIP[top[0]]}</p>`:''}</div>
+ v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}${(()=>{try{return plogHTML()}catch(e){return''}})()}<div class="scope causes"><div class="bar"><b>틀린 까닭</b><span class="muted">${czN?`고른 문제 ${czN}개 · 안 고른 문제 ${A.w.length-czN}개`:'틀린 문제 아래에서 까닭을 고르면 여기에 모입니다.'}</span></div>${czN?`<div class="czl">${CAUSE.map(([k,n])=>`<div class="czr"><span>${n}</span><div class="meter"><i class="${top&&top[0]===k?'lo':''}" style="width:${(cz[k]||0)/czM*100}%"></i></div><b>${cz[k]||0}</b></div>`).join('')}</div><p class="cztip"><b>${top[1]}</b>가 가장 많습니다. ${CAUSE_TIP[top[0]]}</p>`:''}</div>
  <div class="bar" style="margin-top:14px"><h2 class="sec">자주 틀리는 유형</h2><span class="sp"></span><button class="btn pri sm" data-act="weak">약한 유형으로 10문항 시험</button></div>
  <div class="list" style="margin-top:8px">${wk.slice(0,6).map(x=>`<div class="row"><div class="t"><b>${TYPE[x.id].name}</b><p>${SUBNAME[TYPE[x.id].u]} · ${x.n}번 중 ${x.w}번 틀림</p></div><div class="acts"><button class="btn sm" data-new="${x.id}">연습</button></div></div>`).join('')}</div>
  <h2 class="sec" style="margin-top:16px">최근 틀린 문제</h2>
@@ -7202,7 +7241,7 @@ async function aiCtx(key){const st=AIS.get(key);const sj=SJ[CUR];
     const ans=+art.dataset.ans,pick=+art.dataset.pick,done=art.dataset.done==='1';
     const tp=document.createElement('div');tp.innerHTML=art.querySelector('template.aix')?.innerHTML||'';
     const state=!done?(pick>=0?`학생이 ${CIRC[pick]}를 골랐고 아직 채점 전`:'아직 풀지 않음'):(pick===ans-1?`학생이 ${CIRC[pick]}를 골라 맞힘`:pick>=0?`학생이 ${CIRC[pick]}를 골랐고 틀림`:'답을 고르지 않은 채 채점됨');
-    const imgs=[];const svg=art.querySelector('.fig svg');if(svg&&AI_IMG){const b=await aiSvgBlob(svg);if(b)imgs.push(b)}const pd=PAD.get(key);if(pd&&AI_IMG){const pb=await padBlob(pd);if(pb)imgs.push(pb)}
+    const imgs=[];const svg=art.querySelector('.fig svg');if(svg&&AI_IMG){const b=await aiSvgBlob(svg);if(b)imgs.push(b)}const pe=art.querySelector('.pad'),pr0=pe&&PADS.get(pe.dataset.pk),pd=padHas(pr0)?pr0:null;if(pd&&AI_IMG){const pb=await padBlob(pd);if(pb)imgs.push(pb)}
     return{imgs,txt:`과목: ${sj.name} (${sj.book})\n단원·유형: ${aiTxt(art.querySelector('.tag'))}\n\n[문제]\n${aiTxt(art.querySelector('.qt'))}${svg?`\n(그림이 있는 문제${imgs.length?' — 그림을 이미지로 함께 보냄':''})`:''}\n\n[보기]\n${opts}\n\n[정답·풀이]\n정답 ${CIRC[ans-1]}\n${aiTxt(tp)}\n\n[학생 상태]\n${state}${pd&&imgs.length?'\n\n[학생 풀이 이미지] 마지막 이미지는 학생이 손으로 쓴 풀이예요. 풀이 과정을 단계별로 읽고 맞는 단계와 틀린 단계를 짚어 줘요. 글씨가 안 보이면 솔직히 말해요.':''}`}}
   /* 원본 시험지 */
   const o=OV&&OV.o;if(!o)return{txt:'',imgs:[]};const num=(st.num||'').trim();const imgs=[];
@@ -7211,7 +7250,7 @@ async function aiCtx(key){const st=AIS.get(key);const sj=SJ[CUR];
     const p=OV.pick[i]||[];var stt=!OV.graded?(p.length?`학생이 ${p.map(n=>CIRC[n-1]).join(', ')}에 표시했고 아직 채점 전`:'아직 풀지 않음'):(it.a?(oOk(it,p)?'맞힘':`학생이 ${p.length?p.map(n=>CIRC[n-1]).join(', '):'무표기'}로 틀림`):'서술형 — 학생이 스스로 채점')}}
   return{imgs,txt:`과목: ${sj.name}\n시험지: ${o.title} (${o.meta})\n${imgs.length?`[이미지] 이 시험지 ${st.page}쪽 사진을 함께 보냄. 사진 속에서 해당 번호 문제를 찾아 읽어요.`:'[이미지 없음] 학생이 문제 내용을 직접 적었을 수 있어요.'}\n문제 번호: ${num||'(지정 안 함)'}\n\n[정답·풀이]\n${ak||'(답안표에서 찾지 못함)'}\n\n[학생 상태]\n${stt||'알 수 없음'}`}}
 function aiQuick(st){if(st.kind==='o')return['이 문제 힌트 주세요','풀이를 단계별로 알려 주세요','관련 개념을 정리해 주세요','비슷한 문제 하나 내 주세요'];
-  const art=document.querySelector(`article[data-aik="${st.key}"]`);const done=art&&art.dataset.done==='1',wrong=done&&+art.dataset.pick!==+art.dataset.ans-1;const mine=PAD.has(st.key)?['내 풀이가 맞는지 확인해 주세요']:[];
+  const art=document.querySelector(`article[data-aik="${st.key}"]`);const done=art&&art.dataset.done==='1',wrong=done&&+art.dataset.pick!==+art.dataset.ans-1;const mine=(()=>{const pe=art&&art.querySelector('.pad');return padHas(pe&&PADS.get(pe.dataset.pk))})()?['내 풀이가 맞는지 확인해 주세요']:[];
   return done?[...mine,'왜 이게 정답인가요?',...(wrong?['제 답은 왜 틀렸나요?']:[]),'더 쉽게 설명해 주세요','비슷한 문제 하나 내 주세요']:[...mine,'힌트 주세요','관련 개념을 설명해 주세요','어떤 순서로 풀면 돼요?']}
 function aiBoxHTML(st){const o=st.kind==='o'&&OV?OV.o:null;
   return `<div class="aibox" data-aib="${st.key}">
@@ -7333,6 +7372,46 @@ $('#v-review').addEventListener('click',e=>{const b=e.target.closest('[data-mb]'
 $('#v-review').addEventListener('change',e=>{if(e.target.id==='mbFile'&&e.target.files&&e.target.files[0]){const f=e.target.files[0];e.target.value='';mbAnalyze(f)}});
 $('#v-review').addEventListener('keydown',e=>{if(e.target.id==='mbQ'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();const t=e.target.value;e.target.value='';mbAsk(t)}});
 setTimeout(()=>{if(SAMPLE&&!$('#v-review').hidden)renderReview()},1800);
+/* ===== 풀이 기록 (부모 확인용): 아이가 풀이 칸에 쓴 풀이를 문제·정답 풀이와 나란히 보고, 평가·메모를 남기고, AI로 풀이를 비교한다 ===== */
+const PL={filter:'all',open:null,busy:false,txt:'',err:''};
+const PL_RATE=[['ok','✔ 풀이 정확'],['part','△ 일부 부족'],['redo','✖ 다시 쓰기']];
+function plogHTML(){setTimeout(plogRender,0);return '<div id="plogBox" style="margin-bottom:14px"><div class="muted">풀이 기록을 불러오는 중…</div></div>'}
+async function plogRender(){const box=document.getElementById('plogBox');if(!box)return;
+ const pre=SK()+'|';let all=(await padAll()).filter(r=>r.k.startsWith(pre)&&padHas(r)&&TYPE[r.id]);all.forEach(r=>{const m=PADS.get(r.k);if(m)Object.assign(r,{rate:m.rate,memo:m.memo,ai:m.ai,ok:m.ok})});
+ all.sort((a,b)=>b.at-a.at);const F=PL.filter,list=all.filter(r=>F==='all'||(F==='wrong'&&r.ok===false)||(F==='ung'&&r.ok==null)||(F==='todo'&&!r.rate));
+ if(PL.open){const r=all.find(x=>x.k===PL.open);if(r){box.innerHTML=plogDetail(r);return}PL.open=null}
+ const cnt={wrong:all.filter(r=>r.ok===false).length,todo:all.filter(r=>!r.rate).length};
+ box.innerHTML=`<div class="scope"><div class="bar"><b>📒 풀이 기록</b><span class="muted">${SJ[CUR].name} · 아이가 풀이 칸에 쓴 풀이 ${all.length}개 · 부모 확인 전 ${cnt.todo}개</span></div>
+  ${all.length?`<div class="bar" style="margin-top:8px">${[['all','전체'],['wrong','틀린 문제'],['ung','채점 전'],['todo','확인 전']].map(([k,n])=>`<button class="chip${F===k?' on':''}" data-pl="f|${k}">${n}</button>`).join('')}</div>
+  <div class="list" style="margin-top:8px">${list.length?list.map(r=>{const t=TYPE[r.id],im=padImage(r).toDataURL('image/jpeg',.5);return `<div class="row"><div class="t" style="display:flex;gap:10px;align-items:center"><img src="${im}" alt="" style="width:92px;height:${Math.round(92*(r.h||420)/1000)}px;border:1px solid var(--rule);border-radius:6px;background:#fff"><div><b>${t.name}</b><p>${SUBNAME[t.u]} · ${new Date(r.at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})} · ${r.ok==null?'채점 전':r.ok?'맞힘':'틀림'}${r.rate?' · '+PL_RATE.find(x=>x[0]===r.rate)[1]:''}</p></div></div><div class="acts"><button class="btn sm" data-pl="o|0" data-k="${r.k}">확인</button></div></div>`}).join(''):'<div class="empty" style="margin:8px 0">해당하는 풀이가 없습니다.</div>'}</div>`:'<p class="muted" style="margin:8px 0 0">풀이 칸(수학·과학·기술가정 문제 아래)에 쓴 풀이가 여기에 자동으로 모여, 정답 풀이와 나란히 확인할 수 있습니다.</p>'}</div>`}
+function plogDetail(r){const t=TYPE[r.id],d=gen(r.id,r.seed),E=aiEsc,ai=d.opts.indexOf(d.ans),im=padImage(r).toDataURL('image/jpeg',.85);
+ return `<div class="scope"><div class="bar"><b>${t.name}</b><span class="muted">${SUBNAME[t.u]} · ${new Date(r.at).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit'})} · ${r.ok==null?'채점 전':r.ok?'맞힘':'틀림'}</span><span class="sp"></span><button class="btn sm" data-pl="c|0">목록</button></div>
+  <h3 class="mbh">문제</h3><div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${d.sa?'':`<ol class="opts" style="margin-top:6px">${d.opts.map((o,i)=>`<li class="opt${i===ai?' ok':''}" style="cursor:default"><span class="bub">${i+1}</span><span>${o}</span>${i===ai?'<span class="mk">정답</span>':''}</li>`).join('')}</ol>`}
+  <h3 class="mbh">아이가 쓴 풀이</h3><img src="${im}" alt="아이의 풀이" style="width:100%;border:1px solid var(--rule);border-radius:8px;background:#fff">
+  <h3 class="mbh">정답 · 모범 풀이</h3><div class="exp"><b class="h">정답 ${CIRC[ai]??''} · 풀이</b>${d.exp}</div>
+  <h3 class="mbh">부모 확인</h3><div class="bar" style="gap:6px">${PL_RATE.map(([k,n])=>`<button class="chip${r.rate===k?' on':''}" data-pl="r|${k}">${n}</button>`).join('')}</div>
+  <textarea class="satx" id="plMemo" rows="2" placeholder="메모 (예: 3단계에서 부호 실수)">${E(r.memo||'')}</textarea>
+  ${mbOn()?`<div class="bar" style="margin-top:6px"><button class="btn pri sm" data-pl="ai|0" ${PL.busy?'disabled':''}>AI로 풀이 비교하기</button><span class="muted">모범 풀이와 얼마나 같은지, 틀린 단계는 어디인지 알려줘요</span></div>`:''}
+  ${PL.busy?'<p class="aimsg t think" style="margin:8px 0 0">풀이를 비교하는 중이에요…</p>':''}${PL.err?`<p class="ainote">${E(PL.err)}</p>`:''}${r.ai?`<div class="aimsg t" style="margin-top:8px"><b>AI 풀이 비교</b><br>${aiFmt(r.ai)}</div>`:''}
+  <div class="bar" style="margin-top:10px"><button class="btn sm" data-pl="again|0">같은 문제 다시 풀기</button><button class="btn sm" data-pl="del|0">풀이 삭제</button></div></div>`}
+async function plogAI(k){const r=PADS.get(k)||await padGet(k);if(!r||!SAMPLE||PL.busy)return;PL.busy=true;PL.err='';plogRender();
+ try{const d=gen(r.id,r.seed),imgs=[];if(d.fig&&AI_IMG){const div=document.createElement('div');div.innerHTML=d.fig;const sv=div.querySelector('svg');if(sv){const b=await aiSvgBlob(sv);if(b)imgs.push(b)}}
+  const pb=await padBlob(r);if(pb)imgs.push(pb);
+  const msg=`${AI_RULES}\n\n지금은 학부모가 아이의 손글씨 풀이를 확인하려는 상황이에요. 아래 [학생 풀이 이미지](마지막 이미지)를 [모범 풀이]와 비교해서 다음 형식으로 답해요.\n1. **풀이 일치도: N%** (핵심 단계가 모범 풀이와 얼마나 같은지, 한 줄 근거)\n2. 맞게 쓴 단계\n3. 빠졌거나 틀린 단계(어디서 어떻게 틀렸는지)\n4. 학부모를 위한 한 줄 총평\n글씨가 읽히지 않는 부분은 솔직히 말하고, 다른 방법으로 맞게 풀었다면 인정해요.\n\n과목: ${SJ[CUR].name}\n[문제]\n${aiTxt((()=>{const x=document.createElement('div');x.innerHTML=d.q;return x})())}${d.opts.length?'\n[보기]\n'+d.opts.map((o,i)=>`${CIRC[i]} ${aiTxt((()=>{const x=document.createElement('div');x.innerHTML=o;return x})())}`).join('\n'):''}\n\n[정답·모범 풀이]\n정답 ${CIRC[d.opts.indexOf(d.ans)]??''}\n${aiTxt((()=>{const x=document.createElement('div');x.innerHTML=d.exp;return x})())}\n\n[학생 상태]\n${r.ok==null?'채점 전':r.ok?'정답을 맞힘':'정답을 틀림'}`;
+  const res=await SAMPLE([{role:'user',content:msg}],{images:imgs,cache:false});r.ai=res.text;const m=PADS.get(k)||r;m.ai=res.text;PADS.set(k,m);padPut(m)}
+ catch(e){PL.err=(e&&e.code&&AI_ERR[e.code])||'AI 비교를 하지 못했어요. 다시 시도해 주세요.'}
+ finally{PL.busy=false;plogRender()}}
+$('#v-review').addEventListener('click',e=>{const b=e.target.closest('[data-pl]');if(!b)return;const[a,v]=b.dataset.pl.split('|');e.stopPropagation();
+ if(a==='f'){PL.filter=v;plogRender();return}
+ if(a==='o'){PL.open=b.dataset.k;PL.err='';plogRender();return}
+ if(a==='c'){PL.open=null;plogRender();return}
+ const k=PL.open;if(!k)return;
+ (async()=>{let r=PADS.get(k)||await padGet(k);if(!r)return;if(!PADS.has(k)){r.redo=[];PADS.set(k,r)}
+  if(a==='r'){r.rate=r.rate===v?null:v;padPut(r);plogRender()}
+  else if(a==='ai')plogAI(k)
+  else if(a==='again'){newPractice(r.id,r.seed);show('practice')}
+  else if(a==='del'){PADS.delete(k);await padDel(k);PL.open=null;plogRender()}})()},true);
+$('#v-review').addEventListener('change',e=>{if(e.target.id!=='plMemo'||!PL.open)return;const k=PL.open,v=e.target.value;(async()=>{const r=PADS.get(k)||await padGet(k);if(r){r.memo=v;if(!PADS.has(k)){r.redo=[];PADS.set(k,r)}padPut(r)}})()});
 
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
