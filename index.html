@@ -507,7 +507,7 @@ add({id:'a1-vert',u:'A1',name:'맞꼭지각',lv:1,g:R=>{const x=R.i(15,40),a=R.i
 add({id:'a1-flat',u:'A1',name:'평각과 각의 크기의 비',lv:1,g:R=>{let p,q,r,s;do{p=R.i(1,5);q=R.i(2,6);r=R.i(2,8);s=p+q+r}while(180%s||p===q||q===r||p===r);
  const u=180/s,m=Math.max(p,q,r),mn=Math.min(p,q,r),ans=m*u;
  return{q:`평각을 세 각 ∠a, ∠b, ∠c로 나누었더니 ∠a : ∠b : ∠c = ${p} : ${q} : ${r}이었다. 가장 큰 각의 크기는?`,
- ...mc(R,ans,[mn*u,(s-m-mn)*u,ans+u,90,ans-u],v=>v+'°'),exp:`평각의 크기는 180°이므로 가장 큰 각의 크기는<br>180° × ${fr(m,s)} = <b>${ans}°</b>`}}});
+ ...mc(R,ans,[mn*u,(s-m-mn)*u,ans+u,90,ans-u],v=>v+'°'),exp:`평각의 크기는 180°이므로 가장 큰 각의 크기는<br>180° × ${fr(m,s)} = <b>${ans}°</b>`,m:'평각 × 비의 비율',alts:[['한 칸의 크기부터 구하기',`비의 합이 ${s}이므로 한 칸의 크기 = 180° ÷ ${s} = ${u}°<br>가장 큰 각은 ${m}칸이므로 ${m} × ${u}° = <b>${ans}°</b>`]]}}});
 add({id:'a1-pv',u:'A1',name:'교점과 교선의 개수',lv:1,g:R=>{const n=R.i(3,8),k=R.pick(['기둥','뿔']);const V=k==='기둥'?2*n:n+1,E=k==='기둥'?3*n:2*n,F=k==='기둥'?n+2:n+1,ans=V+E;
  return{q:`${NUM[n]}각${k}에서 교점의 개수를 a, 교선의 개수를 b라 할 때, a + b의 값은?`,...mc(R,ans,[V+F,E+F,ans+n,ans-n,ans+2],String),
  exp:`교점의 개수는 꼭짓점의 개수와 같으므로 a = ${V}<br>교선의 개수는 모서리의 개수와 같으므로 b = ${E}<br>∴ a + b = <b>${ans}</b>`}}});
@@ -590,7 +590,7 @@ add({id:'b1-ratio',u:'B1',name:'한 내각과 한 외각의 비',lv:3,g:R=>{cons
 add({id:'b1-ext',u:'B1',name:'삼각형의 외각',lv:2,g:R=>{const q=R.i(1,2),r=q+2,x=R.i(15,30),a=R.i(5,x-5),b=x-a;
  const la=`(${ex(1,a)})°`,lb=`${q===1?'':q}x°`,le=`(${ex(r,-b)})°`;
  return{q:`그림의 △ABC에서 x의 값은?`,fig:figTri(la,lb,le),alt:`∠A = ${la}, ∠B = ${lb}, ∠C의 외각 = ${le}`,...mc(R,x,[x+5,x-5,a,2*x,x+10],String),
- exp:`삼각형의 한 외각의 크기는 이웃하지 않는 두 내각의 크기의 합과 같으므로<br>(${ex(1,a)}) + ${q===1?'':q}x = ${ex(r,-b)} &nbsp;∴ x = <b>${x}</b>`}}});
+ exp:`삼각형의 한 외각의 크기는 이웃하지 않는 두 내각의 크기의 합과 같으므로<br>(${ex(1,a)}) + ${q===1?'':q}x = ${ex(r,-b)} &nbsp;∴ x = <b>${x}</b>`,m:'삼각형의 외각의 크기 = 이웃하지 않는 두 내각의 합',alts:[['내각의 합 180° + 일직선 180°',`∠C = 180° − (${ex(r,-b)})°이고 세 내각의 합은 180°이다.<br>(${ex(1,a)}) + ${q===1?'':q}x + 180 − (${ex(r,-b)}) = 180 → −x + ${a+b} = 0 &nbsp;∴ x = <b>${x}</b>`]]}}});
 add({id:'b1-miss',u:'B1',name:'다각형의 내각의 크기',lv:2,g:R=>{const n=R.pick([5,6]),S=(n-2)*180;let ang,x;do{ang=[...Array(n-1)].map(()=>R.i(n===5?90:100,n===5?130:145));x=S-ang.reduce((s,v)=>s+v,0)}while(x<70||x>170);
  return{q:`${NUM[n]}각형의 내각의 크기가 각각 ${ang.map(v=>v+'°').join(', ')}, x°일 때, x의 값은?`,...mc(R,x,[x+10,x-10,x+20,360-x,x-20],String),
  exp:`${NUM[n]}각형의 내각의 크기의 합 = 180° × ${n-2} = ${S}°<br>x = ${S} − (${ang.join(' + ')}) = <b>${x}</b>`,m:'다각형의 내각의 크기의 합',alts:[['다각형의 외각의 합 360° 이용',`각 내각의 외각: ${ang.map(v=>(180-v)+'°').join(', ')} → 합 ${ang.reduce((t,v)=>t+180-v,0)}°<br>외각의 크기의 합은 360°이므로 x의 외각 = 360° − ${ang.reduce((t,v)=>t+180-v,0)}° = ${360-ang.reduce((t,v)=>t+180-v,0)}°<br>∴ x = 180° − ${360-ang.reduce((t,v)=>t+180-v,0)}° = <b>${x}</b>`]]}}});
@@ -810,7 +810,7 @@ add({id:'c2-frus',u:'C2',name:'[심화] 원뿔대의 부피',lv:3,g:R=>{const r=
 function figHole(Rl,rl,hl){return svg(300,200,`<ellipse class="ln" cx="150" cy="40" rx="80" ry="18"/><ellipse class="sh" cx="150" cy="40" rx="35" ry="8"/><path class="ln" d="M70 40V160M230 40V160M70 160A80 18 0 0 0 230 160"/><path class="ln dash" d="M70 160A80 18 0 0 1 230 160M115 40V150M185 40V150"/>${txt(Rl,230,28)}${txt(rl,150,62,'middle')}${txt(hl,238,104)}`)}
 add({id:'c2-hole',u:'C2',name:'[심화] 구멍 뚫린 원기둥',lv:3,g:R=>{const r=R.i(1,4),Rr=r+R.i(1,4),h=R.i(4,12),k=R.f()<.5;
  if(k){const ans=(Rr*Rr-r*r)*h;return{q:`그림은 밑면의 반지름이 ${Rr} cm인 원기둥의 가운데에서 밑면의 반지름이 ${r} cm인 원기둥을 뚫어 낸 입체도형이다. 높이가 ${h} cm일 때, 부피는?`,fig:figHole(`${Rr}cm`,`${r}cm`,`${h}cm`),alt:`바깥 반지름 ${Rr}, 안쪽 반지름 ${r}, 높이 ${h} (cm)`,
-  ...mc(R,ans,[Rr*Rr*h,(Rr-r)*(Rr-r)*h,(Rr*Rr+r*r)*h,ans+h,(Rr-r)*h],piF('cm³')),exp:`(큰 원기둥) − (작은 원기둥) = π × ${Rr}² × ${h} − π × ${r}² × ${h} = <b>${ans}π cm³</b>`}}
+  ...mc(R,ans,[Rr*Rr*h,(Rr-r)*(Rr-r)*h,(Rr*Rr+r*r)*h,ans+h,(Rr-r)*h],piF('cm³')),exp:`(큰 원기둥) − (작은 원기둥) = π × ${Rr}² × ${h} − π × ${r}² × ${h} = <b>${ans}π cm³</b>`,m:'(큰 원기둥) − (뚫은 원기둥)',alts:[['고리 모양 밑넓이 × 높이',`밑면은 고리 모양이므로 넓이 = π × ${Rr}² − π × ${r}² = ${Rr*Rr-r*r}π<br>(부피) = (밑넓이) × (높이) = ${Rr*Rr-r*r}π × ${h} = <b>${ans}π cm³</b>`]]}}
  const base=2*(Rr*Rr-r*r),side=2*Rr*h+2*r*h,ans=base+side;
  return{q:`그림은 밑면의 반지름이 ${Rr} cm인 원기둥의 가운데에서 밑면의 반지름이 ${r} cm인 원기둥을 뚫어 낸 입체도형이다. 높이가 ${h} cm일 때, 겉넓이는?`,fig:figHole(`${Rr}cm`,`${r}cm`,`${h}cm`),alt:`바깥 반지름 ${Rr}, 안쪽 반지름 ${r}, 높이 ${h} (cm)`,
  ...mc(R,ans,[base+2*Rr*h,2*Rr*Rr+2*Rr*h,ans-2*r*h*2>0?ans-4*r*h:ans+2,base+2*(Rr-r)*h],piF('cm²')),
@@ -935,7 +935,7 @@ add({id:'z1-tri',u:'Z1',name:'[심화] 좌표평면 위 삼각형의 넓이',lv:
  ...mc(R,S,[S2,S+2,S-2,box,box-S],String),exp:`세 점을 둘러싸는 직사각형(넓이 ${box})에서 바깥쪽 직각삼각형들의 넓이를 빼면 된다.<br>∴ △ABC = <b>${S}</b>`}}});
 add({id:'z2-dir',u:'Z2',name:'정비례 그래프 위의 점',lv:2,g:R=>{let a,p;do{a=R.pick([-3,-2,2,3,4]);p=R.pick([1,2,3,-1,-2])}while(Math.abs(a*p)>6);const k=R.pick([-4,-3,3,4,5].filter(v=>v!==p));
  return{q:`정비례 관계 y = ax의 그래프가 점 (${p}, ${a*p})을 지날 때, 이 그래프 위의 점 (${k}, b)에서 b의 값은?`,fig:figGrid([[p,a*p,'']],[x=>a*x]),alt:`y=ax 그래프, 점 (${p}, ${a*p}) 지남`,
- ...mc(R,a*k,[a*p,-a*k,k,a+k,a*k+a],String),exp:`${a*p} = a × ${p} → a = ${a}<br>y = ${a}x에 x = ${k}를 대입하면 b = <b>${a*k}</b>`}}});
+ ...mc(R,a*k,[a*p,-a*k,k,a+k,a*k+a],String),exp:`${a*p} = a × ${p} → a = ${a}<br>y = ${a}x에 x = ${k}를 대입하면 b = <b>${a*k}</b>`,m:'비례상수 a 구하기(대입)',alts:[['y ÷ x는 일정(비례식)',`정비례에서 y ÷ x의 값은 일정하다. ${p} : ${a*p} = ${k} : b 에서 b = ${a*p} × ${k} ÷ ${p} = <b>${a*k}</b>`]]}}});
 const ndiv=n=>{let c=0;for(let i=1;i<=n;i++)if(n%i===0)c++;return c};
 add({id:'z2-inv',u:'Z2',name:'[심화] 반비례 그래프와 정수 좌표',lv:3,g:R=>{const a=R.pick([6,8,10,12,-6,-8,-12,16,18]),p=R.pick([1,2,3,4,-1,-2,-3,-4].filter(v=>a%v===0&&Math.abs(a/v)<=6)),k=R.pick(['val','cnt']);
  if(k==='val'){const ds=[];for(let v=2;v<=Math.abs(a);v++)if(a%v===0)ds.push(v,-v);const x=R.pick(ds.filter(v=>v!==p));return{q:`반비례 관계 y = ${fr('a','x')}의 그래프가 점 (${p}, ${a/p})를 지날 때, x = ${x}일 때의 y의 값은?`,fig:figGrid([[p,a/p,'']],[t=>a/t]),alt:`y=a/x 그래프, 점 (${p}, ${a/p}) 지남`,
@@ -1316,7 +1316,7 @@ G({id:'k15-q',u:'K5b',name:'열량 계산',lv:2,g:R=>{
 
 G({id:'k15-cmp',u:'K5b',name:'[심화] 같은 열량을 가할 때 온도 변화 비교',lv:3,g:R=>{
  const P=[[1,0.5],[0.5,0.25],[1,0.2],[0.2,0.1],[1,0.1],[0.5,0.1]];const [cb,ca]=R.pick(P);const dB=R.pick([4,5,8,10]);const dA=dB*cb/ca;
- return{q:`질량이 같은 물질 A(비열 ${ca} kcal/(kg·°C))와 물질 B(비열 ${cb} kcal/(kg·°C))에 같은 열량을 가했더니 B의 온도가 ${dB} °C 올랐다. A의 온도는 몇 °C 올랐는가? (단, 열 손실은 없다.)`,...mc(R,dA,[dB,dA/2,dA*2,dB+ca*10,dB*ca/cb],v=>v+' °C'),exp:`같은 열량·같은 질량이면 온도 변화는 비열에 반비례한다.<br>Q = c × m × Δt이므로 ${cb} × ${dB} = ${ca} × Δt<sub>A</sub> → Δt<sub>A</sub> = <b>${dA} °C</b>`}}});
+ return{q:`질량이 같은 물질 A(비열 ${ca} kcal/(kg·°C))와 물질 B(비열 ${cb} kcal/(kg·°C))에 같은 열량을 가했더니 B의 온도가 ${dB} °C 올랐다. A의 온도는 몇 °C 올랐는가? (단, 열 손실은 없다.)`,...mc(R,dA,[dB,dA/2,dA*2,dB+ca*10,dB*ca/cb],v=>v+' °C'),exp:`같은 열량·같은 질량이면 온도 변화는 비열에 반비례한다.<br>Q = c × m × Δt이므로 ${cb} × ${dB} = ${ca} × Δt<sub>A</sub> → Δt<sub>A</sub> = <b>${dA} °C</b>`,m:'Q = c × m × Δt',alts:[['비열의 비로 온도 변화의 비 구하기',`질량·열량이 같으면 온도 변화는 비열에 반비례한다. A의 비열은 B의 ${r3(ca/cb)}배이므로 A의 온도 변화는 B의 ${r3(cb/ca)}배이다.<br>${dB} × ${r3(cb/ca)} = <b>${dA} °C</b>`]]}}});
 
 B('k15-exp','K5b','열팽창',1,[
  ['물질에 열을 가하면 길이나 부피가 늘어나는 현상은?','열팽창',['열평형','단열','응고','비열'],'온도가 높아지면 입자 운동이 활발해져 입자 사이 거리가 멀어지고 부피가 늘어난다.'],
@@ -1625,20 +1625,20 @@ function figSpring(F1,x1){const ox=40,oy=180,W=260,H=150,mf=10,mx=Math.ceil(x1*m
  s+=`<path class="arc" style="stroke-width:2" d="M${ox} ${oy}L${f1(tx(mf))} ${f1(ty(x1*mf/F1))}"/>${pt([tx(F1),ty(x1)])}<path class="ln dash" style="opacity:.6" d="M${f1(tx(F1))} ${oy}V${f1(ty(x1))}H${ox}"/>${txt('늘어난 길이(cm)',ox+4,12)}${txt('추의 무게(N)',ox+W,oy+30,'end')}`;return svg(320,218,s)}
 into('sci',{id:'k8-sgraph',u:'K8',name:'[심화] 탄성력 그래프와 달',lv:3,g:R=>{const c=R.pick([1,2,3]),F1=R.pick([2,4]),x1=c*F1,W=6*R.i(1,2),k=R.f()<.5;
  if(k){const F=R.i(5,10),ans=c*F;return{q:`그림은 어떤 용수철에 매단 추의 무게와 용수철이 늘어난 길이의 관계를 나타낸 것이다. 이 용수철에 무게가 ${F} N인 추를 매달면 용수철은 몇 cm 늘어나는가?`,fig:figSpring(F1,x1),alt:`무게 ${F1} N일 때 ${x1} cm 늘어남 (원점을 지나는 직선)`,...mc(R,ans,[ans+c,ans-c,F,x1+F,ans*2],v=>v+' cm'),
-  exp:`그래프에서 ${F1} N일 때 ${x1} cm → 1 N당 ${c} cm 늘어난다.<br>${F} N × ${c} = <b>${ans} cm</b>`}}
+  exp:`그래프에서 ${F1} N일 때 ${x1} cm → 1 N당 ${c} cm 늘어난다.<br>${F} N × ${c} = <b>${ans} cm</b>`,m:'1 N당 늘어난 길이',alts:[['비례식(무게 : 늘어난 길이)',`용수철이 늘어난 길이는 무게에 비례하므로 ${F1} : ${x1} = ${F} : x → x = ${x1} × ${F} ÷ ${F1} = <b>${ans} cm</b>`]]}}
  const ans=c*W/6;return{q:`그림은 어떤 용수철에 매단 추의 무게와 늘어난 길이의 관계를 지구에서 측정한 것이다. 지구에서 무게가 ${W} N인 추를 달에서 이 용수철에 매달면 용수철은 몇 cm 늘어나는가? (단, 달의 중력은 지구의 ${fr(1,6)}이다.)`,fig:figSpring(F1,x1),alt:`무게 ${F1} N일 때 ${x1} cm`,...mc(R,ans,[c*W,ans*2,W/6,ans+c],v=>v+' cm'),
- exp:`달에서 추의 무게 = ${W} × ${fr(1,6)} = ${W/6} N<br>1 N당 ${c} cm 늘어나므로 ${W/6} × ${c} = <b>${ans} cm</b> (질량은 같지만 무게가 줄어든다.)`}}});
+ exp:`달에서 추의 무게 = ${W} × ${fr(1,6)} = ${W/6} N<br>1 N당 ${c} cm 늘어나므로 ${W/6} × ${c} = <b>${ans} cm</b> (질량은 같지만 무게가 줄어든다.)`,m:'달에서의 무게 먼저 구하기',alts:[['지구에서의 늘어난 길이의 1/6',`지구에서라면 ${W} N일 때 ${W} × ${c} = ${W*c} cm 늘어난다. 달에서는 무게가 ${fr(1,6)}이므로 늘어난 길이도 ${fr(1,6)}이다.<br>${W*c} × ${fr(1,6)} = <b>${ans} cm</b>`]]}}});
 into('sci',{id:'k9-three',u:'K9',name:'[심화] 세 힘의 합력과 평형',lv:3,g:R=>{const a=R.i(3,12),b=R.i(3,12),k=R.f()<.5;
- if(k){const c=a+b;return{q:`정지해 있는 물체에 오른쪽으로 ${a} N과 ${b} N의 힘이 작용하고, 왼쪽으로 힘 F가 작용하고 있다. 물체가 계속 정지해 있을 때 F의 크기는?`,...mc(R,c,[Math.abs(a-b),a,b,c+2,c*2],v=>v+' N'),exp:`정지 상태를 유지하므로 알짜힘 = 0 → 왼쪽 힘 = 오른쪽 힘의 합<br>F = ${a} + ${b} = <b>${c} N</b>`}}
+ if(k){const c=a+b;return{q:`정지해 있는 물체에 오른쪽으로 ${a} N과 ${b} N의 힘이 작용하고, 왼쪽으로 힘 F가 작용하고 있다. 물체가 계속 정지해 있을 때 F의 크기는?`,...mc(R,c,[Math.abs(a-b),a,b,c+2,c*2],v=>v+' N'),exp:`정지 상태를 유지하므로 알짜힘 = 0 → 왼쪽 힘 = 오른쪽 힘의 합<br>F = ${a} + ${b} = <b>${c} N</b>`,m:'알짜힘 = 0 → 양쪽 힘의 합이 같다',alts:[['오른쪽을 +, 왼쪽을 −로 부호 붙이기',`(+${a}) + (+${b}) + (−F) = 0 이므로 F = ${a} + ${b} = <b>${c} N</b>`]]}}
  let c;do{c=R.i(3,20)}while(c===a+b);const net=a+b-c,ans=`${Math.abs(net)} N, ${net>0?'오른쪽':'왼쪽'}`;
  return{q:`한 물체에 오른쪽으로 ${a} N, 오른쪽으로 ${b} N, 왼쪽으로 ${c} N의 힘이 동시에 작용할 때, 알짜힘의 크기와 방향은?`,...mc(R,ans,[`${Math.abs(net)} N, ${net>0?'왼쪽':'오른쪽'}`,`${a+b+c} N, 오른쪽`,`${Math.abs(a+c-b)} N, 오른쪽`,'0 N',`${a+b} N, 오른쪽`]),
- exp:`오른쪽 합 ${a} + ${b} = ${a+b} N, 왼쪽 ${c} N<br>${Math.max(a+b,c)} − ${Math.min(a+b,c)} = ${Math.abs(net)} N, 큰 쪽 방향 → <b>${ans}</b>`}}});
+ exp:`오른쪽 합 ${a} + ${b} = ${a+b} N, 왼쪽 ${c} N<br>${Math.max(a+b,c)} − ${Math.min(a+b,c)} = ${Math.abs(net)} N, 큰 쪽 방향 → <b>${ans}</b>`,m:'방향별 합 비교',alts:[['오른쪽을 +, 왼쪽을 −로 계산',`(+${a}) + (+${b}) + (−${c}) = ${net}<br>${net>0?'양수이므로 오른쪽':'음수이므로 왼쪽'}, 크기 ${Math.abs(net)} N → <b>${ans}</b>`]]}}});
 function figBoyle(P1,V1){const ox=40,oy=180,W=260,H=150,mp=6,mv=Math.ceil(P1*V1/0.9/50)*50,tx=P=>ox+P*W/mp,ty=V=>oy-V*H/mv;let s=`<path class="ln" d="M${ox} 15V${oy}H${ox+W}"/>`;const ps=[];for(let P=0.9;P<=mp;P+=0.05)ps.push([tx(P),ty(P1*V1/P)]);
  s+=`<path class="arc" style="stroke-width:2" d="M${ps.map(p=>f1(p[0])+' '+f1(p[1])).join('L')}"/>${pt([tx(P1),ty(V1)])}<path class="ln dash" style="opacity:.6" d="M${f1(tx(P1))} ${oy}V${f1(ty(V1))}H${ox}"/>${txt(V1,ox-5,f1(ty(V1)+4),'end')}`;
  for(let P=1;P<=mp;P++)s+=txt(P,tx(P),oy+15,'middle');s+=`${txt('부피(mL)',ox+4,12)}${txt('압력(기압)',ox+W,oy+30,'end')}`;return svg(320,218,s)}
 into('sci',{id:'k11-bg',u:'K11',name:'[심화] 압력-부피 그래프',lv:3,g:R=>{let P1,P2;do{P1=R.i(1,3);P2=R.i(2,6)}while(P1===P2);const V1=P2*R.pick([20,30,40]),V2=P1*V1/P2;
  return{q:`그림은 온도가 일정할 때 일정량의 기체에 가한 압력과 기체의 부피 관계를 나타낸 것이다. 압력이 ${P2}기압일 때 기체의 부피는?`,fig:figBoyle(P1,V1),alt:`${P1}기압에서 ${V1} mL (반비례 곡선)`,...mc(R,V2,[V1*P2/P1,V1,V2*2,V1-V2,V2+10],v=>v+' mL'),
- exp:`온도가 일정하면 압력 × 부피 = 일정 (보일 법칙)<br>${P1} × ${V1} = ${P2} × V &nbsp;∴ V = <b>${V2} mL</b>`}}});
+ exp:`온도가 일정하면 압력 × 부피 = 일정 (보일 법칙)<br>${P1} × ${V1} = ${P2} × V &nbsp;∴ V = <b>${V2} mL</b>`,m:'압력 × 부피 = 일정',alts:[['반비례 → 몇 배가 되었는지 보기',`압력이 ${P1}기압에서 ${P2}기압으로 ${fr(P2,P1)}배가 되면 부피는 ${fr(P1,P2)}배가 된다.<br>${V1} × ${fr(P1,P2)} = <b>${V2} mL</b>`]]}}});
 function figMoonOrbit(){const c=[150,110],r=78,L='ABCDEFGH';let s=`<circle class="ln" cx="150" cy="110" r="${r}" style="stroke-dasharray:3 4;opacity:.6"/><circle cx="150" cy="110" r="16" style="fill:var(--chip);stroke:var(--ink)"/>${txt('지구',150,114,'middle')}`;
  for(let i=0;i<8;i++){const a=i*45*R2D,x=c[0]+r*Math.cos(a),y=c[1]-r*Math.sin(a);s+=`<circle cx="${f1(x)}" cy="${f1(y)}" r="8" style="fill:var(--sheet);stroke:var(--ink)"/><path d="M${f1(x)} ${f1(y-8)}A8 8 0 0 1 ${f1(x)} ${f1(y+8)}Z" style="fill:var(--omr-soft);stroke:none"/>${txt(L[i],f1(c[0]+(r+20)*Math.cos(a)),f1(c[1]-(r+20)*Math.sin(a)+4),'middle','v')}`}
  s+=`<path class="arc" d="M285 60H265M285 110H265M285 160H265"/>${txt('햇빛',300,40,'middle')}<path class="ln" d="M265 60l6 -4M265 60l6 4M265 110l6 -4M265 110l6 4M265 160l6 -4M265 160l6 4"/>`;return svg(320,220,s)}
@@ -5454,7 +5454,7 @@ const lin=(a,b)=>`${tm(a)}x${sgnT(b)}`;                                  // ax +
 A({id:'pr-lin1',u:'PR1',name:'일차방정식 풀기',lv:1,g:R=>{let x,a,c,b,d;
  do{x=R.i(-6,9);a=R.i(3,8);c=R.i(1,a-1);b=R.i(-9,9);d=(a-c)*x+b}while(!x||Math.abs(d)>40);
  return{q:`일차방정식 ${lin(a,b)} = ${lin(c,d)}의 해는?`,...mc(R,x,[-x,x+1,x-1,(d-b)/(a+c),x+2],String),
- exp:`x를 포함한 항은 좌변, 상수항은 우변으로 이항한다.<br>${a}x − ${c}x = ${d} − (${b}) → ${a-c}x = ${d-b}<br>∴ x = <b>${x}</b>`}}});
+ exp:`x를 포함한 항은 좌변, 상수항은 우변으로 이항한다.<br>${a}x − ${c}x = ${d} − (${b}) → ${a-c}x = ${d-b}<br>∴ x = <b>${x}</b>`,m:'이항(항을 옮기면 부호가 바뀐다)',alts:[['등식의 성질(양변에 같은 수를 빼고 나누기)',`양변에서 ${c}x를 빼면 ${lin(a-c,b)} = ${d}<br>${b?`양변에서 ${b<0?'('+b+')':b}를 빼면 ${a-c}x = ${d-b}<br>`:''}양변을 ${a-c}로 나누면 x = <b>${x}</b>`]]}}});
 A({id:'pr-lin2',u:'PR1',name:'괄호·분수가 있는 일차방정식',lv:2,g:R=>{
  if(R.f()<.5){let x,a,c,b,d;do{x=R.i(-5,8);a=R.i(3,7);c=R.i(1,a-1);b=R.i(-6,6);d=(a-c)*x+a*b}while(!x||!b||Math.abs(d)>45);
   return{q:`일차방정식 ${a}(x${sgnT(b)}) = ${lin(c,d)}의 해는?`,...mc(R,x,[-x,x+1,x-1,(d-b)/(a-c),x+2],String),
@@ -5484,10 +5484,10 @@ A({id:'pr-rat2',u:'PR1',name:'비례배분',lv:2,g:R=>{let a,b,k,w;do{a=R.i(1,7)
 A({id:'pr-rat3',u:'PR1',name:'[심화] 비례식의 활용 (부채꼴·상대도수)',lv:3,g:R=>{
  if(R.f()<.5){const t1=R.pick([20,30,40,45,60]),m=R.i(2,4),L=R.i(2,6)*2,ans=L*m;
   return{q:`한 원에서 중심각의 크기가 ${t1}°인 부채꼴의 호의 길이가 ${L}π cm일 때, 중심각의 크기가 ${t1*m}°인 부채꼴의 호의 길이는?`,...mc(R,ans,[L+m,ans+L,L*m/2,ans-L,L*(m+1)],v=>v+'π cm'),
-  exp:`한 원에서 호의 길이는 중심각의 크기에 비례한다.<br>${t1} : ${t1*m} = ${L} : x → x = ${L} × ${m} = <b>${ans}</b> (π cm)`}}
+  exp:`한 원에서 호의 길이는 중심각의 크기에 비례한다.<br>${t1} : ${t1*m} = ${L} : x → x = ${L} × ${m} = <b>${ans}</b> (π cm)`,m:'비례식(중심각 : 호의 길이)',alts:[['몇 배가 되었는지 보기',`중심각이 ${t1}°에서 ${t1*m}°로 ${m}배가 되었으므로 호의 길이도 ${m}배이다.<br>${L}π × ${m} = <b>${ans}</b> (π cm)`]]}}
  const p=R.pick([0.1,0.2,0.25,0.4]),n1=R.pick([20,40,60]),n2=R.pick([30,50,80,100].filter(v=>(v*p)%1===0)),ans=n2*p;
  return{q:`A반(${n1}명)에서 어떤 계급의 상대도수는 ${p}이다. B반(${n2}명)에서도 같은 상대도수일 때, B반에서 그 계급의 도수는?`,...mc(R,ans,[n1*p,ans+5,ans-5,n2-ans,ans+10],v=>v+'명'),
- exp:`(상대도수) = (도수) ÷ (전체 도수) 이므로 (도수) = (전체 도수) × (상대도수)<br>B반의 도수 = ${n2} × ${p} = <b>${ans}</b>(명)`}}});
+ exp:`(상대도수) = (도수) ÷ (전체 도수) 이므로 (도수) = (전체 도수) × (상대도수)<br>B반의 도수 = ${n2} × ${p} = <b>${ans}</b>(명)`,m:'도수 = 전체 × 상대도수',alts:[['비례식으로 비교하기',`A반의 도수는 ${n1} × ${p} = ${n1*p}(명)이고 상대도수가 같으므로 ${n1*p} : ${n1} = x : ${n2}<br>x = ${n1*p} × ${n2} ÷ ${n1} = <b>${ans}</b>(명)`]]}}});
 A(bank('pr-eq','PR1','등식의 성질과 식의 계산',1,[
  ['a = b일 때, 항상 성립하는 등식이 <u>아닌</u> 것은?','a ÷ c = b ÷ c (c는 임의의 수)',['a + 2 = b + 2','a − 5 = b − 5','3a = 3b','a ÷ 2 = b ÷ 2'],'0으로 나눌 수는 없으므로 c = 0이면 성립하지 않는다. 양변에 같은 수를 더하거나 빼거나 곱해도, 0이 아닌 수로 나누어도 등식은 성립한다.'],
  ['다음 중 동류항끼리 짝지은 것은?','3x와 −5x',['2x와 2y','4x와 4x²','x와 1','3ab와 3a'],'문자와 차수가 같은 항이 동류항이다.'],
