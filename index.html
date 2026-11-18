@@ -5395,16 +5395,16 @@ const $=s=>document.querySelector(s);
 /* 기말고사 범위: 학기별·과목별 소단원 코드. 비어 있으면(미등록) 그 과목은 제한 없음. 예) '1-2':{math:['A3','B1'],sci:['K8','K9']} */
 const FINAL_RANGE={'1-2':{ /* 빛가람중 2026-11-18 가정통신문(12/7~12/8) 1학년 범위 */
  math:['A3','B1','B2','C1','C2'],            /* 5.5 삼각형의 작도 ~ 7 입체도형 (p159~235) */
- eng:['E7V','E7D','E7R','E8V','E8D','E8R'],   /* Lesson 7·8 */
- sci:['K8','K9','K9b','K10','K11','K12','K13'], /* Ⅴ 힘의 작용·Ⅵ 기체의 성질·Ⅶ 태양계 */
- soc:['S6','S8','S10','S11','S12'],           /* 6·8·10·11단원, 12단원 1.인권 보장과 헌법(p217까지) → S12='01 인권 보장과 헌법'만(S12b·S12c 제외) */
- kor:['KA2','KC1','KC2','KD2'],               /* 1-(2) 토의, 3 단어의 세계, 4-(2) 존중하며 말하기 */
- tech:['Q1','Q2','T2','T3','T5']              /* 기술 p134~154·166~169, 가정 p56~67 */
+ eng:['E7V','E7D','E7R','E8V','E8D','E8R','E7T','E7TR','E8T','E8TR'],   /* Lesson 7·8 (E?T* = 교과서 본문 문항) */
+ sci:['K8','K9','K9b','K10','K11','K12','K13','KT8','KT9','KT9b','KT10','KT10b','KT11','KT11b','KT12','KT12b','KT12c','KT13','KT13b','KT13c','KT13d'], /* Ⅴ 힘의 작용·Ⅵ 기체의 성질·Ⅶ 태양계 (KT* = 아티팩트 교과서 본문 문항) */
+ soc:['S6','S8','S10','S11','S12','T6a','T6b','T6c','T8a','T8b','T8c','T10a','T10b','T10c','T11a','T11b','T11c'],           /* 6·8·10·11단원, 12단원 1.인권 보장과 헌법(p217까지) → S12='01 인권 보장과 헌법'만(S12b·S12c 제외) */
+ kor:['KA2','KC1','KC2','KD2','KX1','KX3','KX3b','KX4b'],               /* 1-(2) 토의(50~75쪽), 3 단어의 세계(126~169쪽), 4-(2) 존중하며 말하기(190~211쪽) */
+ tech:['Q1','Q2','T2','T3','T5','GQ1','GQ2','GT2','GT3','GT5']              /* 기술 p134~154·166~169, 가정 p56~67 (G* = 교과서 본문 문항) */
 }};
 const finalOn=()=>!!FINAL_RANGE[SEM]&&LS.get('m12-final',false);
 const finalR=(id=CUR)=>{const r=finalOn()&&FINAL_RANGE[SEM][id];return r&&r.length?new Set(r):null};
 /* 소단원 안에서 범위 밖인 유형 id를 개별 제외할 때만 사용 (과목 코드: [유형 id]) — 지금은 비어 있음 */
-const FINAL_EXCL={'1-2':{}};
+const FINAL_EXCL={'1-2':{tech:['tbt-t5c','tbt-t5z']}}; /* 기술 Ⅳ-5: 170~171쪽(선출원주의·사례·상표 활동)·Ⅳ 단원 마무리는 범위 밖 */
 const finalEx=t=>{const x=finalOn()&&FINAL_RANGE[SEM][CUR]&&FINAL_EXCL[SEM]&&FINAL_EXCL[SEM][CUR];return !!x&&x.includes(t.id)};
 const selKey=(id=CUR)=>'m12-sel-'+SK(id)+(finalR(id)?'_F':'');
 const LV=['','하','중','상'];
@@ -6022,7 +6022,7 @@ $('#subj').addEventListener('click',e=>{const b=e.target.closest('[data-sub]');i
 function renderScope(){const FR=finalR();if(FR)sel=new Set([...sel].filter(x=>FR.has(x)));
  const UN=FR?UNITS.map(U=>({...U,subs:U.subs.filter(x=>FR.has(x[0]))})).filter(U=>U.subs.length):UNITS;
  $('#units').innerHTML=UN.map(U=>{const n=U.subs.filter(x=>sel.has(x[0])).length,st=n===U.subs.length?'all':n?'part':'none';return `<div class="unit"><button class="uh" data-u="${U.id}" data-st="${st}" aria-pressed="${st==='all'}" title="${st==='all'?'단원 전체 해제':'단원 전체 선택'}"><span class="ck">${st==='all'?'✓':st==='part'?'–':''}</span><span class="rn">${U.tag}</span>${U.name}</button><div class="subs">${U.subs.map(([id,nm])=>`<button class="chip ${sel.has(id)?'on':''}" data-s="${id}" aria-pressed="${sel.has(id)}">${nm}<small>${T.filter(t=>t.u===id&&!finalEx(t)).length}</small></button>`).join('')}</div></div>`}).join('');
- $('#scopeSum').textContent=(finalOn()?(FR?'📌 기말 범위 · ':'📌 기말 범위 미등록(전체) · '):'')+`소단원 ${sel.size}/${FR?FR.size:SUBS.length} · ${scoped().length}개 유형`;LS.set(selKey(),[...sel])}
+ $('#scopeSum').textContent=(finalOn()?(FR?'📌 기말 범위 · ':'📌 기말 범위 미등록(전체) · '):'')+`소단원 ${sel.size}/${FR?SUBS.filter(x=>FR.has(x)).length:SUBS.length} · ${scoped().length}개 유형`;LS.set(selKey(),[...sel])}
 $('#scope').addEventListener('click',e=>{const s=e.target.closest('button[data-s]'),u=e.target.closest('[data-u]'),p=e.target.closest('[data-pre]');
  if(s){sel.has(s.dataset.s)?sel.delete(s.dataset.s):sel.add(s.dataset.s)}
  else if(u){const FR=finalR(),subs=UNITS.find(x=>x.id===u.dataset.u).subs.map(x=>x[0]).filter(x=>!FR||FR.has(x));const all=subs.every(x=>sel.has(x));subs.forEach(x=>all?sel.delete(x):sel.add(x))}
