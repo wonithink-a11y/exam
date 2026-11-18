@@ -334,7 +334,7 @@ b.src{color:var(--ac);font-weight:600}
 .stick{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:10px 12px;margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;box-shadow:var(--shadow)}
 /* AI 선생님 */
 .aibar{display:none;gap:6px;flex-wrap:wrap}
-.flagbar{margin-top:8px}.flagbtn.on{background:#fdecec;border-color:#d98a8a;color:#a33}
+.qfoot{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.flagbtn{margin-left:auto}.flagbtn.on{background:#fdecec;border-color:#d98a8a;color:#a33}
 #flov{display:none;position:fixed;inset:0;z-index:80;background:rgba(10,12,20,.55);padding:16px;overflow-y:auto}#flov.on{display:block}
 .fld{max-width:460px;margin:8vh auto 0;background:var(--sheet);color:var(--ink);border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.3)}.fld label{display:block;margin:8px 0;font-size:14px}.fld textarea{width:100%;box-sizing:border-box;font:inherit;padding:8px;border:1px solid var(--rule);border-radius:8px;background:transparent;color:inherit;margin:6px 0 10px}
 .flrow{padding:10px 0;border-top:1px dashed var(--rule)}.flrow .fq{font-size:13.5px;margin:4px 0;line-height:1.5}.flrow .fm{font-size:13px;color:var(--muted)}.flst{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;background:var(--sheet);margin-right:6px}.flst.in{background:#e3f3e6;color:#27632f}.flst.out{background:#fdecec;color:#a33}
@@ -5862,7 +5862,7 @@ const FLST={open:'확인 전',in:'교과서에 있음',out:'교과서에 없음(
 const flKey=()=>'m12-flag-'+SK();const flList=()=>LS.get(flKey(),[]);
 const flFind=(id,seed)=>flList().find(x=>x.id===id&&String(x.seed)===String(seed));
 const fesc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function flagBar(it){try{const f=flFind(it.id,it.seed);return `<div class="flagbar"><button class="btn sm flagbtn${f?' on':''}" data-flag="${it.id}|${it.seed}">${f?'🚩 확인 표시됨':'🚩 확인할 문제로 표시'}</button></div>`}catch(e){return''}}
+function flagBar(it){try{const f=flFind(it.id,it.seed);return `<button class="btn sm flagbtn${f?' on':''}" data-flag="${it.id}|${it.seed}">${f?'🚩 확인 표시됨':'🚩 확인할 문제로 표시'}</button>`}catch(e){return''}}
 function flText(id,seed){const d=gen(id,seed),t=document.createElement('div'),tx=h=>{t.innerHTML=h==null?'':String(h);return t.textContent.replace(/\s+/g,' ').trim()};
  return d.sa?`${tx(d.q)} / 모범 답안: ${tx(d.model)}`:`${tx(d.q)} / 보기: ${(d.opts||[]).map(tx).join(' | ')} / 정답: ${tx(d.ans)}`}
 function flOpen(id,seed){let o=document.getElementById('flov');if(!o){o=document.createElement('div');o.id='flov';document.body.appendChild(o)}
@@ -5888,10 +5888,10 @@ function flagHTML(){const L=flList();
  <div class="bar" style="margin-top:6px"><button class="btn sm" data-flpr="${x.id}|${x.seed}">다시 보기</button><button class="btn sm" data-flst="${x.id}|${x.seed}|in">교과서에 있음</button><button class="btn sm" data-flst="${x.id}|${x.seed}|out">교과서에 없음</button><button class="btn sm" data-flst="${x.id}|${x.seed}|open">확인 전으로</button><button class="btn sm" data-fldel2="${x.id}|${x.seed}">삭제</button></div></div>`).join('')}</div>`}
 const okOf=i=>i.d.sa?i.self===1:i.d.opts[i.pick]===i.d.ans;
 function saHTML(it,idx,o){const t=TYPE[it.id],d=it.d,done=o.graded,show=done||it.show;
- const body=show?`<div class="model"><b>모범 답안</b> ${d.model}</div>${d.exp?`<div class="exp"><b class="h">채점 기준 · 풀이</b>${d.exp}</div>`:''}<div class="selfchk sachk"><span class="muted">스스로 채점</span><button class="chip ${it.self===1?'on':''}" data-sa="${idx}" data-v="1">맞음</button><button class="chip ${it.self===0?'on':''}" data-sa="${idx}" data-v="0">틀림</button></div>`
-  :`${satBox(hsh(d.q),'답을 직접 써 보세요 (종이에 써도 됩니다)')}<div class="sa-note">서술형 — 보기가 없습니다.${o.fold?' 채점하면 모범 답안이 나옵니다.':''}</div>${o.fold?'':`<button class="btn" data-act="sashow">모범 답안 보기</button>`}`;
+ const body=show?`<div class="sa-note" style="margin:8px 0 4px">✍️ 내가 쓴 답 (아래 모범 답안과 비교해 보세요)</div>${padHTML(it,0,o.graded,true)}<div class="model"><b>모범 답안</b> ${d.model}</div>${d.exp?`<div class="exp"><b class="h">채점 기준 · 풀이</b>${d.exp}</div>`:''}<div class="selfchk sachk"><span class="muted">스스로 채점</span><button class="chip ${it.self===1?'on':''}" data-sa="${idx}" data-v="1">맞음</button><button class="chip ${it.self===0?'on':''}" data-sa="${idx}" data-v="0">틀림</button></div>`
+  :`<div class="sa-note" style="margin:8px 0 4px">✍️ 서술형 — 아래 칸에 펜으로 직접 써 보세요.</div>${padHTML(it,0,o.graded,true)}<div class="sa-note">보기가 없습니다.${o.fold?' 채점하면 모범 답안이 나옵니다.':''}</div>${o.fold?'':`<button class="btn" data-act="sashow">모범 답안 보기</button>`}`;
  return `<article class="q sa" id="q${idx}" data-aik="${CUR}|${hsh(d.q+'|'+(d.fig||'')+'|'+d.opts.join('|'))}" data-ans="0" data-pick="-1" data-done="${show?1:0}"><template class="aix">${d.model}<br>${d.exp}</template><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name.replace('[서술형] ','')}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lvsa">서술형</span></div>
- <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${body}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div>${flagBar(it)}</article>`}
+ <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${body}<div class="qfoot"><div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div>${flagBar(it)}</div></article>`}
 /* ===== 풀이 칸 (필기 앱처럼): 펜·형광펜·지우개·직선, 색·굵기, 되돌리기/다시, 펜 압력, 손바닥 방지.
    획(stroke)을 벡터로 저장한다 → IndexedDB 'm12pad' (키: SK|유형id|seed, 새로고침해도 유지, 이 기기). 부모용 "풀이 기록"과 AI 풀이 비교에 쓰인다.
    획 형식 {t:'p'|'h'|'e'|'l'|'x', c:색, w:캔버스 px 굵기, p:[x,y,압력%,…], pr:펜압 사용 여부}  ('x' = 모두 지우기 표시, 되돌리기 가능) */
@@ -5970,9 +5970,9 @@ async function padCanvasA(r,dk){const H=r.h||860,o=document.createElement('canva
 async function padBlob(r){try{const cv=await padCanvasA(r,false);return await new Promise(res=>cv.toBlob(res,'image/jpeg',.88))}catch(e){return null}}
 const padHas=r=>!!(r&&r.strokes&&r.strokes.some(s=>s.t!=='x'));
 function padFigOn(it,r){return !!(it.d&&it.d.fig&&padOn()&&(r?r.fig:true))}
-function padHTML(it,ai,done){if(!padOn())return'';const k=padKey(it.id,it.seed),r=PADS.get(k),T=PADT,ok=done?(it.pick===ai?1:0):'',fg=padFigOn(it,r),hasFig=!!(it.d&&it.d.fig),dk=padDark(),fw=(r&&r.fw)||PAD_FW;
+function padHTML(it,ai,done,force){if(!padOn()&&!force)return'';const k=padKey(it.id,it.seed),r=PADS.get(k),T=PADT,ok=done?((it.d&&it.d.sa)?(it.self===1?1:0):(it.pick===ai?1:0)):'',fg=padFigOn(it,r),hasFig=!!(it.d&&it.d.fig),dk=padDark(),fw=(r&&r.fw)||PAD_FW;
  const lay=document.documentElement.dataset.padlay==='stack'?'좌우':'위아래',bgl={auto:'자동',light:'밝게',dark:'어둡게'}[padBgMode()]||'자동';
- const H=r?r.h:(fg?padFigH(it.d.fig,fw)+560:860),main=PAD_MAIN.includes(T.color)?PAD_MAIN:[...PAD_MAIN,T.color];
+ const H=r?r.h:(force?460:(fg?padFigH(it.d.fig,fw)+560:860)),main=PAD_MAIN.includes(T.color)?PAD_MAIN:[...PAD_MAIN,T.color];
  const sw=(c,x)=>`<button class="padsw${T.color===c[0]?' on':''}" style="background:${dk?c[2]:c[1]}" data-padc="${c[0]}" data-padt="c|${c[0]}" title="${c[3]}" aria-label="${c[3]}"></button>`;
  return `<div class="pad" data-pk="${k}" data-pid="${it.id}" data-pseed="${it.seed}" data-pok="${ok}" data-pfig="${fg?1:0}">
  <div class="padtl"><div class="padrow"><span class="padst" title="자동 저장돼요. 정답이나 다음 문제를 누르면 풀이 기록에 올라가요">✏️<i class="padok${padHas(r)?' on':''}"></i></span>${[['p','✒️','펜'],['h','🖍','형광펜'],['e','🧽','지우개'],['l','／','직선']].map(([t,ic,n])=>`<button class="padb padl${T.tool===t?' on':''}" data-padt="t|${t}" title="${n}" aria-label="${n}">${ic}<span>${n}</span></button>`).join('')}<input type="range" min="1" max="40" value="${T.w[T.tool]}" data-padw="1" title="굵기" aria-label="굵기"><button class="padb" data-padt="sc|-1" title="풀이 창 위로 스크롤" aria-label="위로">▲</button><button class="padb" data-padt="sc|1" title="풀이 창 아래로 스크롤" aria-label="아래로">▼</button><button class="padb" data-padt="undo" title="되돌리기" aria-label="되돌리기">↩</button><button class="padb" data-padt="redo" title="다시" aria-label="다시">↪</button><button class="padb padl pdel" data-padt="clear" title="모두 지우기" aria-label="모두 지우기">🗑<span>모두 지우기</span></button></div>
@@ -6033,7 +6033,7 @@ function qHTML(it,idx,o){if(it.d.sa)return saHTML(it,idx,o);const t=TYPE[it.id],
  const exp=`<div class="exp"><b class="h">정답 ${CIRC[ai]} · 풀이</b>${d.exp}</div>`;
  return `<article class="q" id="q${idx}" data-aik="${CUR}|${hsh(d.q)}" data-ans="${ai+1}" data-pick="${it.pick??-1}" data-done="${done?1:0}"><template class="aix">${d.exp}</template>
  <div class="qsp${padOn()?' hp':''}"><div class="ql"><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lv${t.lv}">${LV[t.lv]}</span></div><div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}${(()=>{try{return noteFor(it).length?`<div class="ntqrow"><button class="btn sm" data-ntq="${it.id}">📖 이 단원 요점 보기</button></div>`:''}catch(e){return''}})()}</div>${padHTML(it,ai,done)}</div>
- ${done?`<div class="helptag${(it.help||0)>=2?' warn':''}">${(it.help||0)?`💡 도움받아 풀었어요 (${HELP_NAME[it.help]}까지)${it.pick===ai&&it.help>=2?' · 복습 필요로 표시했어요':''}`:'✅ 혼자 풀었어요'}</div>`:''}${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div>${flagBar(it)}</article>`}
+ ${done?`<div class="helptag${(it.help||0)>=2?' warn':''}">${(it.help||0)?`💡 도움받아 풀었어요 (${HELP_NAME[it.help]}까지)${it.pick===ai&&it.help>=2?' · 복습 필요로 표시했어요':''}`:'✅ 혼자 풀었어요'}</div>`:''}${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="qfoot"><div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div>${flagBar(it)}</div></article>`}
 const scoped=()=>T.filter(t=>sel.has(t.u)&&!finalEx(t));
 const qCount=t=>t.bank?t.n:'∞';
 
@@ -7380,7 +7380,7 @@ $('#v-note').addEventListener('click',e=>{const f=e.target.closest('.nt.hide .f'
  else if(b.dataset.ntp){NO.hide=false;renderNote();v_open();document.body.classList.add('ntprint');const off=()=>{document.body.classList.remove('ntprint');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);window.print()}else if(b.dataset.ntgo){newPractice(b.dataset.ntgo);show('practice');window.scrollTo({top:0})}});
 
 /* ===== 서술형 (조건형 서술: 용어 포함 확인 + 모범답안 + 스스로 채점) ===== */
-const ES={ans:{},done:{},chk:{}};
+const ES={ans:{},done:{},chk:{},kb:{}};
 /* 서술형 채점 기준표: <조건>의 (N점)을 배점으로 쓰고, 조건마다 충족 여부를 체크해 점수를 합산한다 (점수 표기가 없으면 균등 배분) */
 const esCondPts=x=>{const p=x.conds.map(c=>{const m=c.match(/\((\d+)점\)/);return m?+m[1]:0});return p.every(v=>v)?p:x.conds.map(()=>x.pts/x.conds.length)};
 const esRubric=x=>{const P=esCondPts(x),ck=ES.chk[x.id]||[],got=P.reduce((a,v,i)=>a+(ck[i]?v:0),0);
@@ -7391,13 +7391,14 @@ const esKey=()=>'m12-es-'+SK();
 let esRecAll=()=>LS.get(esKey(),{});
 const esCheck=(x,t)=>{t=t.replace(/\s+/g,'').toLowerCase();return x.kw.map(g=>g.some(k=>t.includes(k.replace(/\s+/g,'').toLowerCase())))};
 function renderEssay(){const v=$('#v-essay'),items=SJ[CUR].essay.filter(x=>sel.has(x.u)),rec=esRecAll();
- v.innerHTML=(items.length?`<p class="muted" style="margin:0 0 10px;font-size:13px">출제 범위 안의 서술형 ${items.length}문항. 조건을 지켜 쓰고 [채점]을 누르면 필요한 용어가 들어갔는지 확인하고 모범답안을 보여 줍니다.</p>`:'<p class="muted">선택한 출제 범위에 서술형 문항이 없습니다.</p>')+items.map(x=>{const d=ES.done[x.id],a=ES.ans[x.id]||'',r=rec[x.id];let res='';
-  if(d){const hit=esCheck(x,a),n=hit.filter(Boolean).length;res=`<div class="esr">필수 용어 <b>${n}/${x.kw.length}</b> · ${x.kw.map((g,i)=>`<span class="${hit[i]?'ok':'no'}">${hit[i]?'✔':'✘'}${esEsc(g[0])}</span>`).join(' ')}${esRubric(x)}<div class="esm"><b>모범답안</b><br>${esEsc(x.model)}</div><div class="bar" style="margin-top:8px"><span class="muted">내 답안과 비교해 스스로 채점</span><span class="sp"></span><button class="btn sm" data-esmk="${x.id}|2">충분히 썼다</button><button class="btn sm" data-esmk="${x.id}|1">일부 빠졌다</button><button class="btn sm" data-esmk="${x.id}|0">다시 공부</button></div></div>`}
-  return `<div class="es"><div class="est">${SUBNAME[x.u]} · ${esEsc(x.name)} · ${x.pts}점${r?` · 최근 ${['다시 공부','일부 빠졌다','충분히 썼다'][r[1]]} (${r[0]}회)`:''}</div><div class="esq">${esEsc(x.q)}</div><div class="escd"><b>&lt;조건&gt;</b><br>${x.conds.map((c,i)=>`${'ㄱㄴㄷㄹ'[i]}. ${esEsc(c)}`).join('<br>')}</div><textarea data-esid="${x.id}" placeholder="여기에 답안을 쓰세요">${esEsc(a)}</textarea><div class="bar" style="margin-top:8px"><button class="btn sm" data-esgo="${x.id}">채점</button><button class="btn sm" data-esclr="${x.id}">지우기</button></div>${res}</div>`}).join('')}
+ v.innerHTML=(items.length?`<p class="muted" style="margin:0 0 10px;font-size:13px">출제 범위 안의 서술형 ${items.length}문항. 조건을 지켜 쓰고 [채점]을 누르면 필요한 용어가 들어갔는지 확인하고 모범답안을 보여 줍니다.</p>`:'<p class="muted">선택한 출제 범위에 서술형 문항이 없습니다.</p>')+items.map(x=>{const d=ES.done[x.id],a=ES.ans[x.id]||'',r=rec[x.id],kb=!!ES.kb[x.id];let res='';
+  if(d){const hit=esCheck(x,a),n=hit.filter(Boolean).length;res=`<div class="esr">${kb?`필수 용어 <b>${n}/${x.kw.length}</b> · ${x.kw.map((g,i)=>`<span class="${hit[i]?'ok':'no'}">${hit[i]?'✔':'✘'}${esEsc(g[0])}</span>`).join(' ')}`:`필수 용어 <b>${x.kw.length}개</b> — 내 필기에 들어갔는지 확인하세요 · ${x.kw.map(g=>`<span class="ok">${esEsc(g[0])}</span>`).join(' ')}`}${esRubric(x)}<div class="esm"><b>모범답안</b><br>${esEsc(x.model)}</div><div class="bar" style="margin-top:8px"><span class="muted">내 답안과 비교해 스스로 채점</span><span class="sp"></span><button class="btn sm" data-esmk="${x.id}|2">충분히 썼다</button><button class="btn sm" data-esmk="${x.id}|1">일부 빠졌다</button><button class="btn sm" data-esmk="${x.id}|0">다시 공부</button></div></div>`}
+  return `<div class="es"><div class="est">${SUBNAME[x.u]} · ${esEsc(x.name)} · ${x.pts}점${r?` · 최근 ${['다시 공부','일부 빠졌다','충분히 썼다'][r[1]]} (${r[0]}회)`:''}</div><div class="esq">${esEsc(x.q)}</div><div class="escd"><b>&lt;조건&gt;</b><br>${x.conds.map((c,i)=>`${'ㄱㄴㄷㄹ'[i]}. ${esEsc(c)}`).join('<br>')}</div>${kb?`<textarea data-esid="${x.id}" placeholder="여기에 답안을 쓰세요">${esEsc(a)}</textarea>`:padHTML({id:'es-'+x.id,seed:0,d:{}},0,false,true)}<div class="bar" style="margin-top:8px"><button class="btn sm" data-esgo="${x.id}">채점</button><button class="btn sm" data-eskb="${x.id}">${kb?'✍️ 필기로 쓰기':'⌨️ 키보드로 쓰기'}</button><button class="btn sm" data-esclr="${x.id}">지우기</button></div>${res}</div>`}).join('')}
 $('#v-essay').addEventListener('input',e=>{const t=e.target.closest('textarea[data-esid]');if(t)ES.ans[t.dataset.esid]=t.value});
 $('#v-essay').addEventListener('change',e=>{const c=e.target.closest('input[data-escond]');if(!c)return;const[id,i]=c.dataset.escond.split('|');(ES.chk[id]=ES.chk[id]||[])[+i]=c.checked;renderEssay()});
 $('#v-essay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
- if(b.dataset.esgo){ES.done[b.dataset.esgo]=true;renderEssay()}
+ if(b.dataset.eskb){ES.kb[b.dataset.eskb]=!ES.kb[b.dataset.eskb];renderEssay()}
+ else if(b.dataset.esgo){const k=padKey('es-'+b.dataset.esgo,0),r=PADS.get(k);if(r&&padHas(r)&&!r.sub){r.sub=true;r.at=Date.now();padPut(r)}ES.done[b.dataset.esgo]=true;renderEssay()}
  else if(b.dataset.esclr){delete ES.ans[b.dataset.esclr];delete ES.done[b.dataset.esclr];delete ES.chk[b.dataset.esclr];renderEssay()}
  else if(b.dataset.esmk){const[id,m]=b.dataset.esmk.split('|'),rec=LS.get(esKey(),{});rec[id]=[((rec[id]||[0])[0])+1,+m,Date.now()];LS.set(esKey(),rec);onRecord();renderEssay()}});
 
@@ -7618,7 +7619,7 @@ const aiEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 const aiFmt=t=>aiEsc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
 /* 화면 요소 → 읽을 수 있는 글 (분수·선분·표 처리) */
 function aiTxt(node){if(!node)return'';const c=node.cloneNode(true);
-  c.querySelectorAll('svg,template,.aibar,.flagbar,.aibox,.mk').forEach(x=>x.remove());
+  c.querySelectorAll('svg,template,.aibar,.qfoot,.aibox,.mk').forEach(x=>x.remove());
   c.querySelectorAll('mfrac').forEach(f=>{const k=f.children;f.replaceWith(`(${k[0]?.textContent||''})/(${k[1]?.textContent||''})`)});
   c.querySelectorAll('.sg').forEach(x=>x.replaceWith('선분 '+x.textContent));
   c.querySelectorAll('table').forEach(tb=>{const rows=[...tb.querySelectorAll('tr')].map(r=>[...r.children].map(td=>td.textContent.trim()).join(' | '));tb.replaceWith('\n'+rows.join('\n')+'\n')});
