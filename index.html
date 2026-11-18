@@ -334,6 +334,10 @@ b.src{color:var(--ac);font-weight:600}
 .stick{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:10px 12px;margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;box-shadow:var(--shadow)}
 /* AI 선생님 */
 .aibar{display:none;gap:6px;flex-wrap:wrap}
+.flagbar{margin-top:8px}.flagbtn.on{background:#fdecec;border-color:#d98a8a;color:#a33}
+#flov{display:none;position:fixed;inset:0;z-index:80;background:rgba(10,12,20,.55);padding:16px;overflow-y:auto}#flov.on{display:block}
+.fld{max-width:460px;margin:8vh auto 0;background:var(--sheet);color:var(--ink);border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.3)}.fld label{display:block;margin:8px 0;font-size:14px}.fld textarea{width:100%;box-sizing:border-box;font:inherit;padding:8px;border:1px solid var(--rule);border-radius:8px;background:transparent;color:inherit;margin:6px 0 10px}
+.flrow{padding:10px 0;border-top:1px dashed var(--rule)}.flrow .fq{font-size:13.5px;margin:4px 0;line-height:1.5}.flrow .fm{font-size:13px;color:var(--muted)}.flst{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;background:var(--sheet);margin-right:6px}.flst.in{background:#e3f3e6;color:#27632f}.flst.out{background:#fdecec;color:#a33}
 :root.ai-on .aibar{display:flex}
 .aibtn{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--ac);background:var(--sheet);color:var(--ac);border-radius:999px;padding:5px 13px 5px 10px;font-weight:600;font-size:13px}
 .aibtn::before{content:"";width:14px;height:14px;flex:none;background:var(--ac);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
@@ -1552,13 +1556,16 @@ add({id:'s10-elec',u:'S10',name:'선거의 기본 원칙',lv:1,g:R=>{const c=R.p
 const ACTOR=[['정치적 견해를 같이하는 사람들이 정권을 획득하기 위해 만든 단체로, 선거에 후보자를 내고 공약을 제시한다.','정당'],['자신들의 특수한 이익을 실현하려고 정책 결정에 영향을 미치는 집단이다. 정권 획득을 목적으로 하지 않는다.','이익 집단'],['공공의 이익을 위해 시민들이 자발적으로 만든 단체로, 정부의 활동을 감시하기도 한다.','시민 단체'],['사회 문제를 보도하고 여론을 형성하여 정치 과정에 영향을 준다.','언론']];
 add({id:'s10-act',u:'S10',name:'정치 주체',lv:1,g:R=>{const c=R.pick(ACTOR);return{q:`다음 설명에 해당하는 정치 주체는?<div class="cond">${c[0]}</div>`,...fixed(['정당','이익 집단','시민 단체','언론','선거 관리 위원회'],c[1]),exp:`∴ <b>${c[1]}</b>`}}});
 add(bank('s10-sys','S10','선거 제도·지방 자치',2,[
- ['특정 정당이나 후보에게 유리하도록 선거구를 마음대로 정하는 것을 막기 위해 선거구를 법률로 정하는 제도는?','선거구 법정주의',['선거 공영제','비례 대표제','주민 소환제','국민 참여 재판'],'선거구를 법률로 정하여 게리맨더링을 막는다.'],
- ['선거 운동을 국가 기관이 관리하고 선거 비용의 일부를 국가가 부담하는 제도는?','선거 공영제',['선거구 법정주의','지방 자치 제도','심급 제도','주민 투표제'],'선거 공영제는 경제력에 따른 불공정을 줄이기 위한 것이다.'],
+ ['선거에서 후보자가 유권자에게 제시하는 공적인 약속은?','공약',['공천','당선','투표','선거구'],'공약은 후보자의 정치적 신념과 시민의 요구를 반영한 정책을 기반으로 한다. (교과서 178쪽)'],
+ ['대통령 선거나 국회 의원 선거 등에서 정당이 후보자를 추천하는 일은?','공천',['공약','당선','선거 운동','투표'],'정당은 정권을 얻기 위해 각종 선거에 후보자를 공천해 대표자로 당선시키려고 노력한다. (교과서 179쪽)'],
  ['정책이 시행된 뒤 그 결과에 대한 반응이 새로운 요구로 다시 투입되는 과정은?','환류',['산출','투입','정책 결정','선거'],'정치 과정: 투입 → 정책 결정 → 산출 → 환류'],
  ['지방 자치 단체에서 조례를 만들고 예산을 심의하는 의결 기관은?','지방 의회',['지방 자치 단체장','국회','법원','선거 관리 위원회'],'지방 의회는 의결 기관, 지방 자치 단체장은 집행 기관이다.'],
  ['주민이 잘못을 저지른 지방 자치 단체장을 임기 중에 투표로 물러나게 할 수 있는 제도는?','주민 소환제',['주민 투표제','선거 공영제','국민 참여 재판','청원 제도'],'주민 소환제는 주민의 직접 참여 제도이다.'],
  ['지방 자치를 “풀뿌리 민주주의”라고 부르는 까닭은?','주민이 지역 문제에 참여하며 민주주의를 배우고 실천하는 바탕이 되기 때문',['중앙 정부의 권력을 강화하기 때문','국회의원을 뽑기 때문','지역 간 경쟁을 없애기 때문','대통령이 모든 지역을 다스리기 때문'],'지방 자치는 민주주의의 기초를 이룬다.'],
  ['우리나라 선거에서 투표할 수 있는 나이는?','만 18세 이상',['만 16세 이상','만 19세 이상','만 20세 이상','만 25세 이상'],'2020년부터 선거 연령이 만 18세로 낮아졌다.']]));
+add(bank('s10-sys2','S10','[교과서 밖] 선거 제도 심화(선거구 법정주의·선거 공영제)',2,[
+ ['특정 정당이나 후보에게 유리하도록 선거구를 마음대로 정하는 것을 막기 위해 선거구를 법률로 정하는 제도는?','선거구 법정주의',['선거 공영제','비례 대표제','주민 소환제','국민 참여 재판'],'선거구를 법률로 정하여 게리맨더링을 막는다.'],
+ ['선거 운동을 국가 기관이 관리하고 선거 비용의 일부를 국가가 부담하는 제도는?','선거 공영제',['선거구 법정주의','지방 자치 제도','심급 제도','주민 투표제'],'선거 공영제는 경제력에 따른 불공정을 줄이기 위한 것이다.']]));
 const LAWS=[['헌법','공법'],['형법','공법'],['행정법','공법'],['형사 소송법','공법'],['민법','사법'],['상법','사법'],['근로 기준법','사회법'],['최저 임금법','사회법'],['국민 건강 보험법','사회법']];
 add({id:'s11-kind',u:'S11',name:'법의 종류',lv:2,g:R=>{const l=R.pick(LAWS);return{q:`<b>${l[0]}</b>은(는) 다음 중 어느 법에 속하는가?`,...fixed(['공법','사법','사회법','국제법','관습법'],l[1]),
  exp:`공법: 국가와 개인, 국가 기관 사이의 관계(헌법·형법·행정법·소송법)<br>사법: 개인과 개인 사이의 관계(민법·상법)<br>사회법: 사회적 약자를 보호하기 위해 국가가 개입(노동법·사회 보장법·경제법)<br>∴ <b>${l[1]}</b>`}}});
@@ -5404,7 +5411,7 @@ const FINAL_RANGE={'1-2':{ /* 빛가람중 2026-11-18 가정통신문(12/7~12/8)
 const finalOn=()=>!!FINAL_RANGE[SEM]&&LS.get('m12-final',false);
 const finalR=(id=CUR)=>{const r=finalOn()&&FINAL_RANGE[SEM][id];return r&&r.length?new Set(r):null};
 /* 소단원 안에서 범위 밖인 유형 id를 개별 제외할 때만 사용 (과목 코드: [유형 id]) — 지금은 비어 있음 */
-const FINAL_EXCL={'1-2':{tech:['tbt-t5c','tbt-t5z']}}; /* 기술 Ⅳ-5: 170~171쪽(선출원주의·사례·상표 활동)·Ⅳ 단원 마무리는 범위 밖 */
+const FINAL_EXCL={'1-2':{tech:['tbt-t5c','tbt-t5z'],soc:['s10-sys2']}}; /* 기술 Ⅳ-5: 170~171쪽(선출원주의·사례·상표 활동)·Ⅳ 단원 마무리는 범위 밖 */
 const finalEx=t=>{const x=finalOn()&&FINAL_RANGE[SEM][CUR]&&FINAL_EXCL[SEM]&&FINAL_EXCL[SEM][CUR];return !!x&&x.includes(t.id)};
 const selKey=(id=CUR)=>'m12-sel-'+SK(id)+(finalR(id)?'_F':'');
 const LV=['','하','중','상'];
@@ -5848,12 +5855,43 @@ document.addEventListener('click',e=>{
   if(el)setTimeout(()=>window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'}),30);return}
  const z=e.target.closest('[data-cz]');if(z){const box=z.closest('.cause'),w=S.w.find(x=>x.id===box.dataset.cid&&String(x.seed)===box.dataset.cseed);if(!w)return;
   if(w.c===z.dataset.cz)delete w.c;else w.c=z.dataset.cz;LS.set('m12-rec-'+SK(),S);onRecord();box.querySelectorAll('[data-cz]').forEach(b=>b.classList.toggle('on',b.dataset.cz===w.c))}});
+/* ===== 🚩 확인할 문제: 배운 적 없는 용어·범위 밖·이상한 문제를 표시 (m12-flag-<SK>, 서버 kv 동기화) =====
+   저장 항목: {id,seed,why(term|bad|ask),memo,st(open|in|out),at,unit,name,txt(문제·보기·정답 전문)} — txt가 있어 Claude가 서버(kv)에서 읽고 교과서와 대조할 수 있다 */
+const FLAGWHY=[['term','배운 적 없는 용어·내용 (교과서에 있는지 확인)'],['bad','문제·정답이 이상해요'],['ask','질문이 있어요 (선생님께 물어보기)']];
+const FLST={open:'확인 전',in:'교과서에 있음',out:'교과서에 없음(범위 밖)'};
+const flKey=()=>'m12-flag-'+SK();const flList=()=>LS.get(flKey(),[]);
+const flFind=(id,seed)=>flList().find(x=>x.id===id&&String(x.seed)===String(seed));
+const fesc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function flagBar(it){try{const f=flFind(it.id,it.seed);return `<div class="flagbar"><button class="btn sm flagbtn${f?' on':''}" data-flag="${it.id}|${it.seed}">${f?'🚩 확인 표시됨':'🚩 확인할 문제로 표시'}</button></div>`}catch(e){return''}}
+function flText(id,seed){const d=gen(id,seed),t=document.createElement('div'),tx=h=>{t.innerHTML=h==null?'':String(h);return t.textContent.replace(/\s+/g,' ').trim()};
+ return d.sa?`${tx(d.q)} / 모범 답안: ${tx(d.model)}`:`${tx(d.q)} / 보기: ${(d.opts||[]).map(tx).join(' | ')} / 정답: ${tx(d.ans)}`}
+function flOpen(id,seed){let o=document.getElementById('flov');if(!o){o=document.createElement('div');o.id='flov';document.body.appendChild(o)}
+ const f=flFind(id,seed)||{},t=TYPE[id];
+ o.innerHTML=`<div class="fld"><b>🚩 확인할 문제로 표시</b><p class="muted" style="margin:4px 0 8px;font-size:13px">${fesc(t?t.name:'')}</p>${FLAGWHY.map(([k,n])=>`<label><input type="radio" name="flw" value="${k}" ${(f.why||'term')===k?'checked':''}> ${n}</label>`).join('')}<textarea id="flm" rows="3" placeholder="어떤 말이 낯선가요? 궁금한 점을 적어 주세요">${fesc(f.memo||'')}</textarea><div class="bar"><button class="btn pri sm" data-flsave="${id}|${seed}">저장</button>${f.id?`<button class="btn sm" data-fldel="${id}|${seed}">표시 해제</button>`:''}<button class="btn sm" data-flclose="1">닫기</button></div></div>`;o.classList.add('on')}
+function flRefresh(){document.querySelectorAll('[data-flag]').forEach(b=>{const[i,sd]=b.dataset.flag.split('|'),f=flFind(i,sd);b.classList.toggle('on',!!f);b.textContent=f?'🚩 확인 표시됨':'🚩 확인할 문제로 표시'});if(!$('#v-review').hidden)renderReview()}
+document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;
+ const fb=t.closest('[data-flag]');if(fb){const[i,sd]=fb.dataset.flag.split('|');flOpen(i,sd);return}
+ const ov=document.getElementById('flov');if(!ov||!ov.classList.contains('on'))return;
+ if(t===ov||t.closest('[data-flclose]')){ov.classList.remove('on');return}
+ const sv=t.closest('[data-flsave]');if(sv){const[i,sd]=sv.dataset.flsave.split('|'),L=flList().filter(x=>!(x.id===i&&String(x.seed)===sd)),old=flFind(i,sd),ty=TYPE[i];
+  let txt='';try{txt=flText(i,+sd)}catch(_){}
+  L.unshift({id:i,seed:+sd,why:(ov.querySelector('input[name=flw]:checked')||{}).value||'term',memo:ov.querySelector('#flm').value.trim(),st:old?old.st:'open',at:Date.now(),unit:ty?(SUBNAME[ty.u]||''):'',name:ty?ty.name:'',txt});
+  LS.set(flKey(),L.slice(0,200));ov.classList.remove('on');flRefresh();return}
+ const dl=t.closest('[data-fldel]');if(dl){const[i,sd]=dl.dataset.fldel.split('|');LS.set(flKey(),flList().filter(x=>!(x.id===i&&String(x.seed)===sd)));ov.classList.remove('on');flRefresh()}});
+function flagHTML(){const L=flList();
+ if(!L.length)return `<div class="scope"><div class="bar"><h2 class="sec" style="margin:0">🚩 확인할 문제</h2></div><p class="muted" style="margin:6px 0 0;font-size:13.5px">문제를 풀다가 배운 적 없는 용어가 나오거나 범위가 의심되면 문제 아래 <b>🚩 확인할 문제로 표시</b>를 눌러 두세요. 여기에 모입니다.</p></div>`;
+ const ord={open:0,in:1,out:1},rows=L.slice().sort((a,b)=>ord[a.st||'open']-ord[b.st||'open']||b.at-a.at);
+ return `<div class="scope"><div class="bar"><h2 class="sec" style="margin:0">🚩 확인할 문제 <small class="muted">${L.filter(x=>(x.st||'open')==='open').length}개 확인 전 · 전체 ${L.length}개</small></h2></div>
+ <p class="muted" style="margin:6px 0 4px;font-size:12.5px">표시한 문제는 서버에도 저장돼요. Claude에게 "표시한 문제 교과서에서 확인해줘"라고 하면 교과서와 대조해 알려 줘요.</p>
+ ${rows.map(x=>`<div class="flrow"><span class="flst ${x.st||'open'}">${FLST[x.st||'open']}</span><span class="flst">${(FLAGWHY.find(w=>w[0]===x.why)||[0,'확인'])[1].split(' (')[0]}</span><b style="font-size:13.5px">${fesc(x.name||'')}</b> <span class="muted" style="font-size:12.5px">${fesc(x.unit||'')}</span>
+ <div class="fq">${fesc((x.txt||'').slice(0,260))}</div>${x.memo?`<div class="fm">메모: ${fesc(x.memo)}</div>`:''}
+ <div class="bar" style="margin-top:6px"><button class="btn sm" data-flpr="${x.id}|${x.seed}">다시 보기</button><button class="btn sm" data-flst="${x.id}|${x.seed}|in">교과서에 있음</button><button class="btn sm" data-flst="${x.id}|${x.seed}|out">교과서에 없음</button><button class="btn sm" data-flst="${x.id}|${x.seed}|open">확인 전으로</button><button class="btn sm" data-fldel2="${x.id}|${x.seed}">삭제</button></div></div>`).join('')}</div>`}
 const okOf=i=>i.d.sa?i.self===1:i.d.opts[i.pick]===i.d.ans;
 function saHTML(it,idx,o){const t=TYPE[it.id],d=it.d,done=o.graded,show=done||it.show;
  const body=show?`<div class="model"><b>모범 답안</b> ${d.model}</div>${d.exp?`<div class="exp"><b class="h">채점 기준 · 풀이</b>${d.exp}</div>`:''}<div class="selfchk sachk"><span class="muted">스스로 채점</span><button class="chip ${it.self===1?'on':''}" data-sa="${idx}" data-v="1">맞음</button><button class="chip ${it.self===0?'on':''}" data-sa="${idx}" data-v="0">틀림</button></div>`
   :`${satBox(hsh(d.q),'답을 직접 써 보세요 (종이에 써도 됩니다)')}<div class="sa-note">서술형 — 보기가 없습니다.${o.fold?' 채점하면 모범 답안이 나옵니다.':''}</div>${o.fold?'':`<button class="btn" data-act="sashow">모범 답안 보기</button>`}`;
  return `<article class="q sa" id="q${idx}" data-aik="${CUR}|${hsh(d.q+'|'+(d.fig||'')+'|'+d.opts.join('|'))}" data-ans="0" data-pick="-1" data-done="${show?1:0}"><template class="aix">${d.model}<br>${d.exp}</template><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name.replace('[서술형] ','')}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lvsa">서술형</span></div>
- <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${body}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
+ <div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${body}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div>${flagBar(it)}</article>`}
 /* ===== 풀이 칸 (필기 앱처럼): 펜·형광펜·지우개·직선, 색·굵기, 되돌리기/다시, 펜 압력, 손바닥 방지.
    획(stroke)을 벡터로 저장한다 → IndexedDB 'm12pad' (키: SK|유형id|seed, 새로고침해도 유지, 이 기기). 부모용 "풀이 기록"과 AI 풀이 비교에 쓰인다.
    획 형식 {t:'p'|'h'|'e'|'l'|'x', c:색, w:캔버스 px 굵기, p:[x,y,압력%,…], pr:펜압 사용 여부}  ('x' = 모두 지우기 표시, 되돌리기 가능) */
@@ -5895,7 +5933,7 @@ async function padPull(){const db=PADCLOUD.db;if(!db)return;try{const snap=await
  catch(e){PADCLOUD.state=e&&e.code==='not_granted'?'서버 저장 꺼짐':'서버 연결 안 됨'}}
 (async()=>{try{if(typeof claude==='undefined'||!claude.use)return;const d=await claude.use('db');if(d){PADCLOUD.db=d;PADCLOUD.state='서버 저장 켜짐';setTimeout(padPull,600)}else PADCLOUD.state='이 기기에만 저장'}catch(e){PADCLOUD.state='이 기기에만 저장'}})();
 /* ===== 기록 서버 저장: 풀이 기록·정답 기록·내 문제집·문제집 약점·계획·모의고사 기록을 서버(db, kv 컬렉션)에도 저장 — 브라우저 데이터를 지워도 복구, 다른 기기에서도 이어서 ===== */
-const KV_RE=/^m12-(rec|pl|mb|wk|hist|sel)-/;const KVQ=new Set();let kvT=null;
+const KV_RE=/^m12-(rec|pl|mb|wk|hist|sel|flag)-/;const KVQ=new Set();let kvT=null;
 const kvAt=()=>{try{return JSON.parse(localStorage.getItem('m12-kvat')||'{}')}catch(e){return{}}};
 function kvPut(k){try{if(!KV_RE.test(k))return;const m=kvAt();m[k]=Date.now();localStorage.setItem('m12-kvat',JSON.stringify(m));if(PADCLOUD.db){KVQ.add(k);clearTimeout(kvT);kvT=setTimeout(kvFlush,3000)}}catch(e){}}
 async function kvFlush(){const db=PADCLOUD.db;if(!db)return;const ks=[...KVQ];KVQ.clear();
@@ -5995,7 +6033,7 @@ function qHTML(it,idx,o){if(it.d.sa)return saHTML(it,idx,o);const t=TYPE[it.id],
  const exp=`<div class="exp"><b class="h">정답 ${CIRC[ai]} · 풀이</b>${d.exp}</div>`;
  return `<article class="q" id="q${idx}" data-aik="${CUR}|${hsh(d.q)}" data-ans="${ai+1}" data-pick="${it.pick??-1}" data-done="${done?1:0}"><template class="aix">${d.exp}</template>
  <div class="qsp${padOn()?' hp':''}"><div class="ql"><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lv${t.lv}">${LV[t.lv]}</span></div><div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}${(()=>{try{return noteFor(it).length?`<div class="ntqrow"><button class="btn sm" data-ntq="${it.id}">📖 이 단원 요점 보기</button></div>`:''}catch(e){return''}})()}</div>${padHTML(it,ai,done)}</div>
- ${done?`<div class="helptag${(it.help||0)>=2?' warn':''}">${(it.help||0)?`💡 도움받아 풀었어요 (${HELP_NAME[it.help]}까지)${it.pick===ai&&it.help>=2?' · 복습 필요로 표시했어요':''}`:'✅ 혼자 풀었어요'}</div>`:''}${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
+ ${done?`<div class="helptag${(it.help||0)>=2?' warn':''}">${(it.help||0)?`💡 도움받아 풀었어요 (${HELP_NAME[it.help]}까지)${it.pick===ai&&it.help>=2?' · 복습 필요로 표시했어요':''}`:'✅ 혼자 풀었어요'}</div>`:''}${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div>${flagBar(it)}</article>`}
 const scoped=()=>T.filter(t=>sel.has(t.u)&&!finalEx(t));
 const qCount=t=>t.bank?t.n:'∞';
 
@@ -6275,14 +6313,17 @@ function hpList(){return(S.hp||[]).filter(x=>x.ok&&x.lv>=2&&!x.done&&TYPE[x.id])
 function hpHTML(){const L=hpList();if(!L.length)return '';
  return `<h2 class="sec" style="margin-top:16px">💡 도움받아 푼 문제 · 복습 필요 <span class="muted" style="font-size:12.5px;font-weight:400">정답이지만 힌트 2단계 이상이나 풀이 전략·요점을 본 문제</span></h2><div class="list" style="margin-top:8px">${L.slice(0,15).map(x=>`<div class="row"><div class="t"><b>${TYPE[x.id].name}</b><p>${SUBNAME[TYPE[x.id].u]} · ${HELP_NAME[x.lv]}까지 보고 풀었어요 · ${new Date(x.at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})}</p></div><div class="acts"><button class="btn sm" data-same="${x.id}" data-seed="${x.seed}">다시 풀기</button><button class="btn sm" data-new="${x.id}">비슷한 문제</button><button class="btn sm" data-hpdone="${x.id}|${x.seed}">복습 완료</button></div></div>`).join('')}</div>`}
 function renderReview(){const v=$('#v-review');const wk=weakTypes(),A=allS();
- if(!A.w.length){v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}${(()=>{try{return wkHTML()}catch(e){return''}})()}${(()=>{try{return plogHTML()}catch(e){return''}})()}${(()=>{try{return hpHTML()}catch(e){return''}})()}<div class="empty">${SJ[CUR].name}에서 아직 틀린 문제가 없습니다. 연습이나 모의고사에서 틀린 문제가 여기에 모입니다.</div>`;return}
+ if(!A.w.length){v.innerHTML=`${(()=>{try{return flagHTML()}catch(e){return''}})()}${(()=>{try{return mbHTML()}catch(e){return''}})()}${(()=>{try{return wkHTML()}catch(e){return''}})()}${(()=>{try{return plogHTML()}catch(e){return''}})()}${(()=>{try{return hpHTML()}catch(e){return''}})()}<div class="empty">${SJ[CUR].name}에서 아직 틀린 문제가 없습니다. 연습이나 모의고사에서 틀린 문제가 여기에 모입니다.</div>`;return}
  const cz={};A.w.forEach(x=>{if(x.c)cz[x.c]=(cz[x.c]||0)+1});const czN=Object.values(cz).reduce((a,b)=>a+b,0),czM=Math.max(1,...Object.values(cz)),top=CAUSE.filter(([k])=>cz[k]===czM&&czN)[0];
- v.innerHTML=`${(()=>{try{return mbHTML()}catch(e){return''}})()}${(()=>{try{return wkHTML()}catch(e){return''}})()}${(()=>{try{return plogHTML()}catch(e){return''}})()}${(()=>{try{return hpHTML()}catch(e){return''}})()}<div class="scope causes"><div class="bar"><b>틀린 까닭</b><span class="muted">${czN?`고른 문제 ${czN}개 · 안 고른 문제 ${A.w.length-czN}개`:'틀린 문제 아래에서 까닭을 고르면 여기에 모입니다.'}</span></div>${czN?`<div class="czl">${CAUSE.map(([k,n])=>`<div class="czr"><span>${n}</span><div class="meter"><i class="${top&&top[0]===k?'lo':''}" style="width:${(cz[k]||0)/czM*100}%"></i></div><b>${cz[k]||0}</b></div>`).join('')}</div><p class="cztip"><b>${top[1]}</b>가 가장 많습니다. ${CAUSE_TIP[top[0]]}</p>`:''}</div>
+ v.innerHTML=`${(()=>{try{return flagHTML()}catch(e){return''}})()}${(()=>{try{return mbHTML()}catch(e){return''}})()}${(()=>{try{return wkHTML()}catch(e){return''}})()}${(()=>{try{return plogHTML()}catch(e){return''}})()}${(()=>{try{return hpHTML()}catch(e){return''}})()}<div class="scope causes"><div class="bar"><b>틀린 까닭</b><span class="muted">${czN?`고른 문제 ${czN}개 · 안 고른 문제 ${A.w.length-czN}개`:'틀린 문제 아래에서 까닭을 고르면 여기에 모입니다.'}</span></div>${czN?`<div class="czl">${CAUSE.map(([k,n])=>`<div class="czr"><span>${n}</span><div class="meter"><i class="${top&&top[0]===k?'lo':''}" style="width:${(cz[k]||0)/czM*100}%"></i></div><b>${cz[k]||0}</b></div>`).join('')}</div><p class="cztip"><b>${top[1]}</b>가 가장 많습니다. ${CAUSE_TIP[top[0]]}</p>`:''}</div>
  <div class="bar" style="margin-top:14px"><h2 class="sec">자주 틀리는 유형</h2><span class="sp"></span><button class="btn pri sm" data-act="weak">약한 유형으로 10문항 시험</button></div>
  <div class="list" style="margin-top:8px">${wk.slice(0,6).map(x=>`<div class="row"><div class="t"><b>${TYPE[x.id].name}</b><p>${SUBNAME[TYPE[x.id].u]} · ${x.n}번 중 ${x.w}번 틀림</p></div><div class="acts"><button class="btn sm" data-new="${x.id}">연습</button></div></div>`).join('')}</div>
  <h2 class="sec" style="margin-top:16px">최근 틀린 문제</h2>
  <div class="list" style="margin-top:8px">${A.w.slice(0,30).map(x=>{if(!TYPE[x.id])return'';const d=gen(x.id,x.seed);return `<div class="row"><div class="t"><b>${TYPE[x.id].name}</b><p>${x.c?`<span class="ntacc lo" style="margin:0 6px 0 0">${(CAUSE.find(c=>c[0]===x.c)||[,''])[1]}</span>`:''}${plain(d.q).split('\n')[0]}</p></div><div class="acts"><button class="btn sm" data-same="${x.id}" data-seed="${x.seed}">그 문제</button><button class="btn sm" data-new="${x.id}">비슷한 문제</button></div></div>`}).join('')}</div>`}
 $('#v-review').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.flst){const[i,sd,st]=b.dataset.flst.split('|');const L=flList();const x=L.find(y=>y.id===i&&String(y.seed)===sd);if(x){x.st=st;LS.set(flKey(),L);renderReview()}return}
+ if(b.dataset.fldel2){const[i,sd]=b.dataset.fldel2.split('|');LS.set(flKey(),flList().filter(y=>!(y.id===i&&String(y.seed)===sd)));renderReview();return}
+ if(b.dataset.flpr){const[i,sd]=b.dataset.flpr.split('|');newPractice(i,+sd);show('practice');return}
  if(b.dataset.hpdone){const[i,sd]=b.dataset.hpdone.split('|');const x=(S.hp||[]).find(y=>y.id===i&&String(y.seed)===sd);if(x){x.done=true;LS.set('m12-rec-'+SK(),S);onRecord();renderReview()}return}
  if(b.dataset.act==='weak'){weakExam(10,{all:true});show('exam');return}
  if(b.dataset.same){newPractice(b.dataset.same,+b.dataset.seed);show('practice');return}
@@ -6599,7 +6640,7 @@ N('soc',[
  pts:[`선거권: 만 ${F('18세')} 이상 국민`,`지방 자치 = ${F('풀뿌리 민주주의')}: 주민이 지역 문제에 참여하며 민주주의를 배우고 실천`,`주민 참여 제도: 주민 투표, ${F('주민 소환제')}(단체장·의원을 임기 중 투표로 물러나게 함), 주민 발안(조례 제정·개정 청구), 주민 참여 예산`],
  tbl:{h:['선거의 4대 원칙','뜻','어긋나는 예'],r:[['보통 선거','일정 나이가 되면 누구나 선거권','여성·무산자에게 선거권을 주지 않음'],['평등 선거','1인 1표, 한 표의 가치가 같음','재산이 많은 사람에게 두 표'],['직접 선거','본인이 직접 투표','다른 사람에게 투표를 맡김'],['비밀 선거','누구에게 투표했는지 모르게','공개 투표, 기표소 없이 투표']]},
  warn:['정당: 정권 획득이 목적, 후보 공천 / 이익 집단: 특수 이익 추구, 정권 획득 목적 <b>없음</b> / 시민 단체: 공익 추구 / 언론: 여론 형성.','선거구 간 인구 차이가 크면 평등 선거 원칙(표의 가치)에 어긋난다 → 선거구 법정주의.'],
- go:['s10-elec','s10-act','s10-sys','s10-dist','s10-turn']},
+ go:['s10-elec','s10-act','s10-sys','s10-sys2','s10-dist','s10-turn']},
 {id:'N-S11',u:'S11',title:'일상생활과 법',
  pts:[`공정한 재판을 위한 제도: ${F('심급 제도(3심제)')}, 공개 재판, 증거 재판, 사법권의 독립`,`3심제: ${F('지방 법원')} → (항소) → ${F('고등 법원')} → (상고) → ${F('대법원')}`],
  tbl:{h:['법의 종류','관계','예'],r:[['공법','국가와 개인, 국가 기관 사이','헌법, 형법, 행정법, 형사 소송법'],['사법','개인과 개인 사이','민법, 상법'],['사회법','사회적 약자 보호 (공법과 사법의 중간)','근로 기준법, 최저 임금법, 국민 건강 보험법']]},
@@ -7577,7 +7618,7 @@ const aiEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 const aiFmt=t=>aiEsc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
 /* 화면 요소 → 읽을 수 있는 글 (분수·선분·표 처리) */
 function aiTxt(node){if(!node)return'';const c=node.cloneNode(true);
-  c.querySelectorAll('svg,template,.aibar,.aibox,.mk').forEach(x=>x.remove());
+  c.querySelectorAll('svg,template,.aibar,.flagbar,.aibox,.mk').forEach(x=>x.remove());
   c.querySelectorAll('mfrac').forEach(f=>{const k=f.children;f.replaceWith(`(${k[0]?.textContent||''})/(${k[1]?.textContent||''})`)});
   c.querySelectorAll('.sg').forEach(x=>x.replaceWith('선분 '+x.textContent));
   c.querySelectorAll('table').forEach(tb=>{const rows=[...tb.querySelectorAll('tr')].map(r=>[...r.children].map(td=>td.textContent.trim()).join(' | '));tb.replaceWith('\n'+rows.join('\n')+'\n')});
