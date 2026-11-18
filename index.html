@@ -335,6 +335,8 @@ b.src{color:var(--ac);font-weight:600}
 /* AI 선생님 */
 .aibar{display:none;gap:6px;flex-wrap:wrap}
 .sasum{display:flex;gap:10px;align-items:center;padding:8px;border:1px dashed var(--rule);border-radius:10px;margin:8px 0}.sasum img{max-height:84px;max-width:48%;border:1px solid var(--rule);border-radius:6px;background:#fff}.sasum .st{font-size:13px;flex:1;white-space:pre-wrap;max-height:84px;overflow:hidden;line-height:1.5}
+.sasum img{cursor:zoom-in}.sasum .st{cursor:zoom-in}.sasum .sabtn{display:flex;flex-direction:column;gap:6px}
+#saov{display:none;position:fixed;inset:0;z-index:90;background:rgba(10,12,20,.7);overflow-y:auto;padding:12px}#saov.on{display:block}.sazp{max-width:1000px;margin:2vh auto;background:var(--sheet);color:var(--ink);border-radius:14px;padding:14px}.sazp img{width:100%;border:1px solid var(--rule);border-radius:8px;background:#fff;margin-top:8px}.sazp .satxt{white-space:pre-wrap;font-size:17px;line-height:1.7;margin-top:10px;padding:10px;border:1px solid var(--rule);border-radius:8px}.sazp .samd{margin-top:12px;padding:10px;border-left:3px solid var(--ac,#6c47d6);background:rgba(120,100,200,.08);border-radius:6px;line-height:1.6}
 .sawt{margin:8px 0 6px;align-items:center}.sakb textarea.satx{min-height:84px}
 .qfoot{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.flagbtn{margin-left:auto}.flagbtn.on{background:#fdecec;border-color:#d98a8a;color:#a33}
 #flov{display:none;position:fixed;inset:0;z-index:80;background:rgba(10,12,20,.55);padding:16px;overflow-y:auto}#flov.on{display:block}
@@ -5429,14 +5431,20 @@ const SAT={};const satBox=(k,ph)=>`<textarea class="satx" data-sat="${k}" rows="
 document.addEventListener('input',e=>{const t=e.target.closest&&e.target.closest('textarea[data-sat]');if(t){SAT[t.dataset.sat]=t.value;const m=/\|es-(.+)\|0$/.exec(t.dataset.sat);if(m)ES.ans[m[1]]=t.value}});
 /* ===== 서술형 작성 칸: ✍️ 필기와 ⌨️ 입력을 둘 다 쓸 수 있고, [작성 완료]를 누르면 작은 요약(필기 썸네일+입력 글)으로 줄어든다 ===== */
 const SAW={};const saSt=k=>SAW[k]||(SAW[k]={tab:LS.get('m12-satab','pad'),done:false,img:''});
-function saSumHTML(k){const st=saSt(k),tx=String(SAT[k]||'').trim();return `${st.img?`<img src="${st.img}" alt="내 필기">`:''}<div class="st">${tx?esEsc(tx.slice(0,240)):(st.img?'':'<span class="muted">쓴 답이 없어요</span>')}</div><button class="btn sm" data-saedit="1">✏️ 다시 쓰기</button>`}
+function saSumHTML(k){const st=saSt(k),tx=String(SAT[k]||'').trim();return `${st.img?`<img src="${st.img}" alt="내 필기" data-saz="1" title="눌러서 크게 보기">`:''}<div class="st" data-saz="1" title="눌러서 크게 보기">${tx?esEsc(tx.slice(0,240)):(st.img?'':'<span class="muted">쓴 답이 없어요</span>')}</div><div class="sabtn"><button class="btn sm pri" data-saz="1">🔍 크게 보기</button><button class="btn sm" data-saedit="1">✏️ 다시 쓰기</button></div>`}
 function saWriteHTML(k,padIt,graded){const st=saSt(k);
  return `<div class="sawrap" data-sak="${k}"><div class="sasum"${st.done?'':' hidden'}>${saSumHTML(k)}</div><div class="sapanel"${st.done?' hidden':''}>
  <div class="bar sawt"><button class="chip${st.tab==='pad'?' on':''}" data-sawt="pad">✍️ 필기</button><button class="chip${st.tab==='kb'?' on':''}" data-sawt="kb">⌨️ 입력</button><span class="muted" style="font-size:12px">둘 다 쓸 수 있어요</span><span class="sp"></span><button class="btn pri sm" data-sadone="1">✅ 작성 완료</button></div>
  <div class="sapad"${st.tab==='pad'?'':' hidden'}>${padHTML(padIt,0,graded,true)}</div><div class="sakb"${st.tab==='kb'?'':' hidden'}>${satBox(k,'여기에 답을 입력하세요')}</div></div></div>`}
 async function saSnap(k){const st=saSt(k);st.done=true;st.img='';const r=PADS.get(k)||await padGet(k);
- if(r&&padHas(r)){try{const c=await padCanvasA(r,padDark());st.img=c.toDataURL('image/jpeg',.55);if(!r.sub){r.sub=true;r.at=Date.now();PADS.set(k,r);padPut(r)}}catch(e){}}return st}
-document.addEventListener('click',async e=>{const t=e.target.closest&&e.target.closest('[data-sawt],[data-sadone],[data-saedit]');if(!t)return;const w=t.closest('.sawrap');if(!w)return;const k=w.dataset.sak,st=saSt(k);
+ if(r&&padHas(r)){try{const c=await padCanvasA(r,padDark());st.img=c.toDataURL('image/jpeg',.7);if(!r.sub){r.sub=true;r.at=Date.now();PADS.set(k,r);padPut(r)}}catch(e){}}return st}
+function saZoom(w,k){const st=saSt(k),tx=String(SAT[k]||'').trim();let o=document.getElementById('saov');if(!o){o=document.createElement('div');o.id='saov';document.body.appendChild(o)}
+ const box=w.closest('.q,.es'),md=box&&box.querySelector('.model,.esm');
+ o.innerHTML=`<div class="sazp"><div class="bar"><b>✍️ 내가 쓴 답</b><span class="sp"></span><button class="btn sm" data-sazx="1">닫기</button></div>${st.img?`<img src="${st.img}" alt="내 필기">`:''}${tx?`<div class="satxt">${esEsc(tx)}</div>`:''}${!st.img&&!tx?'<p class="muted">쓴 답이 없어요</p>':''}${md?`<div class="samd">${md.innerHTML}</div>`:''}<div class="bar" style="margin-top:10px"><span class="sp"></span><button class="btn pri sm" data-sazx="1">닫기</button></div></div>`;o.classList.add('on');o.scrollTop=0}
+document.addEventListener('click',e=>{const o=document.getElementById('saov');if(o&&o.classList.contains('on')&&(e.target===o||(e.target.closest&&e.target.closest('[data-sazx]'))))o.classList.remove('on')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const o=document.getElementById('saov');if(o)o.classList.remove('on')}});
+document.addEventListener('click',async e=>{const t=e.target.closest&&e.target.closest('[data-sawt],[data-sadone],[data-saedit],[data-saz]');if(!t)return;const w=t.closest('.sawrap');if(!w)return;const k=w.dataset.sak,st=saSt(k);
+ if(t.dataset.saz){saZoom(w,k);return}
  if(t.dataset.sawt){st.tab=t.dataset.sawt;LS.set('m12-satab',st.tab);w.querySelector('.sapad').hidden=st.tab!=='pad';w.querySelector('.sakb').hidden=st.tab!=='kb';w.querySelectorAll('[data-sawt]').forEach(b=>b.classList.toggle('on',b===t));return}
  if(t.dataset.saedit){st.done=false;w.querySelector('.sasum').hidden=true;w.querySelector('.sapanel').hidden=false;return}
  if(t.dataset.sadone){await saSnap(k);const sm=w.querySelector('.sasum');sm.innerHTML=saSumHTML(k);sm.hidden=false;w.querySelector('.sapanel').hidden=true}});
