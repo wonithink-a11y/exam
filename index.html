@@ -6070,7 +6070,7 @@ function setSubject(id){CUR=id;OV=null;document.documentElement.dataset.s=id;con
  $('#subj').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sub===id));
  $('#hinfo').textContent=`${s.book} · ${T.length}개 유형`;ddBadge();
  $('#presets').innerHTML='<span>빠른 선택</span>'+s.presets.map((p,i)=>`<button class="chip" data-pre="${i}">${p[0]}</button>`).join('')+'<button class="chip" data-pre="none">전체 해제</button><p class="muted" style="margin:6px 0 0;width:100%;font-size:12.5px">단원 이름을 누르면 그 단원 전체가 선택·해제되고, 소단원은 하나씩 눌러 고를 수 있습니다.</p>';
- P.n=0;P.ok=0;P.last=null;renderScope();newPractice();E=null;makeExam(2612,examN,null,null,{save:false});
+ P.n=0;P.ok=0;P.last=null;renderScope();newPractice();E=null;{const pl=examPlan();SA_N=pl.sa;makeExam(2612,pl.count,null,null,{save:false})}
  const wOn=eeHas(),eOn=essHas(),nOn=ntHas();$('#tabWords').hidden=!wOn;$('#tabEssay').hidden=!eOn;$('#tabNote').hidden=!nOn;{const tb=document.querySelector('.tabs'),n=5+wOn+eOn+nOn;tb.classList.toggle('six',n>=6);tb.classList.toggle('seven',n>=7);tb.style.gridTemplateColumns=n>5?`repeat(${n},1fr)`:''}W.test=null;W.les=null;
  const tab=LS.get('m12-tab','practice');if(['words','essay','note','jokbo'].includes(tab))show(tab);if(tab==='review')renderReview();if(tab==='stats')renderStats();onSubject(id);setTimeout(padFit,150)}
 function renderSem(){const [g,t,ey]=SEMNAME[SEM];$('#eyebrow').textContent=ey;$('#htitle').textContent=`${g} ${t} 문제은행`;
@@ -6115,7 +6115,7 @@ $('#v-practice').addEventListener('click',e=>{const b=e.target.closest('button')
 
 /* ===== 모의고사 ===== */
 let E=null,examN=LS.get('m12-n',20),examEs=LS.get('m12-esn',0);
-function pickEssays(seed){if(!examEs||typeof essHas!=='function'||!essHas())return[];const pool=SJ[CUR].essay.filter(x=>sel.has(x.u));if(!pool.length)return[];
+function pickEssays(seed){if(!examEs||fmtOf()||typeof essHas!=='function'||!essHas())return[];const pool=SJ[CUR].essay.filter(x=>sel.has(x.u));if(!pool.length)return[];
  return mkR(seed*31+7).shuffle(pool).slice(0,examEs).sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u))}
 const esPts=l=>l.reduce((a,x)=>a+(x.pts||0),0);
 /* 약점 집중: 서술형은 '다시 공부'·'일부 빠졌다'로 표시한 문항 → 아직 안 푼 문항 → 충분히 쓴 문항 순으로 가중 추출 */
@@ -6127,7 +6127,12 @@ function pickTypes(R,count,types){types=types.filter(t=>!t.sa);if(!types.length)
  const ptr={};const out=[];let ks=R.shuffle(keys);while(out.length<count){for(const k of ks){if(out.length>=count)break;const i=ptr[k]||0;out.push(by[k][i%by[k].length]);ptr[k]=i+1}ks=R.shuffle(keys)}
  return out.sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)||a.lv-b.lv)}
 /* 서술형이 있는 과목은 모의고사를 객관식 (count-3) + 서술형 3문항으로 구성(맨 뒤). 교과서 본문 서술형(tsa-)이 범위에 있으면 그것만 출제 */
-const SA_N=3;
+let SA_N=3;
+/* 학교 시험 형식: 2026 2학기 1차 시험(중간고사)과 같은 객관식·서술형 문항 수 (국어 21+4, 사회 25+4, 수학 21+3, 과학 25+4, 영어 23+4) */
+const SCHOOL_FMT={kor:{o:21,s:4},soc:{o:25,s:4},math:{o:21,s:3},sci:{o:25,s:4},eng:{o:23,s:4}};
+let examFmt=LS.get('m12-fmt',true);
+const fmtOf=()=>(SEM==='1-2'&&examFmt&&SCHOOL_FMT[CUR])||null;
+function examPlan(){const f=fmtOf();if(f){const sa=scoped().some(t=>t.sa);return{count:sa?f.o+f.s:f.o,sa:sa?f.s:0,fmt:f}}return{count:examN,sa:3,fmt:null}}
 function pickSa(R,types,n){const by={};const sa=types.filter(t=>t.sa),tb=sa.filter(t=>t.id.startsWith('tsa-'));(tb.length?tb:sa).forEach(t=>(by[t.u]=by[t.u]||[]).push(t));const keys=SUBS.filter(k=>by[k]);if(!keys.length)return[];keys.forEach(k=>by[k]=R.shuffle(by[k]));
  const out=[],ptr={};let ks=R.shuffle(keys);while(out.length<n){for(const k of ks){if(out.length>=n)break;const i=ptr[k]||0;out.push(by[k][i%by[k].length]);ptr[k]=i+1}ks=R.shuffle(keys)}
  return out.sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u))}
@@ -6157,7 +6162,7 @@ function histPending(){try{return LS.get('m12-hist-'+SK(),[]).filter(x=>x.pk&&!x
 function histContinue(k){const x=LS.get('m12-hist-'+SK(),[]).find(h=>h.k===+k);if(!x)return;makeExam(x.seed,x.ids.length,x.ids.filter(id=>TYPE[id]),x.label,{srcs:x.srcs,save:false,es:x.es?x.es.map(id=>(SJ[CUR].essay||[]).find(e=>e.id===id)).filter(Boolean):undefined});if(x.esa){Object.assign(ES.ans,x.esa.ans||{});Object.assign(ES.done,x.esa.done||{});Object.assign(ES.chk,x.esa.chk||{})}if(x.pk&&E&&E.items&&E.items.length===x.pk.length&&E.items.every((it,i)=>it.seed===x.sd[i])){E.hk=x.k;E.items.forEach((it,i)=>{if(x.pk[i]!=null)it.pick=pkRestore(it.d,x.pk[i],x.pt&&x.pt[i]);if(x.sf&&x.sf[i]!=null)it.self=x.sf[i];if(x.hp&&x.hp[i])it.help=x.hp[i]});renderExam()}show('exam');window.scrollTo({top:0})}
 function renderExam(){const v=$('#v-exam');
  const pend=histPending().map(x=>`<div class="note" style="margin-bottom:8px">📝 풀던 시험지가 있어요: <b>${x.label}</b> · ${x.ids.length}문항 중 <b>${x.ans}문항</b> 풀었어요 <button class="btn sm pri" data-hcont="${x.k}">이어 풀기</button></div>`).join('');
- const cfg=pend+`<div class="cfg"><div class="bar"><span class="muted">문항 수</span>${[10,15,20,25].map(n=>`<button class="chip ${examN===n?'on':''}" data-n="${n}">${n}</button>`).join('')}${hasSa()?`<span class="muted">객관식 ${examN-SA_N} + 서술형 ${SA_N}</span>`:''}${(typeof essHas==='function'&&essHas())?`<span class="muted" style="margin-left:10px">서술형</span>${[0,2,3,4].map(n=>`<button class="chip ${examEs===n?'on':''}" data-esn="${n}">${n?n+'문항':'없음'}</button>`).join('')}`:''}</div>
+ const pl=examPlan(),sfm=SCHOOL_FMT[CUR]&&SEM==='1-2'?SCHOOL_FMT[CUR]:null;const cfg=pend+`<div class="cfg"><div class="bar"><span class="muted">문항 수</span>${sfm?`<button class="chip ${examFmt?'on':''}" data-fmt="1" title="중간고사(2026 1차 시험)와 같은 객관식·서술형 문항 수">🏫 학교 시험 형식 ${sfm.o}+${sfm.s}</button>`:''}${[10,15,20,25].map(n=>`<button class="chip ${!pl.fmt&&examN===n?'on':''}" data-n="${n}">${n}</button>`).join('')}${pl.fmt?`<span class="muted">객관식 ${pl.count-pl.sa}${pl.sa?` + 서술형 ${pl.sa}`:' (이 화면에는 서술형 문항이 없어요)'}</span>`:hasSa()?`<span class="muted">객관식 ${examN-SA_N} + 서술형 ${SA_N}</span>`:''}${(typeof essHas==='function'&&essHas()&&!pl.fmt)?`<span class="muted" style="margin-left:10px">서술형</span>${[0,2,3,4].map(n=>`<button class="chip ${examEs===n?'on':''}" data-esn="${n}">${n?n+'문항':'없음'}</button>`).join('')}`:''}</div>
  <div class="bar"><label for="seedIn">시험지 번호 <input id="seedIn" inputmode="numeric" placeholder="자동"></label><span class="sp"></span><button class="btn" data-act="weakmode">약점 집중</button><button class="btn pri" data-act="make">시험지 만들기</button></div>
  <p class="muted" style="margin:0">같은 과목에서 같은 번호를 넣으면 같은 시험지가 다시 나옵니다. <b>약점 집중</b>은 출제 범위 안에서 많이 틀린 유형·정답률이 낮은 단원·아직 안 풀어 본 유형을 우선 출제합니다.</p></div>`;
  if(!E||E.err){v.innerHTML=cfg+(E&&E.err?`<div class="empty" style="margin-top:12px">출제 범위를 하나 이상 선택해 주세요.</div>`:'');return}
@@ -6243,10 +6248,11 @@ function examText(){let s=`${SEMNAME[SEM][0]} ${SJ[CUR].name} ${SEMNAME[SEM][1]}
  E.items.forEach((it,i)=>{s+=`${i+1}. ${it.d.sa?'[서술형] ':''}${plain(it.d.q)}\n`;if(it.d.alt)s+=`   [그림] ${it.d.alt}\n`;s+=it.d.sa?'   답: ____________________________\n\n':it.d.opts.map((o,j)=>`   ${CIRC[j]} ${plain(o)}`).join('\n')+'\n\n'});
  s+='[정답]\n'+E.items.map((it,i)=>`${i+1}.${it.d.sa?'서술형':CIRC[it.d.opts.indexOf(it.d.ans)]}`).join('  ')+'\n\n[풀이·모범 답안]\n'+E.items.map((it,i)=>`${i+1}. ${it.d.sa?'모범 답안: '+plain(it.d.model)+' / ':''}${plain(it.d.exp)}`).join('\n');return s}
 $('#v-exam').addEventListener('click',e=>{const hc=e.target.closest('[data-hcont]');if(hc){histContinue(hc.dataset.hcont);return}const b=e.target.closest('button');if(!b)return;
- if(b.dataset.n){examN=+b.dataset.n;LS.set('m12-n',examN);renderExam();return}
+ if(b.dataset.fmt){examFmt=true;LS.set('m12-fmt',true);renderExam();return}
+ if(b.dataset.n){examN=+b.dataset.n;LS.set('m12-n',examN);examFmt=false;LS.set('m12-fmt',false);renderExam();return}
  const a=b.dataset.act;
- if(a==='make'){const sv=parseInt($('#seedIn').value,10);makeExam(sv>0?sv:Math.floor(1000+Math.random()*9000),examN);return}
- if(a==='weakmode'){weakExam(examN);return}
+ if(a==='make'){const sv=parseInt($('#seedIn').value,10),pl=examPlan();SA_N=pl.sa;makeExam(sv>0?sv:Math.floor(1000+Math.random()*9000),pl.count,null,pl.fmt?'기말 대비 모의고사(학교 형식)':null);return}
+ if(a==='weakmode'){SA_N=3;weakExam(examN);return}
  if(a==='grade'){E.graded=true;E.copy=null;E.items.forEach(i=>{if(!i.d.sa)record(i.id,i.seed,okOf(i),i.help)});saveScore();renderExam();window.scrollTo({top:$('#v-exam').offsetTop-60});return}
  if(a==='pdf'){examPdf(b);return}
  if(b.dataset.sa!=null&&E.graded){const it=E.items[+b.dataset.sa];const first=it.self==null;it.self=+b.dataset.v;if(first)record(it.id,it.seed,it.self===1,it.help);saveScore();renderExam();return}
