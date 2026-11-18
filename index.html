@@ -6301,9 +6301,11 @@ $('#v-jokbo').addEventListener('click',e=>{const b=e.target.closest('button');if
 let OV=null;
 const HAS_ORIG=typeof ORIG!=='undefined';
 const oItem=(x,i)=>{if(typeof x==='number')return{l:String(i+1),a:[x]};if(Array.isArray(x))return{l:String(i+1),a:x};if(typeof x==='string')return{l:String(i+1),s:x};return{l:x.l,a:x.a!=null?[].concat(x.a):null,s:x.s}};
-function openOrig(key){const o=ORIG.find(x=>x.key===key);OV={o,its:o.items.map(oItem),pick:LS.get('m12-omr-'+key,{}),self:{},graded:false};renderOrig();window.scrollTo({top:$('#v-jokbo').offsetTop-60})}
+function openOrig(key){const o=ORIG.find(x=>x.key===key);OV={o,its:(o.items||[]).map(oItem),pick:LS.get('m12-omr-'+key,{}),self:{},graded:false};renderOrig();window.scrollTo({top:$('#v-jokbo').offsetTop-60})}
 function oOk(it,p){if(!it.a)return null;const sel=(p||[]).slice().sort();if(!sel.length)return false;if(OV.o.mode==='any')return sel.every(v=>it.a.includes(v));return sel.length===it.a.length&&it.a.every(v=>sel.includes(v))}
 function renderOrig(){const v=$('#v-jokbo'),o=OV.o,its=OV.its,C='①②③④⑤';
+ if(o.view){/* 정답표가 없는 원본: 쪽 이미지만 보여 준다 */
+  v.innerHTML=`<div class="bar"><button class="btn sm" data-ob="back">← 족보 목록</button></div><div class="sheet" style="margin-top:10px;padding-block:12px"><div class="ehead" style="padding-top:0"><b>${o.title}</b><span class="muted">${o.meta}</span></div>${o.note?`<p class="note" style="margin-top:8px">${o.note}</p>`:''}<p class="muted" style="margin:8px 0 0;font-size:12.5px">출처: ${o.src} · 정답표가 없어 자동 채점은 하지 않아요. 문제를 보며 연습 문제와 비교해 보세요.</p><div class="aibar" data-aik="orig|${o.key}" style="margin-top:10px"><button class="aibtn" data-ai="o">AI 선생님에게 이 시험지 묻기</button><button class="btn sm" data-ob="pdf" style="margin-left:8px">원본 A3 PDF (2쪽 모아찍기)</button></div><div class="pgs">${Array.from({length:o.pages},(_,i)=>`<img src="jokbo/${o.key}/p-${i+1}.jpg" alt="${o.title} ${i+1}쪽" loading="lazy">`).join('')}</div></div>`;return}
  const obj=its.filter(i=>i.a),ok=OV.graded?obj.filter((it,k)=>oOk(it,OV.pick[its.indexOf(it)])).length:0;
  let h=`<div class="bar"><button class="btn sm" data-ob="back">← 족보 목록</button></div>
  <div class="sheet" style="margin-top:10px;padding-block:12px"><div class="ehead" style="padding-top:0"><b>${o.title}</b><span class="muted">${o.meta}</span></div>
@@ -6327,8 +6329,8 @@ $('#v-jokbo').addEventListener('click',e=>{if(!OV)return;const b=e.target.closes
  if(a==='reset'){OV.pick={};OV.self={};OV.graded=false;LS.set('m12-omr-'+OV.o.key,{});renderOrig();return}
  if(a==='grade'){OV.graded=true;const obj=OV.its.filter(x=>x.a),ok=obj.filter(it=>oOk(it,OV.pick[OV.its.indexOf(it)])).length;const H=LS.get('m12-hist-'+SK(),[]);H.unshift({k:Date.now(),label:OV.o.title+' (원본)',orig:OV.o.key,n:OV.its.length,at:Date.now(),score:obj.length?Math.round(ok/obj.length*100):0});LS.set('m12-hist-'+SK(),H.slice(0,30));renderOrig();window.scrollTo({top:$('#v-jokbo').offsetTop-60})}},true);
 function origList(){if(!HAS_ORIG)return'';const L=ORIG.filter(o=>o.subj===CUR&&(o.sem||'1-2')===SEM);if(!L.length)return'';
- return `<h2 class="sec" style="margin-top:16px">내 기출 자료 (원본)</h2><p class="muted" style="margin:4px 0 0">다운로드 폴더에 받아 두신 시험지입니다. 문제를 보고 답안지에 표기하면 바로 채점됩니다.</p>
- <div class="list" style="margin-top:8px">${L.map(o=>`<div class="jcard"><div class="t"><b>${o.title}</b>${o.pages?'<span class="pill hot">문제 보기</span>':'<span class="pill">답만 입력</span>'}<p>${o.meta} · ${o.src}</p></div><div class="acts"><button class="btn sm pri" data-orig="${o.key}">풀기</button></div></div>`).join('')}</div>`}
+ return `<h2 class="sec" style="margin-top:16px">내 기출 자료 (원본)</h2><p class="muted" style="margin:4px 0 0">받아 두신 시험지입니다. 정답표가 있는 시험지는 답안지에 표기하면 바로 채점되고, 학교 시험지(보기)는 문제만 볼 수 있어요.</p>
+ <div class="list" style="margin-top:8px">${L.map(o=>`<div class="jcard"><div class="t"><b>${o.title}</b>${o.pages?'<span class="pill hot">문제 보기</span>':'<span class="pill">답만 입력</span>'}<p>${o.meta} · ${o.src}</p></div><div class="acts"><button class="btn sm pri" data-orig="${o.key}">${o.view?'보기':'풀기'}</button></div></div>`).join('')}</div>`}
 
 /* ===== 오답노트 ===== */
 function weakTypes(){return Object.entries(allS().t).map(([id,[n,c]])=>({id,n,c,w:n-c})).filter(x=>x.w>0&&TYPE[x.id]).sort((a,b)=>b.w-a.w||a.c/a.n-b.c/b.n)}
