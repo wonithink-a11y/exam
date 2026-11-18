@@ -338,7 +338,10 @@ b.src{color:var(--ac);font-weight:600}
 .sasum img{cursor:zoom-in}.sasum .st{cursor:zoom-in}.sasum .sabtn{display:flex;flex-direction:column;gap:6px}
 #saov{display:none;position:fixed;inset:0;z-index:90;background:rgba(10,12,20,.7);overflow-y:auto;padding:12px}#saov.on{display:block}.sazp{max-width:1000px;margin:2vh auto;background:var(--sheet);color:var(--ink);border-radius:14px;padding:14px}.sazp img{width:100%;border:1px solid var(--rule);border-radius:8px;background:#fff;margin-top:8px}.sazp .satxt{white-space:pre-wrap;font-size:17px;line-height:1.7;margin-top:10px;padding:10px;border:1px solid var(--rule);border-radius:8px}.sazp .samd{margin-top:12px;padding:10px;border-left:3px solid var(--ac,#6c47d6);background:rgba(120,100,200,.08);border-radius:6px;line-height:1.6}
 .sawt{margin:8px 0 6px;align-items:center}.sakb textarea.satx{min-height:84px}
-.qfoot{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.flagbtn{margin-left:auto}.flagbtn.on{background:#fdecec;border-color:#d98a8a;color:#a33}
+.tbkov{position:fixed;inset:0;z-index:85;background:#14161c;color:#eee;display:none;flex-direction:column}.tbkov.on{display:flex}
+.tbkt{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 10px;background:#0d0f14;border-bottom:1px solid #2a2e38}.tbkt .tbb{border:1px solid #3a3f4c;background:#1d212b;color:#eee;border-radius:8px;padding:6px 11px;font-size:14px;cursor:pointer}.tbkt .tbb.on{background:#6c47d6;border-color:#6c47d6}.tbkt .tbp{font-weight:700;font-size:14px;padding:0 4px}.tbkt .tbex{background:#2e7d4f;color:#fff;border-radius:999px;font-size:12px;padding:2px 9px}.tbkt select{background:#1d212b;color:#eee;border:1px solid #3a3f4c;border-radius:8px;padding:6px;max-width:46vw;font-size:14px}
+.tbkv{flex:1;overflow:auto;display:flex;gap:6px;justify-content:center;align-items:flex-start;padding:10px;-webkit-overflow-scrolling:touch}.tbkv img{background:#fff;max-width:100%;height:auto;flex:1 1 0;min-width:0;border-radius:4px}.tbkv.one img{flex:0 1 auto;max-width:min(100%,900px)}.tbkv.z img{max-width:none;width:180%;flex:0 0 auto}.tbkv.z.one img{width:200%;max-width:none}.tbkv .tbmiss{color:#aaa;padding:40px;text-align:center}
+.qfoot{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.qfr{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}.flagbtn.on{background:#fdecec;border-color:#d98a8a;color:#a33}
 #flov{display:none;position:fixed;inset:0;z-index:80;background:rgba(10,12,20,.55);padding:16px;overflow-y:auto}#flov.on{display:block}
 .fld{max-width:460px;margin:8vh auto 0;background:var(--sheet);color:var(--ink);border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.3)}.fld label{display:block;margin:8px 0;font-size:14px}.fld textarea{width:100%;box-sizing:border-box;font:inherit;padding:8px;border:1px solid var(--rule);border-radius:8px;background:transparent;color:inherit;margin:6px 0 10px}
 .flrow{padding:10px 0;border-top:1px dashed var(--rule)}.flrow .fq{font-size:13.5px;margin:4px 0;line-height:1.5}.flrow .fm{font-size:13px;color:var(--muted)}.flst{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;background:var(--sheet);margin-right:6px}.flst.in{background:#e3f3e6;color:#27632f}.flst.out{background:#fdecec;color:#a33}
@@ -5880,6 +5883,31 @@ document.addEventListener('click',e=>{
   if(el)setTimeout(()=>window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'}),30);return}
  const z=e.target.closest('[data-cz]');if(z){const box=z.closest('.cause'),w=S.w.find(x=>x.id===box.dataset.cid&&String(x.seed)===box.dataset.cseed);if(!w)return;
   if(w.c===z.dataset.cz)delete w.c;else w.c=z.dataset.cz;LS.set('m12-rec-'+SK(),S);onRecord();box.querySelectorAll('[data-cz]').forEach(b=>b.classList.toggle('on',b.dataset.cz===w.c))}});
+/* ===== 📕 교과서 보기 (비공개 아티팩트: 교과서 쪽 이미지 TBK 데이터가 있을 때만) ===== */
+const tbkOk=()=>typeof TBK!=='undefined'&&SEM==='1-2'&&!!TBK[CUR];
+const TBKS={s:null,p:0,two:LS.get('m12-tbk2',null),zoom:false};
+function tbkQBtn(it){try{if(!tbkOk())return'';const t=TYPE[it.id];return t&&TBK[CUR].units[t.u]?`<button class="btn sm" data-tbk="q" data-tbu="${t.u}" title="이 문제의 단원이 나오는 교과서 쪽 보기">📕 교과서</button>`:''}catch(e){return''}}
+function tbkNext(s,p,dir){const ps=TBK[s].pages;if(dir>0){const n=ps.find(x=>x>=p);return n==null?ps[ps.length-1]:n}const n=[...ps].reverse().find(x=>x<=p);return n==null?ps[0]:n}
+function tbkOpen(s,page){let o=document.getElementById('tbkov');if(!o){o=document.createElement('div');o.id='tbkov';o.className='tbkov';document.body.appendChild(o)}
+ TBKS.s=s;TBKS.p=tbkNext(s,page,1);TBKS.zoom=false;if(TBKS.two==null)TBKS.two=window.innerWidth>=900;o.classList.add('on');document.documentElement.style.overflow='hidden';tbkRender()}
+function tbkClose(){const o=document.getElementById('tbkov');if(o)o.classList.remove('on');document.documentElement.style.overflow=''}
+function tbkRender(){const s=TBKS.s,T=TBK[s],o=document.getElementById('tbkov'),two=TBKS.two;let l=TBKS.p,r=null;
+ if(two){l=TBKS.p%2===0?TBKS.p:TBKS.p-1;if(!T.pages.includes(l)&&T.pages.includes(l+1)){r=l+1;l=null}else if(T.pages.includes(l+1))r=l+1}
+ const shown=two?[l,r].filter(x=>x!=null):[TBKS.p],ex=shown.some(x=>T.exam.some(e=>x>=e[0]&&x<=e[1]));
+ const toc=T.toc.map(([n,p])=>`<option value="${p}"${shown.length&&p<=shown[0]&&!T.toc.some(([,q])=>q>p&&q<=shown[0])?' selected':''}>${n} (${p}쪽)</option>`).join('');
+ o.innerHTML=`<div class="tbkt"><button class="tbb" data-tbn="close">✕ 닫기</button><b>📕 ${T.name}</b><button class="tbb" data-tbn="prev">◀</button><span class="tbp">${shown.length>1?shown[0]+'–'+shown[1]:shown[0]}쪽</span><button class="tbb" data-tbn="next">▶</button>${ex?'<span class="tbex">시험범위</span>':''}<select data-tbsel="1" aria-label="단원으로 이동">${toc}</select><button class="tbb${two?' on':''}" data-tbn="two">${two?'두 쪽':'한 쪽'}</button><button class="tbb${TBKS.zoom?' on':''}" data-tbn="zoom">🔍 확대</button></div><div class="tbkv${TBKS.zoom?' z':''}${two?'':' one'}" id="tbkv">${shown.map(x=>`<img src="tb/${s}/p-${x}.jpg" alt="${T.name} 교과서 ${x}쪽" onerror="this.outerHTML='<div class=tbmiss>${x}쪽 이미지를 불러오지 못했어요</div>'">`).join('')}</div>`}
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-tbk],[data-tbn]');if(!t)return;
+ if(t.dataset.tbk==='open'){const first=SUBS.find(c=>sel.has(c)&&TBK[CUR].units[c]);tbkOpen(CUR,first?TBK[CUR].units[first][0]:TBK[CUR].pages[0]);return}
+ if(t.dataset.tbk==='q'){const r=TBK[CUR].units[t.dataset.tbu];tbkOpen(CUR,r[0]);return}
+ const a=t.dataset.tbn;if(a==='close'){tbkClose();return}
+ const T=TBK[TBKS.s],st=TBKS.two?2:1;
+ if(a==='next'){TBKS.p=tbkNext(TBKS.s,(TBKS.two?(TBKS.p%2===0?TBKS.p:TBKS.p-1):TBKS.p)+st,1)}
+ if(a==='prev'){TBKS.p=tbkNext(TBKS.s,(TBKS.two?(TBKS.p%2===0?TBKS.p:TBKS.p-1):TBKS.p)-st,-1)}
+ if(a==='two'){TBKS.two=!TBKS.two;LS.set('m12-tbk2',TBKS.two)}
+ if(a==='zoom')TBKS.zoom=!TBKS.zoom;
+ tbkRender();const v=document.getElementById('tbkv');if(v)v.scrollTop=0});
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.tbsel){TBKS.p=tbkNext(TBKS.s,+t.value,1);tbkRender()}});
+document.addEventListener('keydown',e=>{const o=document.getElementById('tbkov');if(!o||!o.classList.contains('on'))return;if(e.key==='Escape')tbkClose();else if(e.key==='ArrowRight'){const b=o.querySelector('[data-tbn=next]');b&&b.click()}else if(e.key==='ArrowLeft'){const b=o.querySelector('[data-tbn=prev]');b&&b.click()}});
 /* ===== 🚩 확인할 문제: 배운 적 없는 용어·범위 밖·이상한 문제를 표시 (m12-flag-<SK>, 서버 kv 동기화) =====
    저장 항목: {id,seed,why(term|bad|ask),memo,st(open|in|out),at,unit,name,txt(문제·보기·정답 전문)} — txt가 있어 Claude가 서버(kv)에서 읽고 교과서와 대조할 수 있다 */
 const FLAGWHY=[['term','배운 적 없는 용어·내용 (교과서에 있는지 확인)'],['bad','문제·정답이 이상해요'],['ask','질문이 있어요 (선생님께 물어보기)']];
@@ -5887,7 +5915,7 @@ const FLST={open:'확인 전',in:'교과서에 있음',out:'교과서에 없음(
 const flKey=()=>'m12-flag-'+SK();const flList=()=>LS.get(flKey(),[]);
 const flFind=(id,seed)=>flList().find(x=>x.id===id&&String(x.seed)===String(seed));
 const fesc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function flagBar(it){try{const f=flFind(it.id,it.seed);return `<button class="btn sm flagbtn${f?' on':''}" data-flag="${it.id}|${it.seed}">${f?'🚩 확인 표시됨':'🚩 확인할 문제로 표시'}</button>`}catch(e){return''}}
+function flagBar(it){try{const f=flFind(it.id,it.seed),tb=tbkQBtn(it);return `<span class="qfr">${tb}<button class="btn sm flagbtn${f?' on':''}" data-flag="${it.id}|${it.seed}">${f?'🚩 확인 표시됨':'🚩 확인할 문제로 표시'}</button></span>`}catch(e){return''}}
 function flText(id,seed){const d=gen(id,seed),t=document.createElement('div'),tx=h=>{t.innerHTML=h==null?'':String(h);return t.textContent.replace(/\s+/g,' ').trim()};
  return d.sa?`${tx(d.q)} / 모범 답안: ${tx(d.model)}`:`${tx(d.q)} / 보기: ${(d.opts||[]).map(tx).join(' | ')} / 정답: ${tx(d.ans)}`}
 function flOpen(id,seed){let o=document.getElementById('flov');if(!o){o=document.createElement('div');o.id='flov';document.body.appendChild(o)}
@@ -6069,7 +6097,7 @@ function setSubject(id){CUR=id;OV=null;document.documentElement.dataset.s=id;con
  LS.set('m12-subj',id);
  $('#subj').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sub===id));
  $('#hinfo').textContent=`${s.book} · ${T.length}개 유형`;ddBadge();
- $('#presets').innerHTML='<span>빠른 선택</span>'+s.presets.map((p,i)=>`<button class="chip" data-pre="${i}">${p[0]}</button>`).join('')+'<button class="chip" data-pre="none">전체 해제</button><p class="muted" style="margin:6px 0 0;width:100%;font-size:12.5px">단원 이름을 누르면 그 단원 전체가 선택·해제되고, 소단원은 하나씩 눌러 고를 수 있습니다.</p>';
+ $('#presets').innerHTML='<span>빠른 선택</span>'+s.presets.map((p,i)=>`<button class="chip" data-pre="${i}">${p[0]}</button>`).join('')+(tbkOk()?'<button class="chip" data-tbk="open">📕 교과서 보기</button>':'')+'<button class="chip" data-pre="none">전체 해제</button><p class="muted" style="margin:6px 0 0;width:100%;font-size:12.5px">단원 이름을 누르면 그 단원 전체가 선택·해제되고, 소단원은 하나씩 눌러 고를 수 있습니다.</p>';
  P.n=0;P.ok=0;P.last=null;renderScope();newPractice();E=null;{const pl=examPlan();SA_N=pl.sa;makeExam(2612,pl.count,null,null,{save:false})}
  const wOn=eeHas(),eOn=essHas(),nOn=ntHas();$('#tabWords').hidden=!wOn;$('#tabEssay').hidden=!eOn;$('#tabNote').hidden=!nOn;{const tb=document.querySelector('.tabs'),n=5+wOn+eOn+nOn;tb.classList.toggle('six',n>=6);tb.classList.toggle('seven',n>=7);tb.style.gridTemplateColumns=n>5?`repeat(${n},1fr)`:''}W.test=null;W.les=null;
  const tab=LS.get('m12-tab','practice');if(['words','essay','note','jokbo'].includes(tab))show(tab);if(tab==='review')renderReview();if(tab==='stats')renderStats();onSubject(id);setTimeout(padFit,150)}
