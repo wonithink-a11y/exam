@@ -5390,6 +5390,11 @@ let CUR,UNITS,T,SUBS,SUBNAME,TYPE,S,sel;
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));try{kvPut(k)}catch(e){}}catch(e){}}};
 let SEM=SEMS[LS.get('m12-sem','1-2')]?LS.get('m12-sem','1-2'):'1-2',SJ=SEMS[SEM];const SK=(c=CUR)=>SEM==='1-2'?c:c+'_'+SEM.replace('-','');
 const $=s=>document.querySelector(s);
+/* 기말고사 범위: 학기별·과목별 소단원 코드. 비어 있으면(미등록) 그 과목은 제한 없음. 예) '1-2':{math:['A3','B1'],sci:['K8','K9']} */
+const FINAL_RANGE={'1-2':{}};
+const finalOn=()=>!!FINAL_RANGE[SEM]&&LS.get('m12-final',false);
+const finalR=(id=CUR)=>{const r=finalOn()&&FINAL_RANGE[SEM][id];return r&&r.length?new Set(r):null};
+const selKey=(id=CUR)=>'m12-sel-'+SK(id)+(finalR(id)?'_F':'');
 const LV=['','하','중','상'];
 /* 풀이가 여러 개인 문항: g()가 m(첫 풀이의 사용 개념)과 alts([[개념, 풀이]…])를 주면 exp 뒤에 '풀이 ②③'을 붙인다 */
 function withAlts(d){if(d&&d.alts&&d.alts.length&&!d._alts){d._alts=1;d.exp=`<div class="alt"><b>풀이 ① · ${d.m||'기본 풀이'}</b><br>${d.exp}</div>`+d.alts.map((x,i)=>`<div class="alt"><b>풀이 ${'②③④'[i]} · ${x[0]}</b><br>${x[1]}</div>`).join('')}return d}
@@ -5985,7 +5990,7 @@ const qCount=t=>t.bank?t.n:'∞';
 /* ===== 과목 전환 ===== */
 function setSubject(id){CUR=id;OV=null;document.documentElement.dataset.s=id;const s=SJ[id];UNITS=s.units;T=s.T;SUBS=UNITS.flatMap(u=>u.subs.map(x=>x[0]));SUBNAME=Object.fromEntries(UNITS.flatMap(u=>u.subs));TYPE=Object.fromEntries(T.map(t=>[t.id,t]));
  S=LS.get('m12-rec-'+SK(id),null)||(id==='math'&&SEM==='1-2'?LS.get('m12-rec',{t:{},w:[]}):{t:{},w:[]});
- sel=new Set(LS.get('m12-sel-'+SK(id),null)||(id==='math'&&SEM==='1-2'?LS.get('m12-sel',null):null)||s.def||SUBS);
+ sel=new Set(finalR(id)?(LS.get(selKey(id),null)||[...finalR(id)]):LS.get('m12-sel-'+SK(id),null)||(id==='math'&&SEM==='1-2'?LS.get('m12-sel',null):null)||s.def||SUBS);
  LS.set('m12-subj',id);
  $('#subj').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sub===id));
  $('#hinfo').textContent=`${s.book} · ${T.length}개 유형`;ddBadge();
@@ -5994,18 +5999,21 @@ function setSubject(id){CUR=id;OV=null;document.documentElement.dataset.s=id;con
  const wOn=eeHas(),eOn=essHas(),nOn=ntHas();$('#tabWords').hidden=!wOn;$('#tabEssay').hidden=!eOn;$('#tabNote').hidden=!nOn;{const tb=document.querySelector('.tabs'),n=5+wOn+eOn+nOn;tb.classList.toggle('six',n>=6);tb.classList.toggle('seven',n>=7);tb.style.gridTemplateColumns=n>5?`repeat(${n},1fr)`:''}W.test=null;W.les=null;
  const tab=LS.get('m12-tab','practice');if(['words','essay','note','jokbo'].includes(tab))show(tab);if(tab==='review')renderReview();if(tab==='stats')renderStats();onSubject(id);setTimeout(padFit,150)}
 function renderSem(){const [g,t,ey]=SEMNAME[SEM];$('#eyebrow').textContent=ey;$('#htitle').textContent=`${g} ${t} 문제은행`;
- $('#sems').innerHTML=Object.keys(SEMS).filter(k=>Object.keys(SEMS[k]).length).map(k=>`<button data-sem="${k}" aria-pressed="${k===SEM}">${SEMNAME[k][0]} ${SEMNAME[k][1]}</button>`).join('');
+ $('#sems').innerHTML=Object.keys(SEMS).filter(k=>Object.keys(SEMS[k]).length).map(k=>`<button data-sem="${k}" aria-pressed="${k===SEM}">${SEMNAME[k][0]} ${SEMNAME[k][1]}</button>`).join('')+(FINAL_RANGE[SEM]?`<button data-final aria-pressed="${finalOn()}" title="기말고사 시험 범위의 단원만 출제">📌 기말 범위</button>`:'');
  $('#subj').innerHTML=ORDER.filter(k=>SJ[k]).map(k=>`<button data-sub="${k}" aria-pressed="false">${SJ[k].name}</button>`).join('')}
 renderSem();
 $('#sems').addEventListener('click',e=>{const b=e.target.closest('[data-sem]');if(!b||b.dataset.sem===SEM)return;SEM=b.dataset.sem;SJ=SEMS[SEM];LS.set('m12-sem',SEM);renderSem();setSubject(SJ[CUR]?CUR:ORDER.find(k=>SJ[k]))});
+$('#sems').addEventListener('click',e=>{if(!e.target.closest('[data-final]'))return;LS.set('m12-final',!finalOn());renderSem();setSubject(CUR)});
 $('#subj').addEventListener('click',e=>{const b=e.target.closest('[data-sub]');if(b&&b.dataset.sub!==CUR)setSubject(b.dataset.sub)});
 
 /* ===== 범위 ===== */
-function renderScope(){$('#units').innerHTML=UNITS.map(U=>{const n=U.subs.filter(x=>sel.has(x[0])).length,st=n===U.subs.length?'all':n?'part':'none';return `<div class="unit"><button class="uh" data-u="${U.id}" data-st="${st}" aria-pressed="${st==='all'}" title="${st==='all'?'단원 전체 해제':'단원 전체 선택'}"><span class="ck">${st==='all'?'✓':st==='part'?'–':''}</span><span class="rn">${U.tag}</span>${U.name}</button><div class="subs">${U.subs.map(([id,nm])=>`<button class="chip ${sel.has(id)?'on':''}" data-s="${id}" aria-pressed="${sel.has(id)}">${nm}<small>${T.filter(t=>t.u===id).length}</small></button>`).join('')}</div></div>`}).join('');
- $('#scopeSum').textContent=`소단원 ${sel.size}/${SUBS.length} · ${scoped().length}개 유형`;LS.set('m12-sel-'+SK(),[...sel])}
+function renderScope(){const FR=finalR();if(FR)sel=new Set([...sel].filter(x=>FR.has(x)));
+ const UN=FR?UNITS.map(U=>({...U,subs:U.subs.filter(x=>FR.has(x[0]))})).filter(U=>U.subs.length):UNITS;
+ $('#units').innerHTML=UN.map(U=>{const n=U.subs.filter(x=>sel.has(x[0])).length,st=n===U.subs.length?'all':n?'part':'none';return `<div class="unit"><button class="uh" data-u="${U.id}" data-st="${st}" aria-pressed="${st==='all'}" title="${st==='all'?'단원 전체 해제':'단원 전체 선택'}"><span class="ck">${st==='all'?'✓':st==='part'?'–':''}</span><span class="rn">${U.tag}</span>${U.name}</button><div class="subs">${U.subs.map(([id,nm])=>`<button class="chip ${sel.has(id)?'on':''}" data-s="${id}" aria-pressed="${sel.has(id)}">${nm}<small>${T.filter(t=>t.u===id).length}</small></button>`).join('')}</div></div>`}).join('');
+ $('#scopeSum').textContent=(finalOn()?(FR?'📌 기말 범위 · ':'📌 기말 범위 미등록(전체) · '):'')+`소단원 ${sel.size}/${FR?FR.size:SUBS.length} · ${scoped().length}개 유형`;LS.set(selKey(),[...sel])}
 $('#scope').addEventListener('click',e=>{const s=e.target.closest('button[data-s]'),u=e.target.closest('[data-u]'),p=e.target.closest('[data-pre]');
  if(s){sel.has(s.dataset.s)?sel.delete(s.dataset.s):sel.add(s.dataset.s)}
- else if(u){const subs=UNITS.find(x=>x.id===u.dataset.u).subs.map(x=>x[0]);const all=subs.every(x=>sel.has(x));subs.forEach(x=>all?sel.delete(x):sel.add(x))}
+ else if(u){const FR=finalR(),subs=UNITS.find(x=>x.id===u.dataset.u).subs.map(x=>x[0]).filter(x=>!FR||FR.has(x));const all=subs.every(x=>sel.has(x));subs.forEach(x=>all?sel.delete(x):sel.add(x))}
  else if(p){if(p.dataset.pre==='none')sel=new Set();else{const pr=SJ[CUR].presets[+p.dataset.pre][1];sel=new Set(pr||SUBS)}}
  else return;e.preventDefault();renderScope();if(!P.it||!sel.has(TYPE[P.it.id].u))newPractice();if(!$('#v-note').hidden)renderNote()});
 
@@ -7777,7 +7785,7 @@ $('#v-review').addEventListener('click',e=>{const b=e.target.closest('[data-wk]'
  if(a==='close'){WK.open=null;wkRender();return}
  if(a==='del'){LS.set(wkKey(),L.filter(x=>x.id!==+v));if(WK.open===+v)WK.open=null;wkRender();return}
  if(a==='exam'){wkExam();return}
- if(a==='scope'){const t=Object.entries(wkAgg().us).sort((x,y)=>y[1]-x[1]).slice(0,6).map(x=>x[0]);if(!t.length)return;sel=new Set(t);LS.set('m12-sel-'+SK(),[...sel]);renderScope();newPractice();show('practice');window.scrollTo({top:0});return}
+ if(a==='scope'){const t=Object.entries(wkAgg().us).sort((x,y)=>y[1]-x[1]).slice(0,6).map(x=>x[0]);if(!t.length)return;sel=new Set(t);renderScope();newPractice();show('practice');window.scrollTo({top:0});return}
  if(!rec)return;
  if(a==='mark'){const x=rec.items[+v];x.mark=WK_ORD[(WK_ORD.indexOf(x.mark)+1)%WK_ORD.length];wkSave(rec);wkRender();return}
  if(a==='rm'){rec.items.splice(+v,1);wkSave(rec);wkRender();return}
