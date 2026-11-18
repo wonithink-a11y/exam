@@ -5391,7 +5391,14 @@ const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}
 let SEM=SEMS[LS.get('m12-sem','1-2')]?LS.get('m12-sem','1-2'):'1-2',SJ=SEMS[SEM];const SK=(c=CUR)=>SEM==='1-2'?c:c+'_'+SEM.replace('-','');
 const $=s=>document.querySelector(s);
 /* 기말고사 범위: 학기별·과목별 소단원 코드. 비어 있으면(미등록) 그 과목은 제한 없음. 예) '1-2':{math:['A3','B1'],sci:['K8','K9']} */
-const FINAL_RANGE={'1-2':{}};
+const FINAL_RANGE={'1-2':{ /* 빛가람중 2026-11-18 가정통신문(12/7~12/8) 1학년 범위 */
+ math:['A3','B1','B2','C1','C2'],            /* 5.5 삼각형의 작도 ~ 7 입체도형 (p159~235) */
+ eng:['E7V','E7D','E7R','E8V','E8D','E8R'],   /* Lesson 7·8 */
+ sci:['K8','K9','K9b','K10','K11','K12','K13'], /* Ⅴ 힘의 작용·Ⅵ 기체의 성질·Ⅶ 태양계 */
+ soc:['S6','S8','S10','S11','S12'],           /* 6·8·10·11단원, 12단원 1.인권 보장과 헌법(p217까지) */
+ kor:['KA2','KC1','KC2','KD2'],               /* 1-(2) 토의, 3 단어의 세계, 4-(2) 존중하며 말하기 */
+ tech:['Q1','Q2','T2','T3','T5']              /* 기술 p134~154·166~169, 가정 p56~67 */
+}};
 const finalOn=()=>!!FINAL_RANGE[SEM]&&LS.get('m12-final',false);
 const finalR=(id=CUR)=>{const r=finalOn()&&FINAL_RANGE[SEM][id];return r&&r.length?new Set(r):null};
 const selKey=(id=CUR)=>'m12-sel-'+SK(id)+(finalR(id)?'_F':'');
