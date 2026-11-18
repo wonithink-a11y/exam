@@ -5417,6 +5417,8 @@ const finalR=(id=CUR)=>{const r=finalOn()&&FINAL_RANGE[SEM][id];return r&&r.leng
 /* 소단원 안에서 범위 밖인 유형 id를 개별 제외할 때만 사용 (과목 코드: [유형 id]) — 지금은 비어 있음 */
 const FINAL_EXCL={'1-2':{tech:['tbt-t5c','tbt-t5z'],soc:['s10-sys2']}}; /* 기술 Ⅳ-5: 170~171쪽(선출원주의·사례·상표 활동)·Ⅳ 단원 마무리는 범위 밖 */
 const finalEx=t=>{const x=finalOn()&&FINAL_RANGE[SEM][CUR]&&FINAL_EXCL[SEM]&&FINAL_EXCL[SEM][CUR];return !!x&&x.includes(t.id)};
+/* 기말 범위 모드의 선택: 저장된 선택 + 이번에 새로 범위에 들어온 소단원(예전에 저장할 땐 없던 코드)을 자동으로 더한다 */
+function finalSel(id){const FR=finalR(id),k=selKey(id),saved=LS.get(k,null),known=new Set(LS.get(k+'_k',[]));LS.set(k+'_k',[...FR]);return saved?[...new Set([...saved,...[...FR].filter(c=>!known.has(c))])]:[...FR]}
 const selKey=(id=CUR)=>'m12-sel-'+SK(id)+(finalR(id)?'_F':'');
 const LV=['','하','중','상'];
 /* 풀이가 여러 개인 문항: g()가 m(첫 풀이의 사용 개념)과 alts([[개념, 풀이]…])를 주면 exp 뒤에 '풀이 ②③'을 붙인다 */
@@ -6063,7 +6065,7 @@ const qCount=t=>t.bank?t.n:'∞';
 /* ===== 과목 전환 ===== */
 function setSubject(id){CUR=id;OV=null;document.documentElement.dataset.s=id;const s=SJ[id];UNITS=s.units;T=s.T;SUBS=UNITS.flatMap(u=>u.subs.map(x=>x[0]));SUBNAME=Object.fromEntries(UNITS.flatMap(u=>u.subs));TYPE=Object.fromEntries(T.map(t=>[t.id,t]));
  S=LS.get('m12-rec-'+SK(id),null)||(id==='math'&&SEM==='1-2'?LS.get('m12-rec',{t:{},w:[]}):{t:{},w:[]});
- sel=new Set(finalR(id)?(LS.get(selKey(id),null)||[...finalR(id)]):LS.get('m12-sel-'+SK(id),null)||(id==='math'&&SEM==='1-2'?LS.get('m12-sel',null):null)||s.def||SUBS);
+ sel=new Set(finalR(id)?finalSel(id):LS.get('m12-sel-'+SK(id),null)||(id==='math'&&SEM==='1-2'?LS.get('m12-sel',null):null)||s.def||SUBS);
  LS.set('m12-subj',id);
  $('#subj').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sub===id));
  $('#hinfo').textContent=`${s.book} · ${T.length}개 유형`;ddBadge();
@@ -6087,7 +6089,7 @@ function renderScope(){const FR=finalR();if(FR)sel=new Set([...sel].filter(x=>FR
 $('#scope').addEventListener('click',e=>{const s=e.target.closest('button[data-s]'),u=e.target.closest('[data-u]'),p=e.target.closest('[data-pre]');
  if(s){sel.has(s.dataset.s)?sel.delete(s.dataset.s):sel.add(s.dataset.s)}
  else if(u){const FR=finalR(),subs=UNITS.find(x=>x.id===u.dataset.u).subs.map(x=>x[0]).filter(x=>!FR||FR.has(x));const all=subs.every(x=>sel.has(x));subs.forEach(x=>all?sel.delete(x):sel.add(x))}
- else if(p){if(p.dataset.pre==='none')sel=new Set();else{const pp=SJ[CUR].presets[+p.dataset.pre];if(pp[2]==='final'&&FINAL_RANGE[SEM]){LS.set('m12-final',true);renderSem();setSubject(CUR);return}const pr=pp[1];sel=new Set(pr||SUBS)}}
+ else if(p){if(p.dataset.pre==='none')sel=new Set();else{const pp=SJ[CUR].presets[+p.dataset.pre];if(pp[2]==='final'&&FINAL_RANGE[SEM]){LS.set('m12-final',true);const fr=finalR(CUR);if(fr)LS.set(selKey(CUR),[...fr]);renderSem();setSubject(CUR);return}const pr=pp[1];sel=new Set(pr||SUBS)}}
  else return;e.preventDefault();renderScope();if(!P.it||!sel.has(TYPE[P.it.id].u))newPractice();if(!$('#v-note').hidden)renderNote()});
 
 /* ===== 연습 ===== */
