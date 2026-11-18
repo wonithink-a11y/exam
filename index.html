@@ -6087,7 +6087,7 @@ function renderScope(){const FR=finalR();if(FR)sel=new Set([...sel].filter(x=>FR
 $('#scope').addEventListener('click',e=>{const s=e.target.closest('button[data-s]'),u=e.target.closest('[data-u]'),p=e.target.closest('[data-pre]');
  if(s){sel.has(s.dataset.s)?sel.delete(s.dataset.s):sel.add(s.dataset.s)}
  else if(u){const FR=finalR(),subs=UNITS.find(x=>x.id===u.dataset.u).subs.map(x=>x[0]).filter(x=>!FR||FR.has(x));const all=subs.every(x=>sel.has(x));subs.forEach(x=>all?sel.delete(x):sel.add(x))}
- else if(p){if(p.dataset.pre==='none')sel=new Set();else{const pr=SJ[CUR].presets[+p.dataset.pre][1];sel=new Set(pr||SUBS)}}
+ else if(p){if(p.dataset.pre==='none')sel=new Set();else{const pp=SJ[CUR].presets[+p.dataset.pre];if(pp[2]==='final'&&FINAL_RANGE[SEM]){LS.set('m12-final',true);renderSem();setSubject(CUR);return}const pr=pp[1];sel=new Set(pr||SUBS)}}
  else return;e.preventDefault();renderScope();if(!P.it||!sel.has(TYPE[P.it.id].u))newPractice();if(!$('#v-note').hidden)renderNote()});
 
 /* ===== 연습 ===== */
@@ -7634,6 +7634,9 @@ window.addEventListener('pagehide',()=>{try{resumeSaveNow()}catch(e){}});
  s.presets.forEach(p=>{if(p[1]&&p[1].includes('S12'))['S12b','S12c'].forEach(c=>{if(!p[1].includes(c))p[1].push(c)})});
  s.presets.splice(1,0,['기말 범위(6·8·10·11·12-01)',['S6','S8','S10','S11','S12']]);
  if(!LS.get('m12-mig-s12c',false)){LS.set('m12-mig-s12c',true);const k='m12-sel-soc',v=LS.get(k,null);if(v&&v.includes('S12'))LS.set(k,[...new Set([...v,'S12b','S12c'])])}})();
+/* 빠른 선택의 옛 '기말' 프리셋(공개 소단원만 담김)을 없애고, 기말 공지 범위 한 개로 통일. 누르면 상단 📌 기말 범위 버튼과 같은 모드가 켜진다 */
+(()=>{const FR=FINAL_RANGE['1-2']||{},S2=SEMS['1-2'];Object.keys(FR).forEach(k=>{const s=S2[k];if(!s)return;const all=new Set(s.units.flatMap(u=>u.subs.map(x=>x[0])));const codes=FR[k].filter(c=>all.has(c));if(!codes.length)return;
+ s.presets=s.presets.filter(p=>!/기말/.test(p[0])&&p[2]!=='final');s.presets.splice(1,0,['📌 기말 범위(공지 기준)',codes,'final'])})})();
 setSubject(SJ[LS.get('m12-subj','math')]?LS.get('m12-subj','math'):(SJ.math?'math':ORDER.find(k=>SJ[k])));resumeLoad();show(LS.get('m12-tab','practice'));setTimeout(padFit,400);
 /* ===== AI 선생님 (claude.ai 안에서만 켜짐) ===== */
 function hsh(s){let h=5381;s=String(s);for(let i=0;i<s.length;i++)h=(h*33^s.charCodeAt(i))>>>0;return h.toString(36)}
