@@ -5395,12 +5395,15 @@ const FINAL_RANGE={'1-2':{ /* 빛가람중 2026-11-18 가정통신문(12/7~12/8)
  math:['A3','B1','B2','C1','C2'],            /* 5.5 삼각형의 작도 ~ 7 입체도형 (p159~235) */
  eng:['E7V','E7D','E7R','E8V','E8D','E8R'],   /* Lesson 7·8 */
  sci:['K8','K9','K9b','K10','K11','K12','K13'], /* Ⅴ 힘의 작용·Ⅵ 기체의 성질·Ⅶ 태양계 */
- soc:['S6','S8','S10','S11','S12'],           /* 6·8·10·11단원, 12단원 1.인권 보장과 헌법(p217까지) */
+ soc:['S6','S8','S10','S11','S12'],           /* 6·8·10·11단원, 12단원 1.인권 보장과 헌법(p217까지) → 12단원 유형은 FINAL_EXCL로 제한 */
  kor:['KA2','KC1','KC2','KD2'],               /* 1-(2) 토의, 3 단어의 세계, 4-(2) 존중하며 말하기 */
  tech:['Q1','Q2','T2','T3','T5']              /* 기술 p134~154·166~169, 가정 p56~67 */
 }};
 const finalOn=()=>!!FINAL_RANGE[SEM]&&LS.get('m12-final',false);
 const finalR=(id=CUR)=>{const r=finalOn()&&FINAL_RANGE[SEM][id];return r&&r.length?new Set(r):null};
+/* 소단원 안에서 범위 밖인 유형 id (기말 범위 모드에서만 제외) — 사회 12단원은 '1. 인권 보장과 헌법(p217까지)'만 */
+const FINAL_EXCL={'1-2':{soc:['s12-rel','s12-lab','s12-lim','s12-lab2']}};
+const finalEx=t=>{const x=finalOn()&&FINAL_RANGE[SEM][CUR]&&FINAL_EXCL[SEM]&&FINAL_EXCL[SEM][CUR];return !!x&&x.includes(t.id)};
 const selKey=(id=CUR)=>'m12-sel-'+SK(id)+(finalR(id)?'_F':'');
 const LV=['','하','중','상'];
 /* 풀이가 여러 개인 문항: g()가 m(첫 풀이의 사용 개념)과 alts([[개념, 풀이]…])를 주면 exp 뒤에 '풀이 ②③'을 붙인다 */
@@ -5991,7 +5994,7 @@ function qHTML(it,idx,o){if(it.d.sa)return saHTML(it,idx,o);const t=TYPE[it.id],
  return `<article class="q" id="q${idx}" data-aik="${CUR}|${hsh(d.q)}" data-ans="${ai+1}" data-pick="${it.pick??-1}" data-done="${done?1:0}"><template class="aix">${d.exp}</template>
  <div class="qsp${padOn()?' hp':''}"><div class="ql"><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lv${t.lv}">${LV[t.lv]}</span></div><div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}${(()=>{try{return noteFor(it).length?`<div class="ntqrow"><button class="btn sm" data-ntq="${it.id}">📖 이 단원 요점 보기</button></div>`:''}catch(e){return''}})()}</div>${padHTML(it,ai,done)}</div>
  ${done?`<div class="helptag${(it.help||0)>=2?' warn':''}">${(it.help||0)?`💡 도움받아 풀었어요 (${HELP_NAME[it.help]}까지)${it.pick===ai&&it.help>=2?' · 복습 필요로 표시했어요':''}`:'✅ 혼자 풀었어요'}</div>`:''}${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div></article>`}
-const scoped=()=>T.filter(t=>sel.has(t.u));
+const scoped=()=>T.filter(t=>sel.has(t.u)&&!finalEx(t));
 const qCount=t=>t.bank?t.n:'∞';
 
 /* ===== 과목 전환 ===== */
@@ -6016,7 +6019,7 @@ $('#subj').addEventListener('click',e=>{const b=e.target.closest('[data-sub]');i
 /* ===== 범위 ===== */
 function renderScope(){const FR=finalR();if(FR)sel=new Set([...sel].filter(x=>FR.has(x)));
  const UN=FR?UNITS.map(U=>({...U,subs:U.subs.filter(x=>FR.has(x[0]))})).filter(U=>U.subs.length):UNITS;
- $('#units').innerHTML=UN.map(U=>{const n=U.subs.filter(x=>sel.has(x[0])).length,st=n===U.subs.length?'all':n?'part':'none';return `<div class="unit"><button class="uh" data-u="${U.id}" data-st="${st}" aria-pressed="${st==='all'}" title="${st==='all'?'단원 전체 해제':'단원 전체 선택'}"><span class="ck">${st==='all'?'✓':st==='part'?'–':''}</span><span class="rn">${U.tag}</span>${U.name}</button><div class="subs">${U.subs.map(([id,nm])=>`<button class="chip ${sel.has(id)?'on':''}" data-s="${id}" aria-pressed="${sel.has(id)}">${nm}<small>${T.filter(t=>t.u===id).length}</small></button>`).join('')}</div></div>`}).join('');
+ $('#units').innerHTML=UN.map(U=>{const n=U.subs.filter(x=>sel.has(x[0])).length,st=n===U.subs.length?'all':n?'part':'none';return `<div class="unit"><button class="uh" data-u="${U.id}" data-st="${st}" aria-pressed="${st==='all'}" title="${st==='all'?'단원 전체 해제':'단원 전체 선택'}"><span class="ck">${st==='all'?'✓':st==='part'?'–':''}</span><span class="rn">${U.tag}</span>${U.name}</button><div class="subs">${U.subs.map(([id,nm])=>`<button class="chip ${sel.has(id)?'on':''}" data-s="${id}" aria-pressed="${sel.has(id)}">${nm}<small>${T.filter(t=>t.u===id&&!finalEx(t)).length}</small></button>`).join('')}</div></div>`}).join('');
  $('#scopeSum').textContent=(finalOn()?(FR?'📌 기말 범위 · ':'📌 기말 범위 미등록(전체) · '):'')+`소단원 ${sel.size}/${FR?FR.size:SUBS.length} · ${scoped().length}개 유형`;LS.set(selKey(),[...sel])}
 $('#scope').addEventListener('click',e=>{const s=e.target.closest('button[data-s]'),u=e.target.closest('[data-u]'),p=e.target.closest('[data-pre]');
  if(s){sel.has(s.dataset.s)?sel.delete(s.dataset.s):sel.add(s.dataset.s)}
