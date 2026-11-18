@@ -6048,7 +6048,7 @@ function qHTML(it,idx,o){if(it.d.sa)return saHTML(it,idx,o);const t=TYPE[it.id],
  const exp=`<div class="exp"><b class="h">정답 ${CIRC[ai]} · 풀이</b>${d.exp}</div>`;
  return `<article class="q" id="q${idx}" data-aik="${CUR}|${hsh(d.q)}" data-ans="${ai+1}" data-pick="${it.pick??-1}" data-done="${done?1:0}"><template class="aix">${d.exp}</template>
  <div class="qsp${padOn()?' hp':''}"><div class="ql"><div class="qh"><span class="qn">${o.num??idx+1}</span><span class="tag">${SUBNAME[t.u]} · ${t.name}${it.src?` · <b class="src">${it.src}</b>`:''}</span><span class="lv lv${t.lv}">${LV[t.lv]}</span></div><div class="qt">${d.q}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}${/서술형/.test(t.name+(it.src||''))?satBox(hsh(d.q),'풀이 과정과 답을 직접 써 보세요 (아래 보기로 정답 확인)'):''}<ol class="opts${short?' short':''}">${opts}</ol>${o.hint&&!done&&HINT[it.id]?`<div class="hintbox" data-hid="${it.id}"><button class="btn sm" data-hint="0">힌트 1 보기</button></div>`:''}${(()=>{try{return noteFor(it).length?`<div class="ntqrow"><button class="btn sm" data-ntq="${it.id}">📖 이 단원 요점 보기</button></div>`:''}catch(e){return''}})()}</div>${padHTML(it,ai,done)}</div>
- ${done?`<div class="helptag${(it.help||0)>=2?' warn':''}">${(it.help||0)?`💡 도움받아 풀었어요 (${HELP_NAME[it.help]}까지)${it.pick===ai&&it.help>=2?' · 복습 필요로 표시했어요':''}`:'✅ 혼자 풀었어요'}</div>`:''}${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="qfoot"><div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div>${flagBar(it)}</div></article>`}
+ ${done&&it.pick==null?`<div class="helptag warn">⚠️ 답을 고르지 않아서 틀린 것으로 처리됐어요 (미응답)</div>`:done?`<div class="helptag${(it.help||0)>=2?' warn':''}">${(it.help||0)?`💡 도움받아 풀었어요 (${HELP_NAME[it.help]}까지)${it.pick===ai&&it.help>=2?' · 복습 필요로 표시했어요':''}`:'✅ 혼자 풀었어요'}</div>`:''}${done?(o.fold?`<details class="ex" ${it.pick!==ai?'open':''}><summary>풀이 보기</summary>${exp}</details>`:exp):''}${o.cause&&done&&it.pick!==ai?causeHTML(it):''}<div class="qfoot"><div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div>${flagBar(it)}</div></article>`}
 const scoped=()=>T.filter(t=>sel.has(t.u)&&!finalEx(t));
 const qCount=t=>t.bank?t.n:'∞';
 
@@ -6144,7 +6144,7 @@ function weakExam(count,o){o=o||{};const all=o.all?T:scoped(),pool=all.filter(t=
  makeExam(sd,picks.length,picks.map(t=>t.id),'약점 집중 시험',{srcs,es:weakEssays(mkR(sd*13+5),examEs,!!o.all),weakEs:true,weakAll:!!o.all})}
 const hasSa=()=>scoped().some(t=>t.sa);
 function histPending(){try{return LS.get('m12-hist-'+SK(),[]).filter(x=>x.pk&&!x.gr&&x.ans>0&&!x.orig&&(!E||E.hk!==x.k)).slice(0,3)}catch(e){return[]}}
-function histContinue(k){const x=LS.get('m12-hist-'+SK(),[]).find(h=>h.k===+k);if(!x)return;makeExam(x.seed,x.ids.length,x.ids.filter(id=>TYPE[id]),x.label,{srcs:x.srcs,save:false,es:x.es?x.es.map(id=>(SJ[CUR].essay||[]).find(e=>e.id===id)).filter(Boolean):undefined});if(x.esa){Object.assign(ES.ans,x.esa.ans||{});Object.assign(ES.done,x.esa.done||{});Object.assign(ES.chk,x.esa.chk||{})}if(x.pk&&E&&E.items&&E.items.length===x.pk.length&&E.items.every((it,i)=>it.seed===x.sd[i])){E.hk=x.k;E.items.forEach((it,i)=>{if(x.pk[i]!=null)it.pick=x.pk[i];if(x.sf&&x.sf[i]!=null)it.self=x.sf[i];if(x.hp&&x.hp[i])it.help=x.hp[i]});renderExam()}show('exam');window.scrollTo({top:0})}
+function histContinue(k){const x=LS.get('m12-hist-'+SK(),[]).find(h=>h.k===+k);if(!x)return;makeExam(x.seed,x.ids.length,x.ids.filter(id=>TYPE[id]),x.label,{srcs:x.srcs,save:false,es:x.es?x.es.map(id=>(SJ[CUR].essay||[]).find(e=>e.id===id)).filter(Boolean):undefined});if(x.esa){Object.assign(ES.ans,x.esa.ans||{});Object.assign(ES.done,x.esa.done||{});Object.assign(ES.chk,x.esa.chk||{})}if(x.pk&&E&&E.items&&E.items.length===x.pk.length&&E.items.every((it,i)=>it.seed===x.sd[i])){E.hk=x.k;E.items.forEach((it,i)=>{if(x.pk[i]!=null)it.pick=pkRestore(it.d,x.pk[i],x.pt&&x.pt[i]);if(x.sf&&x.sf[i]!=null)it.self=x.sf[i];if(x.hp&&x.hp[i])it.help=x.hp[i]});renderExam()}show('exam');window.scrollTo({top:0})}
 function renderExam(){const v=$('#v-exam');
  const pend=histPending().map(x=>`<div class="note" style="margin-bottom:8px">📝 풀던 시험지가 있어요: <b>${x.label}</b> · ${x.ids.length}문항 중 <b>${x.ans}문항</b> 풀었어요 <button class="btn sm pri" data-hcont="${x.k}">이어 풀기</button></div>`).join('');
  const cfg=pend+`<div class="cfg"><div class="bar"><span class="muted">문항 수</span>${[10,15,20,25].map(n=>`<button class="chip ${examN===n?'on':''}" data-n="${n}">${n}</button>`).join('')}${hasSa()?`<span class="muted">객관식 ${examN-SA_N} + 서술형 ${SA_N}</span>`:''}${(typeof essHas==='function'&&essHas())?`<span class="muted" style="margin-left:10px">서술형</span>${[0,2,3,4].map(n=>`<button class="chip ${examEs===n?'on':''}" data-esn="${n}">${n?n+'문항':'없음'}</button>`).join('')}`:''}</div>
@@ -6155,8 +6155,8 @@ function renderExam(){const v=$('#v-exam');
  const copyBox=E.copy!=null?`<textarea class="copybox" id="copybox" readonly>${E.copy.replace(/</g,'&lt;')}</textarea><p class="muted" style="margin:0">자동 복사가 막혀 있어 위 글을 직접 선택해 복사해 주세요.</p>`:'';
  if(E.graded){const ok=E.items.filter(okOf).length;const by={};E.items.forEach(i=>{const u=TYPE[i.id].u;by[u]=by[u]||[0,0];by[u][0]++;if(okOf(i))by[u][1]++});
   const nSa=E.items.length-nObj,saOk=E.items.filter(i=>i.d.sa&&i.self===1).length,saUn=E.items.filter(i=>i.d.sa&&i.self==null).length;
-  score=`<div class="score"><div class="big">${Math.round(ok/E.items.length*100)}<small>점 · ${E.items.length}문항 중 ${ok}개 정답${nSa?` (객관식 ${ok-saOk}/${nObj} · 서술형 ${saOk}/${nSa}${saUn?` · 서술형 ${saUn}문항은 아래에서 스스로 채점`:''})`:''}</small></div>
-  <div class="omrrow">${E.items.map((i,k)=>`<span class="${okOf(i)?'o':'x'}">${k+1}${i.d.sa?'서':''} ${okOf(i)?'○':i.d.sa&&i.self==null?'?':'×'}</span>`).join('')}</div>
+  score=`<div class="score"><div class="big">${Math.round(ok/Math.max(1,E.items.length-saUn)*100)}<small>점 · ${E.items.length-saUn}문항 중 ${ok}개 정답${nSa?` (객관식 ${ok-saOk}/${nObj} · 서술형 ${saOk}/${nSa}${saUn?` · 서술형 ${saUn}문항은 아래에서 스스로 채점하면 점수에 들어가요`:''})`:''}${(n=>n?` · <b>미응답 ${n}문항</b>(– 표시)`:'')(E.items.filter(i=>!i.d.sa&&i.pick==null).length)}</small></div>
+  <div class="omrrow">${E.items.map((i,k)=>`<span class="${okOf(i)?'o':'x'}">${k+1}${i.d.sa?'서':''} ${okOf(i)?'○':i.d.sa&&i.self==null?'?':i.pick==null?'–':'×'}</span>`).join('')}</div>
   <div class="muted">${Object.entries(by).map(([u,[n,c]])=>`${SUBNAME[u]} ${c}/${n}`).join(' · ')}</div>
   <div class="bar">${ok<E.items.length?`<button class="btn pri sm" data-act="retry">틀린 유형 다시 풀기</button>`:''}<button class="btn sm" data-act="copy">시험지·정답 텍스트 복사</button><button class="btn sm" data-act="pdf">시험지 PDF</button></div>${copyBox}</div>`}
  v.innerHTML=cfg+`<div style="height:12px"></div>${score}<div class="sheet" style="margin-top:12px"><div class="ehead"><b>${SJ[CUR].name} ${E.label}</b><span class="muted">시험지 번호 ${E.seed} · ${E.items.length}문항</span></div>
@@ -6184,7 +6184,7 @@ const PDF_CSS=`.pp{--ink:#111;--muted:#555;--rule:#888;--chip:#f3f3f3;--ac:#333;
 .pp .pg{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:13px;color:#555}
 .pp .ak{display:grid;grid-template-columns:repeat(10,1fr);border:1.5px solid #111;margin-bottom:14px}.pp .ak div{border:1px solid #bbb;text-align:center;padding:4px 0;font-size:15px}.pp .ak b{display:block;font-size:12px;color:#555}
 .pp .sal{height:30px;border-bottom:1px solid #888}.pp .ex{font-size:13.5px;line-height:1.55;padding:4px 0 10px}.pp .ex .tw,.pp .pq .tw{overflow:visible}`;
-function saveScore(){if(!E.hk)return;const H=LS.get('m12-hist-'+SK(),[]),h=H.find(x=>x.k===E.hk);if(h){h.score=Math.round(E.items.filter(okOf).length/E.items.length*100);LS.set('m12-hist-'+SK(),H)}}
+function saveScore(){if(!E.hk)return;const H=LS.get('m12-hist-'+SK(),[]),h=H.find(x=>x.k===E.hk);if(h){h.score=Math.round(E.items.filter(okOf).length/Math.max(1,E.items.filter(i=>!(i.d.sa&&i.self==null)).length)*100);LS.set('m12-hist-'+SK(),H)}}
 function pqHTML(it,i,ans){const d=it.d,t=TYPE[it.id],C='①②③④⑤';if(d.sa){if(ans)return `<div class="ex"><b>${i+1}. 서술형 모범 답안</b> ${pFrac(d.model)}${d.exp?`<br>${pFrac(d.exp)}`:''}</div>`;
   return `<div class="pq"><span class="tag">서술형 · ${SUBNAME[t.u]}</span><div class="pqt"><b class="n">${i+1}.</b>${pFrac(d.q)}</div>${d.fig?`<figure class="fig">${d.fig}</figure>`:''}<div class="sal"></div><div class="sal"></div><div class="sal"></div></div>`}
  const short=d.opts.every(x=>x.replace(/<[^>]+>/g,'').length<=12);
@@ -6242,9 +6242,9 @@ $('#v-exam').addEventListener('click',e=>{const hc=e.target.closest('[data-hcont
  if(b.dataset.sa!=null&&E.graded){const it=E.items[+b.dataset.sa];const first=it.self==null;it.self=+b.dataset.v;if(first)record(it.id,it.seed,it.self===1,it.help);saveScore();renderExam();return}
  if(a==='retry'){const wr=E.items.filter(i=>!okOf(i)).map(i=>i.id);makeExam(Math.floor(1000+Math.random()*9000),wr.length,wr,'오답 유형 시험');return}
  if(a==='copy'){const t=examText();try{navigator.clipboard.writeText(t).then(()=>{b.textContent='복사했습니다'},()=>{E.copy=t;renderExam()})}catch(err){E.copy=t;renderExam()}return}
- if(b.dataset.j!=null&&!E.graded){const it=E.items[+b.dataset.q];it.pick=it.pick===+b.dataset.j?null:+b.dataset.j;
+ if(b.dataset.j!=null&&!E.graded){const it=E.items[+b.dataset.q];it.pick=+b.dataset.j;
   document.querySelector('#v-exam #q'+b.dataset.q).querySelectorAll('.opt').forEach((o,j)=>o.classList.toggle('on',it.pick===j));
-  const tl=document.querySelector('#v-exam .tally');if(tl)tl.textContent=`${E.items.filter(i=>i.pick!=null).length}/${E.items.length} 표기`}});
+  const tl=document.querySelector('#v-exam .tally');if(tl)tl.textContent=`${E.items.filter(i=>i.pick!=null).length}/${E.items.length} 표기`;resumeSave()}});
 
 /* ===== 족보 ===== */
 const JPROF={'중':[.3,.55,.15],'중~중상':[.2,.55,.25],'중~상':[.15,.5,.35]};
@@ -7597,22 +7597,26 @@ document.addEventListener('click',e=>{const q=e.target.closest&&e.target.closest
  if(e.target.id==='ntov')ntClose()},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')ntClose()});
 let _rs=null;
-function resumeSave(){clearTimeout(_rs);_rs=setTimeout(()=>{try{const R={at:Date.now(),subj:CUR,sem:SEM,lv:P.lv,n:P.n,ok:P.ok};
-  if(P.it)R.p={id:P.it.id,seed:P.it.seed,pick:P.it.pick,self:P.it.self,show:!!P.it.show,help:P.it.help||0};
-  if(E&&!E.err&&E.items)R.e={seed:E.seed,label:E.label,graded:E.graded,hk:E.hk,weak:E.weak,weakAll:E.weakAll,items:E.items.map(i=>({id:i.id,seed:i.seed,pick:i.pick,self:i.self,src:i.src,help:i.help||0})),es:(E.es||[]).map(x=>x.id)};
-  R.es={ans:ES.ans,done:ES.done,chk:ES.chk};R.sat=SAT;LS.set('m12-resume',R);histProgress()}catch(e){}},250)}
+/* 저장해 둔 '고른 보기 글'(pt)이 있으면 그 글이 있는 위치로, 없으면 예전 번호를 쓰되 보기 글이 달라졌으면(문항이 수정됨) 선택을 비운다 */
+function pkRestore(d,pk,pt){if(pk==null)return null;if(!d||!d.opts)return pk;if(pt!=null){const ix=d.opts.indexOf(pt);return ix>=0?ix:null}return pk<d.opts.length?pk:null}
+function resumeWrite(){try{const R={at:Date.now(),subj:CUR,sem:SEM,lv:P.lv,n:P.n,ok:P.ok};
+  if(P.it)R.p={id:P.it.id,seed:P.it.seed,pick:P.it.pick,pt:P.it.pick==null||!P.it.d.opts?null:P.it.d.opts[P.it.pick],self:P.it.self,show:!!P.it.show,help:P.it.help||0};
+  if(E&&!E.err&&E.items)R.e={seed:E.seed,label:E.label,graded:E.graded,hk:E.hk,weak:E.weak,weakAll:E.weakAll,items:E.items.map(i=>({id:i.id,seed:i.seed,pick:i.pick,pt:i.pick==null||!i.d.opts?null:i.d.opts[i.pick],self:i.self,src:i.src,help:i.help||0})),es:(E.es||[]).map(x=>x.id)};
+  R.es={ans:ES.ans,done:ES.done,chk:ES.chk};R.sat=SAT;LS.set('m12-resume',R);histProgress()}catch(e){}}
+function resumeSave(){clearTimeout(_rs);_rs=setTimeout(resumeWrite,250)}
 /* 모의고사 중간 저장: '내가 푼 시험지' 항목에 고른 답·문항 seed를 계속 저장 → 다른 시험을 시작해도 나중에 "이어 풀기"로 그 상태에서 계속 */
-function histProgress(){if(!E||E.err||!E.items||!E.hk)return;const H=LS.get('m12-hist-'+SK(),[]),h=H.find(x=>x.k===E.hk);if(!h)return;h.sd=E.items.map(i=>i.seed);h.pk=E.items.map(i=>i.pick==null?null:i.pick);h.sf=E.items.map(i=>i.self==null?null:i.self);h.hp=E.items.map(i=>i.help||0);h.gr=!!E.graded;if(E.es&&E.es.length){const ids=E.es.map(x=>x.id),pk=o=>Object.fromEntries(Object.entries(o||{}).filter(([k])=>ids.some(i=>String(k).startsWith(String(i)))));h.es=ids;h.esa={ans:pk(ES.ans),done:pk(ES.done),chk:pk(ES.chk)}}h.ans=E.items.filter(i=>i.pick!=null||i.self!=null).length;h.upd=Date.now();LS.set('m12-hist-'+SK(),H)}
+function histProgress(){if(!E||E.err||!E.items||!E.hk)return;const H=LS.get('m12-hist-'+SK(),[]),h=H.find(x=>x.k===E.hk);if(!h)return;h.sd=E.items.map(i=>i.seed);h.pk=E.items.map(i=>i.pick==null?null:i.pick);h.pt=E.items.map(i=>i.pick==null||!i.d.opts?null:i.d.opts[i.pick]);h.sf=E.items.map(i=>i.self==null?null:i.self);h.hp=E.items.map(i=>i.help||0);h.gr=!!E.graded;if(E.es&&E.es.length){const ids=E.es.map(x=>x.id),pk=o=>Object.fromEntries(Object.entries(o||{}).filter(([k])=>ids.some(i=>String(k).startsWith(String(i)))));h.es=ids;h.esa={ans:pk(ES.ans),done:pk(ES.done),chk:pk(ES.chk)}}h.ans=E.items.filter(i=>i.pick!=null||i.self!=null).length;h.upd=Date.now();LS.set('m12-hist-'+SK(),H)}
 function resumeLoad(){try{const R=LS.get('m12-resume',null);if(!R||R.subj!==CUR||R.sem!==SEM||Date.now()-R.at>3*864e5)return;
   if(R.es){Object.assign(ES.ans,R.es.ans||{});Object.assign(ES.done,R.es.done||{});Object.assign(ES.chk,R.es.chk||{})}if(R.sat)Object.assign(SAT,R.sat);
-  if(R.p&&TYPE[R.p.id]){P.it={id:R.p.id,seed:R.p.seed,d:gen(R.p.id,R.p.seed),pick:R.p.pick==null?null:R.p.pick};if(R.p.self!=null)P.it.self=R.p.self;if(R.p.show)P.it.show=true;if(R.p.help)P.it.help=R.p.help;P.last=R.p.id;P.lv=R.lv||0;P.n=R.n||0;P.ok=R.ok||0;renderPractice()}
-  if(R.e&&R.e.items&&R.e.items.every(i=>TYPE[i.id])){const items=R.e.items.map(i=>{const it={id:i.id,seed:i.seed,d:gen(i.id,i.seed),pick:i.pick==null?null:i.pick};if(i.self!=null)it.self=i.self;if(i.src)it.src=i.src;if(i.help)it.help=i.help;return it});
+  if(R.p&&TYPE[R.p.id]){P.it={id:R.p.id,seed:R.p.seed,d:gen(R.p.id,R.p.seed),pick:null};P.it.pick=pkRestore(P.it.d,R.p.pick,R.p.pt);if(R.p.self!=null)P.it.self=R.p.self;if(R.p.show)P.it.show=true;if(R.p.help)P.it.help=R.p.help;P.last=R.p.id;P.lv=R.lv||0;P.n=R.n||0;P.ok=R.ok||0;renderPractice()}
+  if(R.e&&R.e.items&&R.e.items.every(i=>TYPE[i.id])){const items=R.e.items.map(i=>{const it={id:i.id,seed:i.seed,d:gen(i.id,i.seed),pick:null};it.pick=pkRestore(it.d,i.pick,i.pt);if(i.self!=null)it.self=i.self;if(i.src)it.src=i.src;if(i.help)it.help=i.help;return it});
    const es=(R.e.es||[]).map(id=>((SJ[CUR]||{}).essay||[]).find(x=>x.id===id)).filter(Boolean);
    E={seed:R.e.seed,label:R.e.label||'모의고사',items,graded:!!R.e.graded,copy:null,hk:R.e.hk||null,es,weak:!!R.e.weak,weakAll:!!R.e.weakAll};renderExam()}}catch(e){}}
 {const _rp=renderPractice;renderPractice=function(){const r=_rp.apply(this,arguments);resumeSave();setTimeout(padFit,60);return r};const _re=renderExam;renderExam=function(){const r=_re.apply(this,arguments);resumeSave();return r}}
 document.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('[data-esid],[data-sat]'))resumeSave()},true);
-document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTimeout(_rs);_rs=null;try{resumeSaveNow()}catch(e){}}});
-function resumeSaveNow(){const t=_rs;resumeSave();}
+function resumeSaveNow(){clearTimeout(_rs);_rs=null;resumeWrite()}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){try{resumeSaveNow()}catch(e){}}});
+window.addEventListener('pagehide',()=>{try{resumeSaveNow()}catch(e){}});
 /* 사회 12단원을 교과서 목차대로 세 소단원으로: 01 인권 보장과 헌법(214~217쪽)=S12 / 02 기본권의 제한과 침해 구제(218~221쪽)=S12b / 03 근로자에게 보장된 권리(222~225쪽)=S12c */
 (()=>{const s=SJ.soc;if(!s||s.units.some(U=>U.subs.some(x=>x[0]==='S12c')))return;
  const M={'s12-rel':'S12b','s12-lim':'S12b','s12-lab':'S12c','s12-lab2':'S12c','s12-youth':'S12c'};s.T.forEach(t=>{if(M[t.id])t.u=M[t.id]});
