@@ -276,9 +276,10 @@ details.ex summary{font-size:13px;font-weight:600;color:var(--ac);cursor:pointer
 .cfg input{width:6.5em;border:1px solid var(--rule);border-radius:8px;padding:6px 8px;font:500 14px var(--f-num);background:var(--sheet);color:var(--ink)}
 .ehead{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;padding:14px 0 12px;border-bottom:2px solid var(--ac);font-size:13px}
 .ehead b{font:400 19px var(--f-disp);color:var(--ac)}
-.etm{position:sticky;top:58px;z-index:4;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;background:var(--ac-s);border:1.5px solid var(--ac);border-radius:12px;padding:6px 12px;margin:10px 0 4px;box-shadow:var(--shadow)}
-.etm .etk{font-weight:700;font-size:13px;color:var(--ac)}.etm .ett{font:700 24px/1 var(--f-num);letter-spacing:.02em;min-width:3.6em}.etm .ets{font-size:12px;color:var(--muted)}.etm .bar2{margin-left:auto;display:flex;gap:5px;align-items:center;flex-wrap:wrap}
-.etm.low .ett{color:var(--bad)}@media (max-width:560px){.etm{top:56px;padding:5px 10px;gap:4px 8px}.etm .etl{display:none}.etm:not(.end) .ets{display:none}.etm .ett{font-size:22px}.etm .ets{flex-basis:100%}}.etm.end{background:var(--bad-soft);border-color:var(--bad)}.etm.end .ett{color:var(--bad)}.etm .chip.sm{padding:2px 9px;font-size:12px}
+.etm{position:sticky;top:58px;z-index:4;width:30%;min-width:148px;margin:10px 0 4px auto;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;justify-content:center;background:var(--ac-s);border:1.5px solid var(--ac);border-radius:12px;padding:6px 8px;box-shadow:var(--shadow);text-align:center}
+.etm .etk{font-weight:700;font-size:13px;color:var(--ac)}.etm .ett{font:700 22px/1 var(--f-num);letter-spacing:.02em}.etm .ets{display:none;flex-basis:100%;font-size:11.5px;color:var(--muted);line-height:1.35}.etm .bar2{display:flex;gap:4px;align-items:center;justify-content:center}
+.etm select{font:600 12px var(--f-body);border:1px solid var(--rule);border-radius:8px;background:var(--sheet);color:var(--ink);padding:3px 2px}.etm .btn.sm{padding:3px 9px;font-size:13px}
+.etm.low .ett{color:var(--bad)}.etm.end{background:var(--bad-soft);border-color:var(--bad)}.etm.end .ett{color:var(--bad)}.etm.end .ets,.etm[data-g] .ets{display:block}@media (max-width:560px){.etm{top:56px}}
 .score{background:var(--ac-s);border-radius:18px;padding:16px 18px;display:grid;gap:10px}
 .score .big{font:400 40px/1 var(--f-disp);color:var(--ac)}
 .score .big small{font:500 14px var(--f-body);color:var(--muted);margin-left:6px}
@@ -6251,14 +6252,15 @@ function tmPause(){if(TM.run){TM.left=tmLeft();TM.run=false;clearInterval(TM.iv)
 function tmStart(){if(TM.run)return;if(TM.left==null||TM.left<=0){TM.left=TM.dur*60;TM.done=false}TM.end=Date.now()+TM.left*1000;TM.run=true;clearInterval(TM.iv);TM.iv=setInterval(tmTick,500);tmTick()}
 function tmCls(l){return 'etm'+(TM.done||l<=0?' end':l<=300?' low':'')}
 function tmTick(){const l=tmLeft();if(TM.run&&l<=0){TM.run=false;TM.left=0;TM.done=true;clearInterval(TM.iv)}
- document.querySelectorAll('.etm').forEach(b=>{b.className=tmCls(l);const t=b.querySelector('.ett');if(t)t.textContent=tmFmt(l);const g=b.querySelector('[data-tm="go"]');if(g)g.textContent=TM.run?'⏸ 일시정지':l<=0?'↺ 다시':(TM.left==null?'▶ 시작':'▶ 계속');const m=b.querySelector('.ets');if(m&&!b.dataset.g)m.textContent=l<=0?'⏰ 풀이 시간 종료 — 이제 OMR(답안지) 작성 5분':(TM.dur===40?'시험 45분 = 풀이 40분 + OMR 5분':'풀이 '+TM.dur+'분')})}
+ document.querySelectorAll('.etm').forEach(b=>{b.className=tmCls(l);const t=b.querySelector('.ett');if(t)t.textContent=tmFmt(l);const g=b.querySelector('[data-tm="go"]');if(g)g.textContent=TM.run?'⏸':l<=0?'↺':'▶';g.title=TM.run?'일시정지':l<=0?'다시 시작':(TM.left==null?'시작':'계속');const m=b.querySelector('.ets');if(m&&!b.dataset.g)m.textContent=l<=0?'⏰ 풀이 시간 종료 — OMR 작성 5분':''})}
 function tmHTML(graded){const l=tmLeft();
  if(graded)return `<div class="etm" data-g="1"><span class="etk">⏱ 걸린 시간</span><span class="ett">${tmFmt(TM.dur*60-l)}</span><span class="ets">제한 ${TM.dur}분${l<=0?' · 시간 초과':''}</span></div>`;
- return `<div class="${tmCls(l)}"><span class="etk">⏱<span class="etl"> 남은 시간</span></span><span class="ett">${tmFmt(l)}</span><span class="ets">${l<=0?'⏰ 풀이 시간 종료 — 이제 OMR(답안지) 작성 5분':(TM.dur===40?'시험 45분 = 풀이 40분 + OMR 5분':'풀이 '+TM.dur+'분')}</span><span class="bar2">${[30,40,45].map(n=>`<button class="chip sm ${TM.dur===n?'on':''}" data-tm="dur" data-d="${n}">${n}분</button>`).join('')}<button class="btn sm pri" data-tm="go">${TM.run?'⏸ 일시정지':l<=0?'↺ 다시':(TM.left==null?'▶ 시작':'▶ 계속')}</button><button class="btn sm" data-tm="reset" title="처음 시간으로">↺</button></span></div>`}
+ return `<div class="${tmCls(l)}"><span class="etk">⏱</span><span class="ett">${tmFmt(l)}</span><span class="bar2"><select data-tm="dursel" title="풀이 시간(분)">${[30,40,45].map(n=>`<option value="${n}"${TM.dur===n?' selected':''}>${n}분</option>`).join('')}</select><button class="btn sm pri" data-tm="go" title="${TM.run?'일시정지':l<=0?'다시 시작':(TM.left==null?'시작':'계속')}">${TM.run?'⏸':l<=0?'↺':'▶'}</button><button class="btn sm" data-tm="reset" title="처음 시간으로">↺</button></span><span class="ets">${l<=0?'⏰ 풀이 시간 종료 — OMR 작성 5분':''}</span></div>`}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tm]');if(!b)return;const a=b.dataset.tm;
  if(a==='go'){if(TM.run)tmPause();else tmStart();tmTick()}
  else if(a==='reset'){tmReset();tmTick()}
- else if(a==='dur'){TM.dur=+b.dataset.d;LS.set('m12-tmdur',TM.dur);tmReset();document.querySelectorAll('.etm').forEach(x=>{x.querySelectorAll('[data-tm="dur"]').forEach(c=>c.classList.toggle('on',+c.dataset.d===TM.dur))});tmTick()}});
+});
+document.addEventListener('change',e=>{const b=e.target.closest&&e.target.closest('[data-tm="dursel"]');if(!b)return;TM.dur=+b.value;LS.set('m12-tmdur',TM.dur);tmReset();document.querySelectorAll('.etm [data-tm="dursel"]').forEach(x=>{x.value=String(TM.dur)});tmTick()});
 function makeExam(seed,count,list,label,o){tmReset();o=o||{};let ids;if(list){ids=list}else{const types=scoped();if(!types.length){E={err:true};renderExam();return}const R=mkR(seed),sa=pickSa(R,types,SA_N);ids=[...pickTypes(R,count-sa.length,types).map(t=>t.id),...sa.map(t=>t.id)]}
  const seen=new Set();const items=ids.map((id,i)=>{let s=seed*100+i,d=gen(id,s);for(let k=1;k<10&&seen.has(d.q);k++){s=seed*100+i+k*1000003;d=gen(id,s)}seen.add(d.q);return{id,seed:s,d,pick:null}});
  if(o.srcs)items.forEach((it,i)=>it.src=o.srcs[i]);
