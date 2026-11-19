@@ -1472,7 +1472,7 @@ S.units=[
  {id:'S7',tag:'Ⅶ',name:'태양계',subs:[['K12','태양계 구성 천체와 태양의 활동'],['K13','지구와 달의 운동']]}];
 const ord={};let n=0;S.units.forEach(u=>u.subs.forEach(s=>{ord[s[0]]=n++}));
 S.T.sort((a,b)=>(ord[a.u]??99)-(ord[b.u]??99)||a.lv-b.lv);
-S.presets=[['전 단원',null],['Ⅲ~Ⅳ',['K5','K5b','K6','K7','K7b']],['Ⅳ~Ⅶ',['K6','K7','K7b','K8','K9','K9b','K10','K11','K12','K13']],['기말(Ⅴ~Ⅶ)',['K8','K9','K9b','K10','K11','K12','K13']]];
+S.presets=[['전 단원',null],['Ⅲ~Ⅳ',['K5','K5b','K6','K7','K7b']],['Ⅳ~Ⅶ',['K6','K7','K7b','K8','K9','K9b','K10','K11','K12','K13']],['기말(Ⅴ~Ⅶ-1)',['K8','K9','K9b','K10','K11','K12']]];
 S.book='미래엔 과학 1 (김태일 · 2022 개정)';
 S.def=['K6','K7','K7b','K8','K9','K9b','K10','K11','K12','K13'];
 })();
@@ -5411,7 +5411,7 @@ const $=s=>document.querySelector(s);
 const FINAL_RANGE={'1-2':{ /* 빛가람중 2026-11-18 가정통신문(12/7~12/8) 1학년 범위 */
  math:['A3','B1','B2','C1','C2'],            /* 5.5 삼각형의 작도 ~ 7 입체도형 (p159~235) */
  eng:['E7V','E7D','E7R','E8V','E8D','E8R','E7T','E7TR','E8T','E8TR','E7S'],   /* Lesson 7·8 (E?T* = 교과서 본문 문항, E7S = 학교 학습지) */
- sci:['K8','K9','K9b','K10','K11','K12','K13','KT8','KT9','KT9b','KT10','KT10b','KT11','KT11b','KT12','KT12b','KT12c','KT13','KT13b','KT13c','KT13d'], /* Ⅴ 힘의 작용·Ⅵ 기체의 성질·Ⅶ 태양계 (KT* = 아티팩트 교과서 본문 문항) */
+ sci:['K8','K9','K9b','K10','K11','K12','KT8','KT9','KT9b','KT10','KT10b','KT11','KT11b','KT12','KT12b'], /* 공지: Ⅴ 152~183·Ⅵ 194~223·Ⅶ 224~235쪽 → Ⅶ-1 태양계 구성 천체·행성 분류까지(태양의 활동 236쪽~·Ⅶ-2 지구와 달의 운동 244쪽~은 범위 밖) (KT* = 아티팩트 교과서 본문 문항) */
  soc:['S6','S8','S10','S11','S12','T12a','T6a','T6b','T6c','T8a','T8b','T8c','T10a','T10b','T10c','T11a','T11b','T11c'],           /* 6·8·10·11단원, 12단원 1.인권 보장과 헌법(p217까지) → S12='01 인권 보장과 헌법'만(S12b·S12c 제외) */
  kor:['KA2','KC1','KC2','KD2','KX1','KX3','KX3b','KX4b'],               /* 1-(2) 토의(50~75쪽), 3 단어의 세계(126~169쪽), 4-(2) 존중하며 말하기(190~211쪽) */
  tech:['Q1','Q2','T2','T3','T5','GQ1','GQ2','GT2','GT3','GT5']              /* 기술 p134~154·166~169, 가정 p56~67 (G* = 교과서 본문 문항) */
@@ -5419,7 +5419,7 @@ const FINAL_RANGE={'1-2':{ /* 빛가람중 2026-11-18 가정통신문(12/7~12/8)
 const finalOn=()=>!!FINAL_RANGE[SEM]&&LS.get('m12-final',false);
 const finalR=(id=CUR)=>{const r=finalOn()&&FINAL_RANGE[SEM][id];return r&&r.length?new Set(r):null};
 /* 소단원 안에서 범위 밖인 유형 id를 개별 제외할 때만 사용 (과목 코드: [유형 id]) — 지금은 비어 있음 */
-const FINAL_EXCL={'1-2':{tech:['tbt-t5c','tbt-t5z'],soc:['s10-sys2']}}; /* 기술 Ⅳ-5: 170~171쪽(선출원주의·사례·상표 활동)·Ⅳ 단원 마무리는 범위 밖 */
+const FINAL_EXCL={'1-2':{tech:['tbt-t5c','tbt-t5z'],soc:['s10-sys2'],sci:['k12-act']}}; /* 기술 Ⅳ-5: 170~171쪽(선출원주의·사례·상표 활동)·Ⅳ 단원 마무리는 범위 밖 / 과학 K12: ‘태양의 활동’(236쪽~)은 범위 밖 */
 const finalEx=t=>{const x=finalOn()&&FINAL_RANGE[SEM][CUR]&&FINAL_EXCL[SEM]&&FINAL_EXCL[SEM][CUR];return !!x&&x.includes(t.id)};
 /* 기말 범위 모드의 선택: 저장된 선택 + 이번에 새로 범위에 들어온 소단원(예전에 저장할 땐 없던 코드)을 자동으로 더한다 */
 function finalSel(id){const FR=finalR(id),k=selKey(id),saved=LS.get(k,null),known=new Set(LS.get(k+'_k',[]));LS.set(k+'_k',[...FR]);return saved?[...new Set([...saved,...[...FR].filter(c=>!known.has(c))])]:[...FR]}
