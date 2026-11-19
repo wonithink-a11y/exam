@@ -6442,18 +6442,27 @@ $('#v-review').addEventListener('click',e=>{const b=e.target.closest('button');i
 let confirmReset=false;
 /* 시험 D-day·학습 계획: 날짜는 학기·과목별로 저장(m12-dday-<SK>), 범위 안 소단원을 약한 순으로 남은 날짜에 나눠 배정 */
 const ddKey=()=>'m12-dday-'+SK();
-function ddLeft(){const d=LS.get(ddKey(),null);if(!d)return null;const t=new Date(d+'T00:00:00'),n=new Date();n.setHours(0,0,0,0);return Math.round((t-n)/864e5)}
+/* 빛가람중 2026 2학기 기말(가정통신문 11-18): 12/7 기·가·영·과, 12/8 사·국·수 — 저장된 날짜가 없으면 이 날짜를 기본으로 */
+const DD_DEF={'1-2':{tech:'2026-12-07',eng:'2026-12-07',sci:'2026-12-07',soc:'2026-12-08',kor:'2026-12-08',math:'2026-12-08'}};
+const ddGet=()=>LS.get(ddKey(),null)||((DD_DEF[SEM]||{})[CUR]||null);
+function ddLeft(){const d=ddGet();if(!d)return null;const t=new Date(d+'T00:00:00'),n=new Date();n.setHours(0,0,0,0);return Math.round((t-n)/864e5)}
 function ddBadge(){const el=$('#dday'),n=ddLeft();el.hidden=n===null;if(n!==null)el.textContent=n>0?'D-'+n:n===0?'D-DAY':'D+'+(-n)}
 function planToday(){const n=ddLeft(),A=allS(),acc={};T.forEach(t=>{const r=A.t[t.id];if(r){const a=acc[t.u]||(acc[t.u]=[0,0]);a[0]+=r[0];a[1]+=r[1]}});
  const us=SUBS.filter(u=>sel.has(u)).map(u=>({u,n:acc[u]?acc[u][0]:0,p:acc[u]&&acc[u][0]?acc[u][1]/acc[u][0]:-1})).sort((a,b)=>a.p-b.p);
- const k=Math.max(1,Math.ceil(us.length/Math.max(1,n||1)));return{n,us,today:us.slice(0,k)}}
-function planCard(){const d=LS.get(ddKey(),''),pl=planToday(),n=pl.n;
+ const k=Math.max(1,Math.ceil(us.length/Math.max(1,(n||1)-1)));return{n,us,k,today:us.slice(0,k)}}
+function planCard(){const d=ddGet()||'',pl=planToday(),n=pl.n;
  let h=`<div class="scope plan"><div class="bar"><b>📅 시험 D-day</b><input type="date" id="ddIn" value="${d||''}"><span class="sp"></span>${n===null?'':`<b class="dday">${n>0?'D-'+n:n===0?'D-DAY':'시험 종료'}</b>`}</div>`;
  if(n===null)h+='<p class="muted" style="margin:6px 0 0">시험 날짜를 정하면 출제 범위 소단원을 약한 순서로 남은 날짜에 나눠 오늘 할 범위를 알려 드립니다.</p>';
  else if(n<0)h+='<p class="muted" style="margin:6px 0 0">날짜가 지났습니다. 새 시험 날짜를 정해 주세요.</p>';
  else if(!pl.us.length)h+='<p class="muted" style="margin:6px 0 0">출제 범위가 비어 있습니다. 연습·모의고사 탭에서 소단원을 선택하세요.</p>';
- else h+=`<p style="margin:8px 0 4px;font-size:13.5px">출제 범위 ${pl.us.length}개 소단원 · 하루 약 ${pl.today.length}개씩 · <b>오늘 집중 범위</b></p><div style="display:flex;flex-wrap:wrap;gap:6px">${pl.today.map(x=>`<span class="chip">${SUBNAME[x.u]} <small>${x.n?Math.round(x.p*100)+'%':'미학습'}</small></span>`).join('')}</div><div class="bar" style="margin-top:8px"><button class="btn sm" data-ddgo="1">오늘 범위로 약점 집중 시험</button></div>`;
+ else h+=`<p style="margin:8px 0 4px;font-size:13.5px">출제 범위 ${pl.us.length}개 소단원 · 하루 약 ${pl.today.length}개씩 · <b>오늘 집중 범위</b></p><div style="display:flex;flex-wrap:wrap;gap:6px">${pl.today.map(x=>`<span class="chip">${SUBNAME[x.u]} <small>${x.n?Math.round(x.p*100)+'%':'미학습'}</small></span>`).join('')}</div><div class="bar" style="margin-top:8px"><button class="btn sm" data-ddgo="1">오늘 범위로 약점 집중 시험</button></div>`+planTable(pl);
  return h+'</div>'}
+/* 일별 계획표: 약한 소단원부터 시험 전날 전까지 나눠 배정하고, 시험 전날(D-1)은 총정리(오답노트·모의고사). 정답률이 바뀌면 순서도 바뀐다 */
+function planTable(pl){const n=pl.n,days=Math.min(Math.max(1,n-1),21),rows=[];const fmt=dt=>`${dt.getMonth()+1}/${dt.getDate()}(${'일월화수목금토'[dt.getDay()]})`;
+ for(let i=0;i<days;i++){const dt=new Date();dt.setHours(0,0,0,0);dt.setDate(dt.getDate()+i);const last=(n-i)===1;
+  const us=pl.us.slice(i*pl.k,(i+1)*pl.k);
+  rows.push(`<tr><td><b>${i===0?'오늘':fmt(dt)}</b><br><small>D-${n-i}</small></td><td>${last?'총정리 — 오답노트·약점 집중 모의고사·요점 훑어보기':us.length?us.map(x=>`<span class="chip">${SUBNAME[x.u]}</span>`).join(' '):'복습 — 틀린 문제 다시 풀기·모의고사'}</td></tr>`)}
+ return `<details class="ex" style="margin-top:8px"><summary>📆 시험까지 일별 계획표 보기 (${Math.max(1,n-1)}일)</summary><div class="tw"><table class="ft"><tbody>${rows.join('')}</tbody></table></div><p class="muted" style="font-size:12.5px;margin:4px 0 0">정답률이 낮은 소단원이 앞에 오고, 풀 때마다 순서가 바뀝니다. 마지막 날은 총정리입니다.</p></details>`}
 /* ===== 학습 계획표: 과목별·소단원별로 5단계(요점·연습·심화·오답·실전)를 체크하고 진행률을 본다 =====
    저장: m12-pl-<SK(과목)> = {"소단원|단계번호":1}. 계획 범위 = 과목의 기본 출제 범위(def) */
 const PL_STEPS=[['📖','요점 읽기'],['✏️','연습 풀기'],['🔥','심화·서술형'],['🔁','오답 복습'],['📝','실전 확인']];
@@ -6461,7 +6470,7 @@ const PL_SUBJ=['kor','eng','math','sci','soc','tech'];
 const plKey=id=>'m12-pl-'+SK(id);
 const plSubs=id=>{const s=SJ[id];if(!s)return[];const all=s.units.flatMap(u=>u.subs.map(x=>x[0]));return(s.def||all).filter(c=>all.includes(c))};
 function plProg(id){const c=LS.get(plKey(id),{}),subs=plSubs(id);let d=0;subs.forEach(u=>PL_STEPS.forEach((_,i)=>{if(c[u+'|'+i])d++}));return{d,t:subs.length*PL_STEPS.length,c,subs,p:subs.length?Math.round(d/(subs.length*PL_STEPS.length)*100):0}}
-const plLeft=id=>{const d=LS.get('m12-dday-'+SK(id),null);if(!d)return null;const n=new Date();n.setHours(0,0,0,0);return Math.round((new Date(d+'T00:00:00')-n)/864e5)};
+const plLeft=id=>{const d=LS.get('m12-dday-'+SK(id),null)||((DD_DEF[SEM]||{})[id]||null);if(!d)return null;const n=new Date();n.setHours(0,0,0,0);return Math.round((new Date(d+'T00:00:00')-n)/864e5)};
 const plMsg=p=>p===0?'시작이 반! 첫 단원부터 체크해 봐요 🌱':p<30?'좋은 출발이에요 🚀':p<60?'절반을 향해 가는 중 💪':p<90?'거의 다 왔어요 🔥':p<100?'마지막 점검만 남았어요 ✨':'🎉 계획 완료! 오답을 한 번 더 훑어봐요';
 const plDd=n=>n===null?'':n>0?`D-${n}`:n===0?'D-DAY':'종료';
 function plRing(p,col){const r=34,c=2*Math.PI*r;return `<svg viewBox="0 0 84 84" width="84" height="84" role="img" aria-label="진행률 ${p}%"><circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--rule)" stroke-width="9"/><circle cx="42" cy="42" r="${r}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(c*p/100).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 42 42)"/><text x="42" y="48" text-anchor="middle" style="font:700 19px var(--f-num);fill:var(--ink)">${p}%</text></svg>`}
