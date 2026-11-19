@@ -5887,7 +5887,17 @@ document.addEventListener('click',e=>{
 /* ===== 📕 교과서 보기 (비공개 아티팩트: 교과서 쪽 이미지 TBK 데이터가 있을 때만) ===== */
 const tbkOk=()=>typeof TBK!=='undefined'&&SEM==='1-2'&&!!TBK[CUR];
 const TBKS={s:null,p:0,two:LS.get('m12-tbk2',null),zoom:false,tool:'view',col:{h:'y',u:'r'},hist:[]};
-function tbkQBtn(it){try{if(!tbkOk())return'';const t=TYPE[it.id];return t&&TBK[CUR].units[t.u]?`<button class="btn sm" data-tbk="q" data-tbu="${t.u}" title="이 문제의 단원이 나오는 교과서 쪽 보기">📕 교과서</button>`:''}catch(e){return''}}
+function tbkQBtn(it){try{if(!tbkOk())return'';const t=TYPE[it.id];return t&&TBK[CUR].units[t.u]?`<button class="btn sm" data-tbk="q" data-tbu="${t.u}" data-tbid="${it.id}" data-tbsd="${it.seed}" title="이 문제의 내용이 나오는 교과서 쪽 보기">📕 교과서</button>`:''}catch(e){return''}}
+/* 문제 → 교과서 쪽: 단원 쪽 범위 안에서 문제·정답·풀이 글자(3글자 조각)가 가장 많이 나오는 쪽. 쪽 글자(OCR)는 비공개 TBOCR가 있을 때만 */
+const tbkNorm=x=>String(x==null?'':x).replace(/<[^>]*>/g,' ').replace(/[^0-9A-Za-z가-힣]/g,'');
+const TBDF={};
+function tbkGrams(t){const g=new Set();for(let i=0;i+3<=t.length;i++)g.add(t.substr(i,3));return g}
+function tbkFind(s,id,seed,unit){try{if(typeof TBOCR==='undefined'||!TBOCR[s])return null;const T=TBK[s],r=T.units[unit];if(!r)return null;
+ if(!TBDF[s]){const df=new Map(),G={};for(const p of T.pages){const g=tbkGrams(tbkNorm(TBOCR[s][p]));G[p]=g;g.forEach(x=>df.set(x,(df.get(x)||0)+1))}TBDF[s]={df,G}}
+ const d=gen(id,seed),ans=d.opts&&typeof d.ans==='number'?d.opts[d.ans]:d.opts&&d.opts.includes&&d.opts.includes(d.ans)?d.ans:d.ans;
+ const q=tbkGrams(tbkNorm([d.q,ans,d.exp,d.model].join(' '))),{df,G}=TBDF[s];let best=null,bs=0;
+ for(const p of T.pages){if(p<r[0]||p>r[1])continue;let sc=0;q.forEach(x=>{if(G[p].has(x))sc+=1/df.get(x)});if(sc>bs){bs=sc;best=p}}
+ return bs>0?best:null}catch(e){return null}}
 function tbkNext(s,p,dir){const ps=TBK[s].pages;if(dir>0){const n=ps.find(x=>x>=p);return n==null?ps[ps.length-1]:n}const n=[...ps].reverse().find(x=>x<=p);return n==null?ps[0]:n}
 function tbkOpen(s,page){let o=document.getElementById('tbkov');if(!o){o=document.createElement('div');o.id='tbkov';o.className='tbkov';document.body.appendChild(o)}
  TBKS.s=s;TBKS.p=tbkNext(s,page,1);TBKS.zoom=false;if(TBKS.two==null)TBKS.two=window.innerWidth>=900;o.classList.add('on');document.documentElement.style.overflow='hidden';tbkRender()}
@@ -5926,7 +5936,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
  TBKS.tool=a;tbkSyncTool()});
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-tbk],[data-tbn]');if(!t)return;
  if(t.dataset.tbk==='open'){const first=SUBS.find(c=>sel.has(c)&&TBK[CUR].units[c]);tbkOpen(CUR,first?TBK[CUR].units[first][0]:TBK[CUR].pages[0]);return}
- if(t.dataset.tbk==='q'){const r=TBK[CUR].units[t.dataset.tbu];tbkOpen(CUR,r[0]);return}
+ if(t.dataset.tbk==='q'){const r=TBK[CUR].units[t.dataset.tbu];tbkOpen(CUR,tbkFind(CUR,t.dataset.tbid,+t.dataset.tbsd,t.dataset.tbu)||r[0]);return}
  const a=t.dataset.tbn;if(a==='close'){tbkClose();return}
  const T=TBK[TBKS.s],st=TBKS.two?2:1;
  if(a==='next'){TBKS.p=tbkNext(TBKS.s,(TBKS.two?(TBKS.p%2===0?TBKS.p:TBKS.p-1):TBKS.p)+st,1)}
