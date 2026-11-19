@@ -7520,12 +7520,18 @@ async function ntPdfCore(groups,fname,btn){if(_pdfBusy)return;_pdfBusy=true;cons
   for(const el of parts){n++;pdfToast(`PDF 만드는 중… ${n}/${parts.length}`,true);
    if(el.dataset.np&&y>0)y=CH+1;
    const total=el.getBoundingClientRect().height,rem=(CH-y)*pxmm-6,kids=[...el.children];
-   /* 카드가 남은 자리에 안 들어가면 내용 블록 단위로 쪼개서 이어 붙임(쪽 아래가 비지 않게) */
-   if(!el.classList.contains('nt')||total<=rem||y===0||rem<capPx*.3||kids.length<2){await put(el);continue}
-   const tops=kids.map(k=>k.getBoundingClientRect().top),last=kids[kids.length-1].getBoundingClientRect().bottom,hs=kids.map((k,i)=>(i+1<kids.length?tops[i+1]:last)-tops[i]),over=Math.max(0,total-(last-tops[0]));
-   let piece=[],used=over,avail=rem;
-   const flush=async()=>{if(!piece.length)return;const sh=el.cloneNode(false);sh.style.cssText='margin:0';piece.forEach(k=>sh.appendChild(k.cloneNode(true)));host.appendChild(sh);await put(sh);sh.remove();piece=[]};
-   for(let i=0;i<kids.length;i++){if(used+hs[i]>avail&&piece.length){await flush();y=CH;avail=capPx-6;used=over}piece.push(kids[i]);used+=hs[i]}
+   /* 카드가 남은 자리에 안 들어가면 내용 블록(문단·표 한 줄·그림·목록 한 항목) 단위로 쪼개서 이어 붙임 — 행·그림 한가운데에서 잘리지 않게 */
+   if(!el.classList.contains('nt')||kids.length<2||total<=rem){await put(el);continue}
+   if(y>0&&rem<capPx*.3&&total<=capPx){y=CH+1;await put(el);continue}
+   const EXP='.nts,.ntfigs,.ntp',atoms=[];
+   let pre=[];kids.forEach((k,i)=>{const kr=k.getBoundingClientRect(),subs=k.matches(EXP)?[...k.children]:[],nx0=kids[i+1],kh=(nx0?nx0.getBoundingClientRect().top:kr.bottom)-kr.top;
+    if(k.matches('.est,.ntt')){pre.push({par:null,el:k,h:kh});return}/* 소제목·제목은 다음 내용과 붙여서(제목만 쪽 끝에 남지 않게) */
+    if(subs.length>1){subs.forEach((c,j)=>{const cr=c.getBoundingClientRect(),nx=subs[j+1],h=(nx?nx.getBoundingClientRect().top:kr.bottom)-cr.top;atoms.push({par:k,el:c,h,pre:j?[]:pre});if(!j)pre=[]})}else{atoms.push({par:null,el:k,h:kh,pre});pre=[]}});
+   const first=kids[0].getBoundingClientRect().top,last=kids[kids.length-1].getBoundingClientRect().bottom,over=Math.max(0,total-(last-first));
+   let piece=[],used=over,avail=y>0?rem:capPx-6;
+   const flush=async()=>{if(!piece.length)return;const sh=el.cloneNode(false);sh.style.cssText='margin:0';let cur=null,cp=null;piece.forEach(a=>{if(a.par){if(cp!==a.par){cur=a.par.cloneNode(false);sh.appendChild(cur);cp=a.par}cur.appendChild(a.el.cloneNode(true))}else{sh.appendChild(a.el.cloneNode(true));cp=null}});host.appendChild(sh);await put(sh);sh.remove();piece=[]};
+   {const a0=atoms[0],u0=over+a0.h+(a0.pre||[]).reduce((n,x)=>n+x.h,0);if(y>0&&u0>avail){y=CH+1;avail=capPx-6}}
+   for(const a of atoms){const pr=a.pre||[],uh=a.h+pr.reduce((n,x)=>n+x.h,0);if(used+uh>avail&&piece.length){await flush();y=CH+1;avail=capPx-6;used=over}pr.forEach(x=>piece.push(x));piece.push(a);used+=uh}
    await flush()}
   const tp=doc.getNumberOfPages();for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(9);doc.setTextColor(120);doc.text(`- ${i} / ${tp} -`,PW/2,PH-6,{align:'center'})}
   const fn=(fname+'.pdf').replace(/[\\/:*?"<>|\s()]+/g,'_');const r2=await savePdf(doc.output('blob'),fn);
