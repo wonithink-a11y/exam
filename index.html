@@ -5923,10 +5923,11 @@ function tbkNext(s,p,dir){const ps=TBK[s].pages;if(dir>0){const n=ps.find(x=>x>=
 function tbkOpen(s,page){let o=document.getElementById('tbkov');if(!o){o=document.createElement('div');o.id='tbkov';o.className='tbkov';document.body.appendChild(o)}
  TBKS.s=s;TBKS.p=tbkNext(s,page,1);TBKS.zoom=false;if(TBKS.two==null)TBKS.two=window.innerWidth>=900;o.classList.add('on');document.documentElement.style.overflow='hidden';tbkRender()}
 function tbkClose(){const o=document.getElementById('tbkov');if(o)o.classList.remove('on');document.documentElement.style.overflow=''}
-/* 쪽 이미지: 기본은 쪽마다 파일(tb/<과목>/p-N.jpg). T.spread가 있으면 파일 수를 아끼려고 두 쪽(홀수 L, L+1)을 가로로 붙인 s-L.jpg 한 장에 담고, 화면에는 한 쪽씩 잘라 보여 준다 */
+/* 쪽 이미지: 기본은 쪽마다 파일(tb/<과목>/p-N.jpg). T.spread가 있으면 파일 수를 아끼려고 여러 쪽(기본 2쪽, 홀수 L부터)을 가로로 붙인 s-L.jpg 한 장에 담고, 화면에는 한 쪽씩 잘라 보여 준다 */
 function tbkImg(s,x,T){const alt=`${T.name} 교과서 ${x}쪽`,er=`this.parentNode.outerHTML='<div class=tbmiss>${x}쪽 이미지를 불러오지 못했어요</div>'`;
  if(!T.spread)return`<img src="tb/${s}/p-${x}.jpg" alt="${alt}" onload="hlDraw(this.parentNode)" onerror="${er}">`;
- const L=x%2?x:x-1;return`<img class="s${x===L?0:1}" src="tb/${s}/s-${L}.jpg" alt="${alt}" onload="this.parentNode.style.aspectRatio=(this.naturalWidth/2)+'/'+this.naturalHeight;hlDraw(this.parentNode)" onerror="${er}">`}
+ /* spread:1 = 2쪽 묶음(기존, 홀수 L), spread:n(n≥2) = n쪽 묶음, sb = 첫 묶음의 시작 쪽(기본 1). 묶음 안에서 k번째 쪽만 잘라 보인다 */
+ const n=T.spread===1?2:T.spread,b=T.sb||1,L=x-(((x-b)%n)+n)%n,k=x-L;return`<img class="s${k?1:0}" style="width:${n*100}%;margin-left:-${k*100}%" src="tb/${s}/s-${L}.jpg" alt="${alt}" onload="this.parentNode.style.aspectRatio=(this.naturalWidth/${n})+'/'+this.naturalHeight;hlDraw(this.parentNode)" onerror="${er}">`}
 function tbkRender(){const s=TBKS.s,T=TBK[s],o=document.getElementById('tbkov'),two=TBKS.two;let l=TBKS.p,r=null;
  if(two){l=TBKS.p%2===0?TBKS.p:TBKS.p-1;if(!T.pages.includes(l)&&T.pages.includes(l+1)){r=l+1;l=null}else if(T.pages.includes(l+1))r=l+1}
  const shown=two?[l,r].filter(x=>x!=null):[TBKS.p],ex=shown.some(x=>T.exam.some(e=>x>=e[0]&&x<=e[1]));
