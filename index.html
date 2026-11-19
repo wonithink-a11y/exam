@@ -7486,7 +7486,7 @@ function renderNote(){const v=$('#v-note');if(!v)return;const all=((SJ[CUR]||{})
  items.map(x=>noteCard(x,badge)).join('')}
 $('#v-note').addEventListener('click',e=>{const f=e.target.closest('.nt.hide .f');if(f){f.classList.toggle('on');return}const b=e.target.closest('button');if(!b)return;
  if(b.dataset.ntm){NM.on=!NM.on;renderNote();return}
- if(b.dataset.nm){const[a,v]=b.dataset.nm.split('|');if(a==='r'){NM.range=v;LS.set('m12-ntrange',v)}else if(a==='s'){NM.subs.has(v)?NM.subs.delete(v):NM.subs.add(v)}else if(a==='a'){NM.subs=new Set(v==='1'?Object.keys(SJ).filter(id=>((SJ[id].notes)||[]).length):[])}else if(a==='go'){ntMultiPdf(b);return}renderNote();return}
+ if(b.dataset.nm){const[a,v]=b.dataset.nm.split('|');if(a==='r'){NM.range=v;LS.set('m12-ntrange',v);NM.subs=new Set(ntMultiIds())}else if(a==='s'){NM.subs.has(v)?NM.subs.delete(v):NM.subs.add(v)}else if(a==='a'){NM.subs=new Set(v==='1'?ntMultiIds():[])}else if(a==='go'){ntMultiPdf(b);return}renderNote();return}
  if(b.dataset.ntw){NO.weak=!NO.weak;LS.set('m12-ntweak',NO.weak);renderNote()}else if(b.dataset.nta){NO.all=!NO.all;renderNote()}else if(b.dataset.nth){NO.hide=!NO.hide;renderNote()}else if(b.dataset.ntj){const el=document.getElementById('nt-'+b.dataset.ntj);if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'})}
  else if(b.dataset.ntp){notePdf(b)}else if(b.dataset.ntgo){newPractice(b.dataset.ntgo);show('practice');window.scrollTo({top:0})}});
 
@@ -7497,12 +7497,14 @@ function ntSubjItems(id,range){const sj=SJ[id],all=((sj&&sj.notes)||[]).slice();
  if(range==='all')return all;let set=null;if(range==='final'){const r=FINAL_RANGE[SEM]&&FINAL_RANGE[SEM][id];set=r&&r.length?new Set(r):null}else{const sv=id===CUR?[...sel]:LS.get('m12-sel-'+SK(id),null);set=sv?new Set(sv):null}
  return set?all.filter(x=>set.has(x.u)):all}
 const NM_RNG={final:'기말고사 범위',sel:'내가 고른 출제 범위',all:'전체 노트'};
-function ntMultiHTML(){const ids=Object.keys(SJ).filter(id=>((SJ[id].notes)||[]).length);if(!NM.subs)NM.subs=new Set(ids);
+/* 기말 범위는 시험 과목(FINAL_RANGE에 있는 과목)만 — 도덕·정보처럼 시험에 없는 과목은 목록에서 뺌 */
+const ntMultiIds=()=>Object.keys(SJ).filter(id=>((SJ[id].notes)||[]).length&&(NM.range!=='final'||!FINAL_RANGE[SEM]||(FINAL_RANGE[SEM][id]||[]).length));
+function ntMultiHTML(){const ids=ntMultiIds();if(!NM.subs)NM.subs=new Set(ids);
  const cnt=id=>ntSubjItems(id,NM.range).length;
  return `<div class="cfg ntmulti"><div class="bar"><b>📚 여러 과목 요점 PDF</b><span class="muted">과목과 범위를 골라 한 파일로 저장해요 (A4 세로, 과목마다 새 쪽에서 시작)</span></div>
  <div class="bar"><span class="muted">범위</span>${Object.keys(NM_RNG).map(k=>`<button class="chip${NM.range===k?' on':''}" data-nm="r|${k}">${k==='final'?'📌 ':''}${NM_RNG[k]}</button>`).join('')}</div>
  <div class="bar"><span class="muted">과목</span>${ids.map(id=>`<button class="chip${NM.subs.has(id)?' on':''}" data-nm="s|${id}">${SJ[id].name} <small>${cnt(id)}</small></button>`).join('')}<button class="chip" data-nm="a|1">전체 선택</button><button class="chip" data-nm="a|0">전체 해제</button></div>
- <div class="bar"><span class="muted">${[...NM.subs].filter(id=>ids.includes(id)).reduce((n,id)=>n+cnt(id),0)}개 노트 선택됨</span><span class="sp"></span><button class="btn pri" data-nm="go|1">📄 PDF 만들기</button></div></div>`}
+ <div class="bar"><span class="muted">${ids.filter(id=>NM.subs.has(id)).reduce((n,id)=>n+cnt(id),0)}개 노트 선택됨</span><span class="sp"></span><button class="btn pri" data-nm="go|1">📄 PDF 만들기</button></div></div>`}
 async function ntPdfCore(groups,fname,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='PDF 만드는 중…'}pdfToast('PDF를 만드는 중입니다…',true);let host;
  try{await loadPdfLibs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
   host=document.createElement('div');host.className='pp ntpdf';host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;width:760px;height:auto;padding:0;overflow:visible;background:#fff';
@@ -7535,7 +7537,7 @@ async function notePdf(btn){const cards=[...document.querySelectorAll('#v-note a
  const [g,t,ey]=SEMNAME[SEM],rng=NO.all?'전체 노트':(finalOn()?'기말고사 범위':'선택한 출제 범위');
  return ntPdfCore([{title:`${g} ${ey} ${SJ[CUR].name} 요점 노트<small>${rng} · ${cards.length}개 · ${SJ[CUR].book||''}</small>`,els:cards}],`${SJ[CUR].name}_요점노트_${rng.replace(/\s/g,'')}`,btn)}
 /* 여러 과목: 고른 과목·범위의 노트를 한 파일로 */
-async function ntMultiPdf(btn){const ids=Object.keys(SJ).filter(id=>NM.subs&&NM.subs.has(id)&&((SJ[id].notes)||[]).length);if(!ids.length){pdfToast('과목을 하나 이상 골라 주세요.');return}
+async function ntMultiPdf(btn){const ids=ntMultiIds().filter(id=>NM.subs&&NM.subs.has(id));if(!ids.length){pdfToast('과목을 하나 이상 골라 주세요.');return}
  const [g,t,ey]=SEMNAME[SEM],keepN=SUBNAME,groups=[];
  try{for(const id of ids){const items=ntSubjItems(id,NM.range);if(!items.length)continue;SUBNAME=Object.fromEntries(SJ[id].units.flatMap(u=>u.subs));
    const w=document.createElement('div');w.innerHTML=items.map(x=>noteCard(x)).join('');groups.push({title:`${g} ${ey} ${SJ[id].name} 요점 노트<small>${NM_RNG[NM.range]} · ${items.length}개 · ${SJ[id].book||''}</small>`,els:[...w.children]})}}finally{SUBNAME=keepN}
