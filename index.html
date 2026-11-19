@@ -6033,7 +6033,7 @@ const padDarkTheme=()=>{const D=document.documentElement;return D.dataset.theme=
 const padBgMode=()=>LS.get('m12-padbg',/SamsungBrowser/i.test(navigator.userAgent)?'dark':'auto');
 const padDark=()=>{const m=padBgMode();return m==='dark'||(m==='auto'&&padDarkTheme())};
 const padCol=(t,dk)=>{if(!t)return dk?'#f1f3f8':'#1b1f2e';if(t[0]==='#')return t==='#1b1f2e'?(dk?'#f1f3f8':t):t;const x=PADC.find(c=>c[0]===t);return x?(dk?x[2]:x[1]):(dk?'#f1f3f8':'#1b1f2e')};
-const PADT=Object.assign({tool:'p',color:'ink',po:false},LS.get('m12-padt',{}));if(!PADC.some(c=>c[0]===PADT.color))PADT.color='ink';PADT.w=Object.assign({p:5,h:28,e:36,l:5},PADT.w||{});if(PADT.poAuto){PADT.po=false;PADT.poAuto=false}
+const PADT=Object.assign({tool:'p',color:'green',po:false},LS.get('m12-padt',{}));if(!PADC.some(c=>c[0]===PADT.color))PADT.color='ink';PADT.w=Object.assign({p:5,h:28,e:36,l:5},PADT.w||{});if(!PADT.v2){PADT.v2=1;PADT.color='green';PADT.w.p=2}/* 2차 기본값: 펜은 가는 초록(도형은 검정/흰색·보라라 구분됨) */if(PADT.poAuto){PADT.po=false;PADT.poAuto=false}
 const padOn=()=>PAD_SUBJ.includes(CUR);
 const padKey=(id,seed)=>SK()+'|'+id+'|'+seed;
 let _pdb=null;
