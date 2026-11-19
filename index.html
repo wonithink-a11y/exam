@@ -7462,7 +7462,7 @@ ST('kor',[
  ex:[{t:'“너는 왜 맨날 그 모양이야?”를 존중하는 말로 바꾸면?',a:'“오늘 일이 잘 안 풀려서 걱정이 돼. 도와줄 수 있는 게 있을까?”'}],
  go:['kg-deep','km-case','ks-case']}]);
 })();
-const NO={hide:false,weak:LS.get('m12-ntweak',false)};
+const NO={hide:false,weak:LS.get('m12-ntweak',false)};const NM={on:false,subs:null,range:LS.get('m12-ntrange','final')};
 /* 소단원별 정답률 (단원 현황과 같은 기록 allS) → {u:[푼 수, 맞힌 수]} */
 function ntAcc(){const A=allS(),acc={};T.forEach(t=>{const r=A.t[t.id];if(r){const a=acc[t.u]||(acc[t.u]=[0,0]);a[0]+=r[0];a[1]+=r[1]}});return acc}
 const v_open=()=>document.querySelectorAll('#v-note details').forEach(d=>d.open=true);
@@ -7481,24 +7481,34 @@ function noteCard(x,badge){badge=badge||(()=>'');return `<article class="es nt${
  ${(x.ex||[]).map((e,i)=>`<details class="ex ntx"${x.st&&!i?' open':''}><summary>예제 ${i+1}. ${e.t}</summary>${e.fig?`<figure class="fig">${e.fig()}</figure>`:''}<p>${e.a}</p></details>`).join('')}
  ${(x.go||[]).filter(id=>TYPE[id]).length?`<div class="bar ntg"><span class="muted">관련 유형 풀기</span>${x.go.filter(id=>TYPE[id]).map(id=>`<button class="chip" data-ntgo="${id}">${TYPE[id].name}</button>`).join('')}</div>`:''}</article>`}
 function renderNote(){const v=$('#v-note');if(!v)return;const all=((SJ[CUR]||{}).notes||[]).slice().sort((a,b)=>SUBS.indexOf(a.u)-SUBS.indexOf(b.u)),acc=ntAcc(),pc=u=>acc[u]&&acc[u][0]?acc[u][1]/acc[u][0]:null,rk=u=>{const q=pc(u);return q===null?.595:q<.6?q-1:q};let items=NO.all?all:all.filter(x=>sel.has(x.u));if(NO.weak)items=items.slice().sort((a,b)=>rk(a.u)-rk(b.u)||SUBS.indexOf(a.u)-SUBS.indexOf(b.u));const us=[...new Set(items.map(x=>x.u))],weakU=us.filter(u=>pc(u)!==null&&pc(u)<.6),badge=u=>{const q=pc(u);return q===null?'<span class="ntacc">미학습</span>':`<span class="ntacc${q<.6?' lo':''}">정답률 ${Math.round(q*100)}% · ${acc[u][0]}문제</span>`};
- v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${!all.length?'이 과목은 아직 요점 노트가 없습니다.':items.length?`${SJ[CUR].name} 요점 노트 ${items.length}개${NO.all?' (전체)':` (출제 범위 · 전체 ${all.length}개 중)`}. 소단원 이름을 누르면 바로 이동합니다. [공식 가리기]를 누르면 핵심이 가려지고, 가린 칸을 누르면 하나씩 보입니다.`:`선택한 출제 범위에 요점 노트가 없습니다. 위 [출제 범위]에서 소단원을 고르거나 전체 노트를 보세요.`}</span>${all.length?`<button class="btn sm" data-ntw="1" aria-pressed="${!!NO.weak}">${NO.weak?'교과서 순서로':'약한 단원 먼저'}</button>`:''}${all.length?`<button class="btn sm" data-nta="1" aria-pressed="${!!NO.all}">${NO.all?'출제 범위만 보기':`전체 노트 보기 (${all.length})`}</button>`:''}<span class="sp"></span>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button><button class="btn sm" data-ntp="1" title="지금 보이는 요점 노트를 A4 PDF로 저장해요 (출제 범위만 보기 상태면 그 범위만)">📄 PDF 저장·인쇄</button>`:''}</div>`+
+ v.innerHTML=`<div class="bar" style="margin-bottom:10px"><span class="muted">${!all.length?'이 과목은 아직 요점 노트가 없습니다.':items.length?`${SJ[CUR].name} 요점 노트 ${items.length}개${NO.all?' (전체)':` (출제 범위 · 전체 ${all.length}개 중)`}. 소단원 이름을 누르면 바로 이동합니다. [공식 가리기]를 누르면 핵심이 가려지고, 가린 칸을 누르면 하나씩 보입니다.`:`선택한 출제 범위에 요점 노트가 없습니다. 위 [출제 범위]에서 소단원을 고르거나 전체 노트를 보세요.`}</span>${all.length?`<button class="btn sm" data-ntw="1" aria-pressed="${!!NO.weak}">${NO.weak?'교과서 순서로':'약한 단원 먼저'}</button>`:''}${all.length?`<button class="btn sm" data-nta="1" aria-pressed="${!!NO.all}">${NO.all?'출제 범위만 보기':`전체 노트 보기 (${all.length})`}</button>`:''}<span class="sp"></span><button class="btn sm" data-ntm="1" aria-pressed="${NM.on}" title="여러 과목을 기말 범위 등으로 골라 한 파일로 저장">📚 여러 과목 PDF</button>${items.length?`<button class="btn sm" data-nth="1" aria-pressed="${NO.hide}">${NO.hide?'공식 모두 보이기':'공식 가리기'}</button><button class="btn sm" data-ntp="1" title="지금 보이는 요점 노트를 A4 PDF로 저장해요 (출제 범위만 보기 상태면 그 범위만)">📄 PDF 저장·인쇄</button>`:''}</div>`+(NM.on?ntMultiHTML():'')+
  (NO.weak&&items.length?`<div class="ntweak">${weakU.length?`<b>정답률 60% 미만 소단원 ${weakU.length}개</b>를 맨 앞에 놓았습니다. 그다음 아직 안 푼 단원, 잘하는 단원 순서입니다.`:Object.keys(acc).length?'<b>정답률 60% 미만인 소단원이 없습니다.</b> 아직 안 푼 단원과 정답률이 낮은 단원부터 보여 줍니다.':'<b>아직 푼 문제가 없습니다.</b> 연습·모의고사를 풀면 정답률이 낮은 단원의 노트부터 보여 줍니다.'}</div>`:'')+(us.length>1?`<nav class="bar ntnav" aria-label="소단원 바로가기">${us.map(u=>`<button class="chip${NO.weak&&weakU.includes(u)?' lo':''}" data-ntj="${items.find(x=>x.u===u).id}">${SUBNAME[u]||u}<small>${NO.weak?(pc(u)!==null?Math.round(pc(u)*100)+'%':'미학습'):items.filter(x=>x.u===u).length}</small></button>`).join('')}</nav>`:'')+
  items.map(x=>noteCard(x,badge)).join('')}
 $('#v-note').addEventListener('click',e=>{const f=e.target.closest('.nt.hide .f');if(f){f.classList.toggle('on');return}const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.ntm){NM.on=!NM.on;renderNote();return}
+ if(b.dataset.nm){const[a,v]=b.dataset.nm.split('|');if(a==='r'){NM.range=v;LS.set('m12-ntrange',v)}else if(a==='s'){NM.subs.has(v)?NM.subs.delete(v):NM.subs.add(v)}else if(a==='a'){NM.subs=new Set(v==='1'?Object.keys(SJ).filter(id=>((SJ[id].notes)||[]).length):[])}else if(a==='go'){ntMultiPdf(b);return}renderNote();return}
  if(b.dataset.ntw){NO.weak=!NO.weak;LS.set('m12-ntweak',NO.weak);renderNote()}else if(b.dataset.nta){NO.all=!NO.all;renderNote()}else if(b.dataset.nth){NO.hide=!NO.hide;renderNote()}else if(b.dataset.ntj){const el=document.getElementById('nt-'+b.dataset.ntj);if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'})}
  else if(b.dataset.ntp){notePdf(b)}else if(b.dataset.ntgo){newPractice(b.dataset.ntgo);show('practice');window.scrollTo({top:0})}});
 
 
 /* 요점 노트 PDF (A4 세로): 지금 보이는 노트 카드를 하나씩 이미지로 만들어 쪽에 차례로 채움. window.print()는 아티팩트(iframe)에서 막혀 PDF 저장 방식 사용 */
-async function notePdf(btn){if(_pdfBusy)return;const cards=[...document.querySelectorAll('#v-note article.nt')];if(!cards.length){pdfToast('인쇄할 요점 노트가 없어요. 출제 범위를 먼저 골라 주세요.');return}
- _pdfBusy=true;const lb=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='PDF 만드는 중…'}pdfToast('PDF를 만드는 중입니다…',true);let host;
+/* 과목별 범위에 맞는 요점 노트 목록: final=기말 범위, sel=내가 고른 출제 범위, all=전체 */
+function ntSubjItems(id,range){const sj=SJ[id],all=((sj&&sj.notes)||[]).slice();if(!all.length)return[];const subs=sj.units.flatMap(u=>u.subs.map(x=>x[0]));all.sort((a,b)=>subs.indexOf(a.u)-subs.indexOf(b.u));
+ if(range==='all')return all;let set=null;if(range==='final'){const r=FINAL_RANGE[SEM]&&FINAL_RANGE[SEM][id];set=r&&r.length?new Set(r):null}else{const sv=id===CUR?[...sel]:LS.get('m12-sel-'+SK(id),null);set=sv?new Set(sv):null}
+ return set?all.filter(x=>set.has(x.u)):all}
+const NM_RNG={final:'기말고사 범위',sel:'내가 고른 출제 범위',all:'전체 노트'};
+function ntMultiHTML(){const ids=Object.keys(SJ).filter(id=>((SJ[id].notes)||[]).length);if(!NM.subs)NM.subs=new Set(ids);
+ const cnt=id=>ntSubjItems(id,NM.range).length;
+ return `<div class="cfg ntmulti"><div class="bar"><b>📚 여러 과목 요점 PDF</b><span class="muted">과목과 범위를 골라 한 파일로 저장해요 (A4 세로, 과목마다 새 쪽에서 시작)</span></div>
+ <div class="bar"><span class="muted">범위</span>${Object.keys(NM_RNG).map(k=>`<button class="chip${NM.range===k?' on':''}" data-nm="r|${k}">${k==='final'?'📌 ':''}${NM_RNG[k]}</button>`).join('')}</div>
+ <div class="bar"><span class="muted">과목</span>${ids.map(id=>`<button class="chip${NM.subs.has(id)?' on':''}" data-nm="s|${id}">${SJ[id].name} <small>${cnt(id)}</small></button>`).join('')}<button class="chip" data-nm="a|1">전체 선택</button><button class="chip" data-nm="a|0">전체 해제</button></div>
+ <div class="bar"><span class="muted">${[...NM.subs].filter(id=>ids.includes(id)).reduce((n,id)=>n+cnt(id),0)}개 노트 선택됨</span><span class="sp"></span><button class="btn pri" data-nm="go|1">📄 PDF 만들기</button></div></div>`}
+async function ntPdfCore(groups,fname,btn){if(_pdfBusy)return;_pdfBusy=true;const lb=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='PDF 만드는 중…'}pdfToast('PDF를 만드는 중입니다…',true);let host;
  try{await loadPdfLibs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
   host=document.createElement('div');host.className='pp ntpdf';host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;width:760px;height:auto;padding:0;overflow:visible;background:#fff';
   const st=document.createElement('style');st.textContent=PDF_CSS+'.ntpdf{--f-body:inherit}.ntpdf .nt{margin:0;border:1px solid #bbb;box-shadow:none}.ntpdf .nt.hide .f{background:none!important;color:inherit!important}.ntpdf .ntg,.ntpdf .ntacc{display:none!important}.ntpdf .tw{overflow:visible}.ntpdf .nt .ntb{min-width:0}.ntpdf .ntpt{font:700 22px/1.3 var(--f-body);padding:6px 4px 10px;border-bottom:2px solid #111;margin-bottom:6px}.ntpdf .ntpt small{display:block;font:400 13px/1.4 var(--f-body);color:#555;margin-top:2px}';host.appendChild(st);
-  const [g,t,ey]=SEMNAME[SEM];
-  const rng=NO.all?'전체 노트':(finalOn()?'기말고사 범위':'선택한 출제 범위');
-  const head=document.createElement('div');head.innerHTML=`<div class="ntpt">${g} ${ey} ${SJ[CUR].name} 요점 노트<small>${rng} · ${cards.length}개 · ${SJ[CUR].book||''}</small></div>`;host.appendChild(head.firstChild);
-  cards.forEach(c=>{const k=c.cloneNode(true);k.classList.remove('hide');k.querySelectorAll('details').forEach(d=>d.open=true);k.querySelectorAll('.ntg,.ntacc').forEach(x=>x.remove());k.style.cssText='margin:0 0 8px';host.appendChild(k)});
+  groups.forEach(gr=>{const h=document.createElement('div');h.className='ntpt';h.dataset.np='1';h.innerHTML=gr.title;host.appendChild(h);
+   gr.els.forEach(c=>{const k=c.cloneNode(true);k.classList.remove('hide');k.querySelectorAll('details').forEach(d=>d.open=true);k.querySelectorAll('.ntg,.ntacc').forEach(x=>x.remove());k.style.cssText='margin:0 0 8px';host.appendChild(k)})});
   document.body.appendChild(host);
   const {jsPDF}=window.jspdf,doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true}),PW=210,PH=297,M=10,CW=PW-2*M,CH=PH-2*M-4,pxmm=760/CW,capPx=CH*pxmm;let y=0;
   const parts=[...host.children].filter(x=>x.tagName!=='STYLE');let n=0;
@@ -7506,6 +7516,7 @@ async function notePdf(btn){if(_pdfBusy)return;const cards=[...document.querySel
    if(h<=CH){if(y>0&&y+h>CH){doc.addPage();y=0}doc.addImage(cv.toDataURL('image/jpeg',.88),'JPEG',M,M+y,CW,h);y+=h+3}
    else{if(y>0){doc.addPage();y=0}const sh=Math.floor(CH/h*cv.height);for(let o=0;o<cv.height;o+=sh){const hh=Math.min(sh,cv.height-o),sc=document.createElement('canvas');sc.width=cv.width;sc.height=hh;sc.getContext('2d').drawImage(cv,0,o,cv.width,hh,0,0,cv.width,hh);if(o)doc.addPage();doc.addImage(sc.toDataURL('image/jpeg',.88),'JPEG',M,M,CW,hh/cv.width*CW);y=hh/cv.width*CW+3}}};
   for(const el of parts){n++;pdfToast(`PDF 만드는 중… ${n}/${parts.length}`,true);
+   if(el.dataset.np&&y>0)y=CH+1;
    const total=el.getBoundingClientRect().height,rem=(CH-y)*pxmm-6,kids=[...el.children];
    /* 카드가 남은 자리에 안 들어가면 내용 블록 단위로 쪼개서 이어 붙임(쪽 아래가 비지 않게) */
    if(!el.classList.contains('nt')||total<=rem||y===0||rem<capPx*.3||kids.length<2){await put(el);continue}
@@ -7515,10 +7526,21 @@ async function notePdf(btn){if(_pdfBusy)return;const cards=[...document.querySel
    for(let i=0;i<kids.length;i++){if(used+hs[i]>avail&&piece.length){await flush();y=CH;avail=capPx-6;used=over}piece.push(kids[i]);used+=hs[i]}
    await flush()}
   const tp=doc.getNumberOfPages();for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(9);doc.setTextColor(120);doc.text(`- ${i} / ${tp} -`,PW/2,PH-6,{align:'center'})}
-  const fn=`${SJ[CUR].name}_요점노트_${rng.replace(/\s/g,'')}.pdf`.replace(/[\\/:*?"<>|\s()]+/g,'_');const r2=await savePdf(doc.output('blob'),fn);
+  const fn=(fname+'.pdf').replace(/[\\/:*?"<>|\s()]+/g,'_');const r2=await savePdf(doc.output('blob'),fn);
   pdfToast(r2==='declined'?'저장을 취소했습니다.':`PDF를 저장했습니다 (${tp}쪽). A4 세로로 인쇄하세요.`)}
  catch(e){pdfToast('PDF를 만들지 못했습니다: '+(e&&e.message||e))}
  finally{if(host)host.remove();_pdfBusy=false;if(btn){btn.disabled=false;btn.textContent=lb}}}
+/* 지금 보이는 한 과목 노트 */
+async function notePdf(btn){const cards=[...document.querySelectorAll('#v-note article.nt')];if(!cards.length){pdfToast('인쇄할 요점 노트가 없어요. 출제 범위를 먼저 골라 주세요.');return}
+ const [g,t,ey]=SEMNAME[SEM],rng=NO.all?'전체 노트':(finalOn()?'기말고사 범위':'선택한 출제 범위');
+ return ntPdfCore([{title:`${g} ${ey} ${SJ[CUR].name} 요점 노트<small>${rng} · ${cards.length}개 · ${SJ[CUR].book||''}</small>`,els:cards}],`${SJ[CUR].name}_요점노트_${rng.replace(/\s/g,'')}`,btn)}
+/* 여러 과목: 고른 과목·범위의 노트를 한 파일로 */
+async function ntMultiPdf(btn){const ids=Object.keys(SJ).filter(id=>NM.subs&&NM.subs.has(id)&&((SJ[id].notes)||[]).length);if(!ids.length){pdfToast('과목을 하나 이상 골라 주세요.');return}
+ const [g,t,ey]=SEMNAME[SEM],keepN=SUBNAME,groups=[];
+ try{for(const id of ids){const items=ntSubjItems(id,NM.range);if(!items.length)continue;SUBNAME=Object.fromEntries(SJ[id].units.flatMap(u=>u.subs));
+   const w=document.createElement('div');w.innerHTML=items.map(x=>noteCard(x)).join('');groups.push({title:`${g} ${ey} ${SJ[id].name} 요점 노트<small>${NM_RNG[NM.range]} · ${items.length}개 · ${SJ[id].book||''}</small>`,els:[...w.children]})}}finally{SUBNAME=keepN}
+ if(!groups.length){pdfToast('선택한 범위에 요점 노트가 없어요.');return}
+ return ntPdfCore(groups,`요점노트_${NM_RNG[NM.range].replace(/\s/g,'')}_${groups.length}과목`,btn)}
 /* ===== 서술형 (조건형 서술: 용어 포함 확인 + 모범답안 + 스스로 채점) ===== */
 const ES={ans:{},done:{},chk:{},kb:{}};
 /* 서술형 채점 기준표: <조건>의 (N점)을 배점으로 쓰고, 조건마다 충족 여부를 체크해 점수를 합산한다 (점수 표기가 없으면 균등 배분) */
