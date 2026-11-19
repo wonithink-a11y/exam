@@ -5983,12 +5983,13 @@ const flKey=()=>'m12-flag-'+SK();const flList=()=>LS.get(flKey(),[]);
 const flFind=(id,seed)=>flList().find(x=>x.id===id&&String(x.seed)===String(seed));
 const fesc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 /* 문제 아래 줄: AI 선생님에게 묻기 · 📕 교과서 · ✏️ 풀이칸(수학 외 과목은 기본 접힘) */
-const PADOPEN=new Set();
-const padWant=it=>{try{if(!padOn())return false;if(CUR==='math')return true;const k=padKey(it.id,it.seed);return PADOPEN.has(k)||padHas(PADS.get(k))}catch(e){return false}};
-function padToggleBtn(it){try{if(!padOn()||CUR==='math')return'';const k=padKey(it.id,it.seed),on=padWant(it);return `<button class="btn sm" data-padopen="${k}">${on?'✏️ 풀이칸 접기':'✏️ 풀이칸 펼치기'}</button>`}catch(e){return''}}
+const PADOPEN=new Set(),PADCLOSE=new Set();
+/* 수학: 도형·그림이 있는 문제만 풀이칸을 처음부터 펼친다. 그 밖의 문제는 접어 두고 '풀이칸 펼치기'를 눌렀을 때만 연다(쓴 풀이가 있으면 펼침). */
+const padWant=it=>{try{if(!padOn())return false;const k=padKey(it.id,it.seed);if(PADOPEN.has(k)||padHas(PADS.get(k)))return true;return CUR==='math'&&!PADCLOSE.has(k)&&!!(it.d&&it.d.fig)}catch(e){return false}};
+function padToggleBtn(it){try{if(!padOn())return'';const k=padKey(it.id,it.seed),on=padWant(it);return `<button class="btn sm" data-padopen="${k}">${on?'✏️ 풀이칸 접기':'✏️ 풀이칸 펼치기'}</button>`}catch(e){return''}}
 const aiBar=it=>`<div class="aibar"><button class="aibtn" data-ai="q">AI 선생님에게 묻기</button></div>${tbkQBtn(it)}${padToggleBtn(it)}`;
 function padSet(w,open){const art=w.closest('article'),qsp=w.closest('.qsp');w.hidden=!open;if(qsp)qsp.classList.toggle('hp',open);if(art){const b=art.querySelector('[data-padopen]');if(b)b.textContent=open?'✏️ 풀이칸 접기':'✏️ 풀이칸 펼치기'}}
-document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-padopen]');if(!b)return;const art=b.closest('article'),w=art&&art.querySelector('.padwrap');if(!w)return;const open=w.hidden;if(open)PADOPEN.add(b.dataset.padopen);else PADOPEN.delete(b.dataset.padopen);padSet(w,open)});
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-padopen]');if(!b)return;const art=b.closest('article'),w=art&&art.querySelector('.padwrap');if(!w)return;const open=w.hidden;if(open){PADOPEN.add(b.dataset.padopen);PADCLOSE.delete(b.dataset.padopen)}else{PADOPEN.delete(b.dataset.padopen);PADCLOSE.add(b.dataset.padopen)}padSet(w,open)});
 function flagBar(it){try{const f=flFind(it.id,it.seed);return `<span class="qfr"><button class="btn sm flagbtn${f?' on':''}" data-flag="${it.id}|${it.seed}">${f?'🚩 확인 표시됨':'🚩 확인할 문제로 표시'}</button></span>`}catch(e){return''}}
 function flText(id,seed){const d=gen(id,seed),t=document.createElement('div'),tx=h=>{t.innerHTML=h==null?'':String(h);return t.textContent.replace(/\s+/g,' ').trim()};
  return d.sa?`${tx(d.q)} / 모범 답안: ${tx(d.model)}`:`${tx(d.q)} / 보기: ${(d.opts||[]).map(tx).join(' | ')} / 정답: ${tx(d.ans)}`}
